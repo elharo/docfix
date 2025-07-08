@@ -86,4 +86,20 @@ public class DocFixTest {
         assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
     }
 
+    /**
+     * Test that DocFix.main applies fixes to a file given as a command line argument.
+     * This test should fail until the main method is implemented.
+     */
+    @Test
+    public void testMainFixesFile() throws IOException {
+        Path file = Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java");
+        Path tempFile = Files.createTempFile("ComplexNumberMain", ".java");
+        Files.writeString(tempFile, Files.readString(file, StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        String[] args = { tempFile.toString() };
+        DocFix.main(args);
+        String fixed = Files.readString(tempFile, StandardCharsets.UTF_8);
+        assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+    }
+
 }
