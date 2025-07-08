@@ -7,6 +7,9 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +70,18 @@ public class DocFixTest {
     @Test
     public void testDocFix_noInitialCaps_anotherMethod() {
         String fixed = DocFix.fix(code);
+        assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+    }
+
+    // Now let's see if we can load a file rather than a resource
+    @Test
+    public void testLoadFile() throws IOException {
+        Path file = Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java");
+        Path tempFile = Files.createTempFile("ComplexNumber", ".java");
+        Files.writeString(tempFile, Files.readString(file, StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        DocFix.fix(tempFile);
+        String fixed = Files.readString(tempFile, StandardCharsets.UTF_8);
         assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
         assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
     }
