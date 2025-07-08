@@ -1,5 +1,6 @@
 package com.elharo.docfix;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
