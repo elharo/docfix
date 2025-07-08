@@ -66,9 +66,9 @@ public class DocFixTest {
      */
     @Test
     public void testDocFix_noInitialCaps_anotherMethod() {
-        //String fixed = DocFix.fix(code);
-        // assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-        //assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        String fixed = DocFix.fix(code);
+        assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
     }
 
 }
