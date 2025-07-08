@@ -126,4 +126,32 @@ public class DocFixTest {
         }
     }
 
+    /** 
+     * At this point, I notice that I haven't actually tested that none .java files are not modified.
+     * Let's add a test for that.
+     */
+    @Test
+    public void testDocFix_noModificationOfNonJavaFiles() throws IOException {
+        Path file1 = Files.createTempFile("ComplexNumber1", ".java");
+        Path file2 = Files.createTempFile("ComplexNumber2", ".java");
+        Path file3 = Files.createTempFile("ComplexNumber3", ".txt");
+        String original = Files.readString(Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java"), StandardCharsets.UTF_8);
+        Files.writeString(file1, original, StandardCharsets.UTF_8);
+        Files.writeString(file2, original, StandardCharsets.UTF_8);
+        Path dir = Files.createTempDirectory("docfix_test_dir");
+        Files.move(file1, dir.resolve(file1.getFileName()));
+        Files.move(file2, dir.resolve(file2.getFileName()));
+        String[] args = { dir.toString() };
+        DocFix.main(args);
+        for (Path file : Files.newDirectoryStream(dir, "*.java")) {
+            String fixed = Files.readString(file, StandardCharsets.UTF_8);
+            assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        }
+        for (Path file : Files.newDirectoryStream(dir, "*.txt")) {
+            String fixed = Files.readString(file, StandardCharsets.UTF_8);
+            assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertFalse(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        }
+    }
 }
