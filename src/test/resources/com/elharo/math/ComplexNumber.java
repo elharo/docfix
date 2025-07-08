@@ -26,8 +26,8 @@ public class ComplexNumber implements Cloneable {
     /**
      * Constructs a complex number with the specified real and imaginary parts.
      *
-     * @param real the real part
-     * @param imaginary the imaginary part
+     * @param real The real part
+     * @param imaginary The imaginary part
      */
     public ComplexNumber(double real, double imaginary) {
         this.real = real;
@@ -37,7 +37,7 @@ public class ComplexNumber implements Cloneable {
     /**
      * Returns the real part of this complex number.
      *
-     * @return the real part
+     * @return The real part
      */
     public double getReal() {
         return real;
@@ -89,7 +89,7 @@ public class ComplexNumber implements Cloneable {
      *
      * @param other the complex number to divide by
      * @return the quotient as a new ComplexNumber
-     * @throws ArithmeticException if the divisor is zero
+     * @throws ArithmeticException If the divisor is zero
      */
     public ComplexNumber divide(ComplexNumber other) {
         double denominator = other.real * other.real + other.imaginary * other.imaginary;
@@ -102,18 +102,18 @@ public class ComplexNumber implements Cloneable {
     }
 
     /**
-     * Returns the absolute value (modulus) of this complex number.
+     * Returns the absolute value (modulus) of this complex number
      *
-     * @return the absolute value
+     * @return the absolute value.
      */
     public double abs() {
         return Math.hypot(real, imaginary);
     }
 
     /**
-     * Returns a string representation of this complex number.
+     * Returns a string representation of this complex number
      *
-     * @return a string in the form "a + bi" or "a - bi"
+     * @return a string in the form "a + bi" or "a - bi".
      */
     @Override
     public String toString() {
@@ -128,6 +128,7 @@ public class ComplexNumber implements Cloneable {
      * Indicates whether some other object is equal to this one.
      *
      * @param obj the reference object with which to compare
+     * 
      * @return true if this object is the same as the obj argument; false otherwise
      */
     @Override
@@ -156,7 +157,7 @@ public class ComplexNumber implements Cloneable {
     /**
      * Creates and returns a copy of this complex number.
      *
-     * @return a clone of this instance
+     * @return a clone of this Instance
      */
     @Override
     public ComplexNumber clone() {
