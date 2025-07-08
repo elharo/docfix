@@ -34,7 +34,7 @@ public class DocFixTest {
     /**
      * Test that ComplexNumber.java contains the string "ChatGPT".
      * Mostly this just verifies that we can read a test resource as a
-     * prerequisite for tests fo the functionality. This is traditionally
+     * prerequisite for tests of the functionality. This is traditionally
      * a rather tricky thing to make work, and one I almost always have trouble with.
      * Copilot+ChatGPT did a pretty good job here.
      */
@@ -45,7 +45,7 @@ public class DocFixTest {
 
     /** 
      * I need to think about the API now. This is where TDD shines.
-     * Probably what we really want is a method that takes as an argument
+     * Probably all I really want is a method that takes as an argument
      * a string containing the code and returns a string containing the fixed code.
      * I can add overloaded variants that take a file, input stream, or reader.
      * I would have come up with something much more complex if I jumped straight to implementation.
@@ -53,8 +53,8 @@ public class DocFixTest {
     @Test
     public void testDocFix_noInitialCaps() {
         String fixed = DocFix.fix(code);
-        assertFalse(code.contains("     * The real part of the complex number.\n"));
-        assertTrue(code.contains("     * the real part of the complex number.\n"));
+        assertFalse(fixed, fixed.contains("     * The real part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * the real part of the complex number.\n"));
     }
 
 }
