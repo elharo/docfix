@@ -127,7 +127,7 @@ public class DocFixTest {
     }
 
     /** 
-     * At this point, I notice that I haven't actually tested that none .java files are not modified.
+     * At this point, I notice that I haven't actually tested that no .java files are not modified.
      * Let's add a test for that.
      */
     @Test
@@ -152,6 +152,30 @@ public class DocFixTest {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
             assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
             assertFalse(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        }
+    }
+
+    /**
+     * Now lets add subdirectories and recursion.
+     * I started this one with theb LLM but I realized it was trivial to do by hand
+     * with some copy pasta and then passing a parent directory to the main method.
+     */
+    @Test
+    public void testMainFixesSubDirectories() throws IOException {
+        Path file1 = Files.createTempFile("ComplexNumber1", ".java");
+        Path file2 = Files.createTempFile("ComplexNumber2", ".java");
+        String original = Files.readString(Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java"), StandardCharsets.UTF_8);
+        Files.writeString(file1, original, StandardCharsets.UTF_8);
+        Files.writeString(file2, original, StandardCharsets.UTF_8);
+        Path dir = Files.createTempDirectory("docfix_test_dir");
+        Files.move(file1, dir.resolve(file1.getFileName()));
+        Files.move(file2, dir.resolve(file2.getFileName()));
+        String[] args = { dir.getParent().getParent().toString() };
+        DocFix.main(args);
+        for (Path file : Files.newDirectoryStream(dir, "*.java")) {
+            String fixed = Files.readString(file, StandardCharsets.UTF_8);
+            assertFalse(fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertTrue(fixed.contains("     * the imaginary part of the complex number.\n"));
         }
     }
 }
