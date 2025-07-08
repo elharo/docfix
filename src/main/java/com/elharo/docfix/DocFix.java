@@ -7,6 +7,10 @@ import com.github.javaparser.ast.Node;
 // ChatGPT put this in the wrong package intially so the coe wouldn't compile.
 import com.github.javaparser.printer.configuration.PrettyPrinterConfiguration;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -49,5 +53,18 @@ public class DocFix {
         PrettyPrinterConfiguration conf = new PrettyPrinterConfiguration();
         conf.setEndOfLineCharacter("\n");
         return cu.toString(conf);
+    }
+
+    /**
+     * Fixes Javadoc comments in the provided Java source file so that the first letter
+     * of each doc comment is lower case. The file is modified in place.
+     *
+     * @param file the path to the Java source file
+     * @throws IOException if an I/O error occurs
+     */
+    public static void fix(Path file) throws IOException {
+        String code = Files.readString(file, StandardCharsets.UTF_8);
+        String fixed = fix(code);
+        Files.writeString(file, fixed, StandardCharsets.UTF_8);
     }
 }
