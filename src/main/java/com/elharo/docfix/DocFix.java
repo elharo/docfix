@@ -67,4 +67,18 @@ public class DocFix {
         String fixed = fix(code);
         Files.writeString(file, fixed, StandardCharsets.UTF_8);
     }
+
+    /**
+     * Main method that applies Javadoc fixes to the file specified as the first command line argument.
+     *
+     * @param args command line arguments; args[0] should be the path to the file to fix
+     */
+    public static void main(String[] args) throws IOException {
+        if (args.length < 1) {
+            System.err.println("Usage: DocFix <file>");
+            System.exit(1);
+        }
+        Path file = java.nio.file.Paths.get(args[0]);
+        fix(file);
+    }
 }
