@@ -80,11 +80,16 @@ public class DocFix {
         }
         Path path = java.nio.file.Paths.get(args[0]);
         if (Files.isDirectory(path)) {
-            try (java.nio.file.DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.java")) {
-                for (Path file : stream) {
-                    fix(file);
-                }
-            }
+            Files.walk(path, 3)
+                .filter(p -> !Files.isSymbolicLink(p))
+                .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
+                .forEach(p -> {
+                    try {
+                        fix(p);
+                    } catch (Exception e) {
+                        System.err.println("Failed to fix: " + p + ", " + e.getMessage());
+                    }
+                });
         } else {
             fix(path);
         }
