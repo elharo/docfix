@@ -57,4 +57,18 @@ public class DocFixTest {
         assertTrue(fixed, fixed.contains("     * the real part of the complex number.\n"));
     }
 
+    /** 
+     * Now I'll add another failing test and see what ChatGPT suggests.
+     * OK, not so great. Now it's just replacing two very specific strings.
+     * Let's do better.
+     * 
+     * We'll need to do a little work by hand.
+     */
+    @Test
+    public void testDocFix_noInitialCaps_anotherMethod() {
+        //String fixed = DocFix.fix(code);
+        // assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+        //assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+    }
+
 }

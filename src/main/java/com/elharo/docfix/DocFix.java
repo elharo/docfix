@@ -1,18 +1,53 @@
 package com.elharo.docfix;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.comments.JavadocComment;
+import com.github.javaparser.ast.Node;
+// ChatGPT put this in the wrong package intially so the coe wouldn't compile.
+import com.github.javaparser.printer.configuration.PrettyPrinterConfiguration;
+
+import java.util.Optional;
+
 /**
- * Utility class for fixing Javadoc comments to conform to conventions.
+ * Utility class for fixing Javadoc comments to conform to Oracle Javadoc conventions.
  */
 public class DocFix {
+
     /**
-     * Fixes Javadoc comments in the given code string.
-     * This minimal implementation lowercases the first letter of the field Javadoc.
+     * Fixes Javadoc comments in the provided code string so that the first letter
+     * of each doc comment is lower case.
      *
-     * @param code the input Java code
-     * @return the fixed Java code
+     * @param code the source code containing Javadoc comments
+     * @return the fixed source code
      */
     public static String fix(String code) {
-        // Replace the specific line as required by the test
-        return code.replace("The real part of the complex number", "the real part of the complex number");
+        JavaParser parser = new JavaParser();
+        CompilationUnit cu = parser.parse(code).getResult().orElse(null);
+        if (cu == null) return code;
+
+        cu.getAllContainedComments().forEach(comment -> {
+            if (comment instanceof JavadocComment) {
+                JavadocComment javadoc = (JavadocComment) comment;
+                String content = javadoc.getContent();
+                String[] lines = content.split("\r?\n");
+                for (int i = 0; i < lines.length; i++) {
+                    String line = lines[i];
+                    String trimmed = line.trim();
+                    if (trimmed.startsWith("* ") && trimmed.length() > 2) {
+                        char first = trimmed.charAt(2);
+                        if (Character.isUpperCase(first)) {
+                            // Lowercase the first letter after '* '
+                            lines[i] = line.replaceFirst("(\\* )([A-Z])", "$1" + Character.toLowerCase(first));
+                        }
+                    }
+                }
+                String newContent = String.join("\n", lines);
+                javadoc.setContent(newContent);
+            }
+        });
+        PrettyPrinterConfiguration conf = new PrettyPrinterConfiguration();
+        conf.setEndOfLineCharacter("\n");
+        return cu.toString(conf);
     }
 }
