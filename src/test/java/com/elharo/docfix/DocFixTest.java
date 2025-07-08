@@ -87,7 +87,7 @@ public class DocFixTest {
     }
 
     /**
-     * Test that DocFix.main applies fixes to a file given as a command line argument.
+     * Test that DocFix.main() applies fixes to a file given as a command line argument.
      * This test should fail until the main method is implemented.
      */
     @Test
@@ -103,7 +103,7 @@ public class DocFixTest {
     }
 
     /**
-     * Test that DocFix.main applies fixes to all files in a directory given as a command line argument.
+     * Test that DocFix.main() applies fixes to all files in a directory given as a command line argument.
      * The directory should contain two files to fix, and the test should verify that both files are fixed.
      * This test will fail until the main method is updated to support directories.
      */
@@ -121,8 +121,8 @@ public class DocFixTest {
         DocFix.main(args);
         for (Path file : Files.newDirectoryStream(dir, "*.java")) {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
-            assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-            assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+            assertFalse(fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertTrue(fixed.contains("     * the imaginary part of the complex number.\n"));
         }
     }
 
@@ -138,27 +138,31 @@ public class DocFixTest {
         String original = Files.readString(Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java"), StandardCharsets.UTF_8);
         Files.writeString(file1, original, StandardCharsets.UTF_8);
         Files.writeString(file2, original, StandardCharsets.UTF_8);
+        Files.writeString(file3, original, StandardCharsets.UTF_8);
         Path dir = Files.createTempDirectory("docfix_test_dir");
         Files.move(file1, dir.resolve(file1.getFileName()));
         Files.move(file2, dir.resolve(file2.getFileName()));
+        Files.move(file3, dir.resolve(file3.getFileName()));
         String[] args = { dir.toString() };
         DocFix.main(args);
         for (Path file : Files.newDirectoryStream(dir, "*.java")) {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
-            assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-            assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+            assertFalse(fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertTrue(fixed.contains("     * the imaginary part of the complex number.\n"));
         }
         for (Path file : Files.newDirectoryStream(dir, "*.txt")) {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
-            assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-            assertFalse(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+            assertTrue(fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertFalse(fixed.contains("     * the imaginary part of the complex number.\n"));
         }
     }
 
     /**
-     * Now lets add subdirectories and recursion.
-     * I started this one with theb LLM but I realized it was trivial to do by hand
+     * Now let's add subdirectories and recursion.
+     * I started this one with the LLM, but I realized it was trivial to do by hand
      * with some copy pasta and then passing a parent directory to the main method.
+     * Joke's on me. It wasn't nearly as trivial as it looked, and my efforts took
+     * some real debugging.
      */
     @Test
     public void testMainFixesSubDirectories() throws IOException {
@@ -168,9 +172,10 @@ public class DocFixTest {
         Files.writeString(file1, original, StandardCharsets.UTF_8);
         Files.writeString(file2, original, StandardCharsets.UTF_8);
         Path dir = Files.createTempDirectory("docfix_test_dir");
-        Files.move(file1, dir.resolve(file1.getFileName()));
-        Files.move(file2, dir.resolve(file2.getFileName()));
-        String[] args = { dir.getParent().getParent().toString() };
+        Path subdirectory = Files.createDirectories(dir.resolve("com/elharo/docfix"));
+        Files.move(file1, subdirectory.resolve(file1.getFileName()));
+        Files.move(file2, subdirectory.resolve(file2.getFileName()));
+        String[] args = { dir.toString() };
         DocFix.main(args);
         for (Path file : Files.newDirectoryStream(dir, "*.java")) {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);

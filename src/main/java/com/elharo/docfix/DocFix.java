@@ -85,8 +85,7 @@ public class DocFix {
                 .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
                 .forEach(p -> {
                     try {
-                        System.out.println("Fixing: " + p);
-                        // fix(p);
+                        fix(p);
                     } catch (Exception e) {
                         System.err.println("Failed to fix: " + p + ", " + e.getMessage());
                     }
