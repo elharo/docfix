@@ -41,4 +41,19 @@ public class DocFixTest {
     public void testComplexNumberResourceContainsChatGPT() {
         assertTrue("Resource does not contain 'ChatGPT'", code.contains("ChatGPT"));
     }
+
+    /** 
+     * I need to think about the API now. This is where TDD shines.
+     * Probably what we really want is a method that takes as an argument
+     * a string containing the code and returns a string containing the fixed code.
+     * I can add overloaded variants that take a file, input stream, or reader.
+     * I would have come up with something much more complex if I jumped straight to implementation.
+     */
+    @Test
+    public void testDocFix_noInitialCaps() {
+        String fixed = DocFix.fix(code);
+        assertFalse(code.contains("     * The real part of the complex number.\n"));
+        assertTrue(code.contains("     * the real part of the complex number.\n"));
+    }
+
 }
