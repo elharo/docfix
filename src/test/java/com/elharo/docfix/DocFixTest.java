@@ -102,4 +102,28 @@ public class DocFixTest {
         assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
     }
 
+    /**
+     * Test that DocFix.main applies fixes to all files in a directory given as a command line argument.
+     * The directory should contain two files to fix, and the test should verify that both files are fixed.
+     * This test will fail until the main method is updated to support directories.
+     */
+    @Test
+    public void testMainFixesDirectory() throws IOException {
+        Path file1 = Files.createTempFile("ComplexNumber1", ".java");
+        Path file2 = Files.createTempFile("ComplexNumber2", ".java");
+        String original = Files.readString(Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java"), StandardCharsets.UTF_8);
+        Files.writeString(file1, original, StandardCharsets.UTF_8);
+        Files.writeString(file2, original, StandardCharsets.UTF_8);
+        Path dir = Files.createTempDirectory("docfix_test_dir");
+        Files.move(file1, dir.resolve(file1.getFileName()));
+        Files.move(file2, dir.resolve(file2.getFileName()));
+        String[] args = { dir.toString() };
+        DocFix.main(args);
+        for (Path file : Files.newDirectoryStream(dir, "*.java")) {
+            String fixed = Files.readString(file, StandardCharsets.UTF_8);
+            assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        }
+    }
+
 }

@@ -75,10 +75,18 @@ public class DocFix {
      */
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
-            System.err.println("Usage: DocFix <file>");
+            System.err.println("Usage: java DocFix <file-or-directory>");
             System.exit(1);
         }
-        Path file = java.nio.file.Paths.get(args[0]);
-        fix(file);
+        Path path = java.nio.file.Paths.get(args[0]);
+        if (Files.isDirectory(path)) {
+            try (java.nio.file.DirectoryStream<Path> stream = Files.newDirectoryStream(path, "*.java")) {
+                for (Path file : stream) {
+                    fix(file);
+                }
+            }
+        } else {
+            fix(path);
+        }
     }
 }
