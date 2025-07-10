@@ -3,8 +3,12 @@ package com.elharo.docfix;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.comments.JavadocComment;
+import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration.ConfigOption;
 // ChatGPT put this in the wrong package intially so the code wouldn't compile.
 import com.github.javaparser.printer.configuration.PrettyPrinterConfiguration;
+import com.github.javaparser.printer.configuration.PrinterConfiguration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -48,9 +52,9 @@ public class DocFix {
                 javadoc.setContent(newContent);
             }
         });
-        PrettyPrinterConfiguration conf = new PrettyPrinterConfiguration();
-        conf.setEndOfLineCharacter("\n");
-        return cu.toString(conf);
+        DefaultPrinterConfiguration configuration = new DefaultPrinterConfiguration();
+        configuration.addOption(new DefaultConfigurationOption(ConfigOption.END_OF_LINE_CHARACTER, "\n"));
+        return cu.toString(configuration);
     }
 
     /**
