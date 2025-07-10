@@ -73,27 +73,58 @@ public class DocFix {
     /**
      * Main method that applies Javadoc fixes to the file specified as the first command line argument.
      *
-     * @param args command line arguments; args[0] should be the path to the file to fix
+     * @param args command line arguments; the last argument should be the path to the file to fix
      */
     public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
-            System.err.println("Usage: java DocFix <file-or-directory>");
+        int argIndex = 0;
+        if ("--dryrun".equals(args[0])) {
+            argIndex = 1;
+        }
+        if (args.length <= argIndex) {
+            System.err.println("Usage: java DocFix [--dryrun] <file-or-directory>");
             System.exit(1);
         }
-        Path path = java.nio.file.Paths.get(args[0]);
+
+        final boolean dryrun = "--dryrun".equals(args[0]);
+
+        Path path = java.nio.file.Paths.get(args[argIndex]);
         if (Files.isDirectory(path)) {
             Files.walk(path, 3)
                 .filter(p -> !Files.isSymbolicLink(p))
                 .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
                 .forEach(p -> {
                     try {
-                        fix(p);
+                        if (dryrun) {
+                            String original = Files.readString(p, StandardCharsets.UTF_8);
+                            String fixed = fix(original);
+                            if (!original.equals(fixed)) {
+                                System.out.println("==== " + p + " ====");
+                                System.out.println("--- original ---");
+                                System.out.println(original);
+                                System.out.println("--- fixed ---");
+                                System.out.println(fixed);
+                            }
+                        } else {
+                            fix(p);
+                        }
                     } catch (Exception e) {
                         System.err.println("Failed to fix: " + p + ", " + e.getMessage());
                     }
                 });
         } else {
-            fix(path);
+            if (dryrun) {
+                String original = Files.readString(path, StandardCharsets.UTF_8);
+                String fixed = fix(original);
+                if (!original.equals(fixed)) {
+                    System.out.println("==== " + path + " ====");
+                    System.out.println("--- original ---");
+                    System.out.println(original);
+                    System.out.println("--- fixed ---");
+                    System.out.println(fixed);
+                }
+            } else {
+                fix(path);
+            }
         }
     }
 }
