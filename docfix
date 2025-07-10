@@ -3,11 +3,5 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
-JAR_PATH="$PROJECT_ROOT/target/docfix-1.0-SNAPSHOT.jar"
 
-if [ ! -f "$JAR_PATH" ]; then
-  echo "docfix: JAR not found, building with Maven..." >&2
-  mvn -f "$PROJECT_ROOT/pom.xml" clean package || exit 1
-fi
-
-exec java -cp "$JAR_PATH" com.elharo.docfix.DocFix "$@"
+exec mvn -f "$PROJECT_ROOT/pom.xml" exec:java -Dexec.mainClass="com.elharo.docfix.DocFix" -Dexec.args="$*"
