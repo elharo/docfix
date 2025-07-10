@@ -6,9 +6,6 @@ import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration.ConfigOption;
-// ChatGPT put this in the wrong package intially so the code wouldn't compile.
-import com.github.javaparser.printer.configuration.PrettyPrinterConfiguration;
-import com.github.javaparser.printer.configuration.PrinterConfiguration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -98,11 +95,10 @@ public class DocFix {
                             String original = Files.readString(p, StandardCharsets.UTF_8);
                             String fixed = fix(original);
                             if (!original.equals(fixed)) {
-                                System.out.println("==== " + p + " ====");
-                                System.out.println("--- original ---");
-                                System.out.println(original);
-                                System.out.println("--- fixed ---");
-                                System.out.println(fixed);
+                                java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
+                                java.nio.file.Path relPath = cwd.relativize(p.toAbsolutePath());
+                                System.out.println(relPath);
+                                printChangedLines(original, fixed);
                             }
                         } else {
                             fix(p);
@@ -116,14 +112,34 @@ public class DocFix {
                 String original = Files.readString(path, StandardCharsets.UTF_8);
                 String fixed = fix(original);
                 if (!original.equals(fixed)) {
-                    System.out.println("==== " + path + " ====");
-                    System.out.println("--- original ---");
-                    System.out.println(original);
-                    System.out.println("--- fixed ---");
-                    System.out.println(fixed);
+                    java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
+                    java.nio.file.Path relPath = cwd.relativize(path.toAbsolutePath());
+                    System.out.println(relPath);
+                    printChangedLines(original, fixed);
                 }
             } else {
                 fix(path);
+            }
+        }
+    }
+
+    /**
+     * Prints only the changed lines between the original and fixed content, showing both old and new lines.
+     */
+    private static void printChangedLines(String original, String fixed) {
+        String[] origLines = original.split("\\r?\\n");
+        String[] fixedLines = fixed.split("\\r?\\n");
+        int max = Math.max(origLines.length, fixedLines.length);
+        for (int i = 0; i < max; i++) {
+            String origLine = i < origLines.length ? origLines[i] : "";
+            String fixedLine = i < fixedLines.length ? fixedLines[i] : "";
+            if (!origLine.equals(fixedLine)) {
+                if (!origLine.isEmpty()) {
+                    System.out.println(origLine);
+                }
+                if (!fixedLine.isEmpty()) {
+                    System.out.println(fixedLine);
+                }
             }
         }
     }
