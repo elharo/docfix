@@ -73,24 +73,19 @@ public class DocFix {
     /**
      * Main method that applies Javadoc fixes to the file specified as the first command line argument.
      *
-     * @param args command line arguments; args[0] should be the path to the file to fix
+     * @param args command line arguments; the last argument should be the path to the file to fix
      */
     public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
-            System.err.println("Usage: java DocFix <file-or-directory>");
-            System.exit(1);
-        }
-
-        boolean dryrun = false;
         int argIndex = 0;
         if ("--dryrun".equals(args[0])) {
-            dryrun = true;
             argIndex = 1;
         }
         if (args.length <= argIndex) {
             System.err.println("Usage: java DocFix [--dryrun] <file-or-directory>");
             System.exit(1);
         }
+
+        final boolean dryrun = "--dryrun".equals(args[0]);
 
         Path path = java.nio.file.Paths.get(args[argIndex]);
         if (Files.isDirectory(path)) {
