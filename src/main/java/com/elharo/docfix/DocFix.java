@@ -43,7 +43,7 @@ public class DocFix {
                     if (trimmed.startsWith("* ") && trimmed.length() > 2) {
                         char first = trimmed.charAt(2);
                         if (Character.isUpperCase(first)) {
-                            // Lowercase the first letter after '* '
+                            // Lowercase the first letter after the javadoc tag
                             lines[i] = line.replaceFirst("(\\* )([A-Z])", "$1" + Character.toLowerCase(first));
                         }
                     }
