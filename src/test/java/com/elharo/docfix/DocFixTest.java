@@ -4,8 +4,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -182,5 +184,37 @@ public class DocFixTest {
             assertFalse(fixed.contains("     * The imaginary part of the complex number.\n"));
             assertTrue(fixed.contains("     * the imaginary part of the complex number.\n"));
         }
+    }
+
+    /**
+     * Test that DocFix.main() with --dryrun prints the changes but does not modify the file.
+     */
+    @Test
+    public void testMainDryRunDoesNotModifyFiles() throws IOException {
+        Path file = Files.createTempFile("ComplexNumberDryRun", ".java");
+        String original = Files.readString(Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java"), StandardCharsets.UTF_8);
+        Files.writeString(file, original, StandardCharsets.UTF_8);
+
+        // Capture System.out
+        PrintStream oldOut = System.out;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(baos, true, StandardCharsets.UTF_8));
+
+        try {
+            String[] args = { "--dryrun", file.toString() };
+            DocFix.main(args);
+        } finally {
+            System.setOut(oldOut);
+        }
+
+        String after = Files.readString(file, StandardCharsets.UTF_8);
+        // File should not be changed
+        assertTrue(after.contains("     * The imaginary part of the complex number.\n"));
+        assertFalse(after.contains("     * the imaginary part of the complex number.\n"));
+
+        String output = baos.toString(StandardCharsets.UTF_8);
+        // Output should show the fix
+        assertTrue(output.contains("     * the imaginary part of the complex number."));
+        assertTrue(output.contains("     * The imaginary part of the complex number."));
     }
 }
