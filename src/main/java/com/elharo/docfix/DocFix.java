@@ -80,20 +80,56 @@ public class DocFix {
             System.err.println("Usage: java DocFix <file-or-directory>");
             System.exit(1);
         }
-        Path path = java.nio.file.Paths.get(args[0]);
+
+        boolean dryrun = false;
+        int argIndex = 0;
+        if ("--dryrun".equals(args[0])) {
+            dryrun = true;
+            argIndex = 1;
+        }
+        if (args.length <= argIndex) {
+            System.err.println("Usage: java DocFix [--dryrun] <file-or-directory>");
+            System.exit(1);
+        }
+
+        Path path = java.nio.file.Paths.get(args[argIndex]);
         if (Files.isDirectory(path)) {
             Files.walk(path, 3)
                 .filter(p -> !Files.isSymbolicLink(p))
                 .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
                 .forEach(p -> {
                     try {
-                        fix(p);
+                        if (dryrun) {
+                            String original = Files.readString(p, StandardCharsets.UTF_8);
+                            String fixed = fix(original);
+                            if (!original.equals(fixed)) {
+                                System.out.println("==== " + p + " ====");
+                                System.out.println("--- original ---");
+                                System.out.println(original);
+                                System.out.println("--- fixed ---");
+                                System.out.println(fixed);
+                            }
+                        } else {
+                            fix(p);
+                        }
                     } catch (Exception e) {
                         System.err.println("Failed to fix: " + p + ", " + e.getMessage());
                     }
                 });
         } else {
-            fix(path);
+            if (dryrun) {
+                String original = Files.readString(path, StandardCharsets.UTF_8);
+                String fixed = fix(original);
+                if (!original.equals(fixed)) {
+                    System.out.println("==== " + path + " ====");
+                    System.out.println("--- original ---");
+                    System.out.println(original);
+                    System.out.println("--- fixed ---");
+                    System.out.println(fixed);
+                }
+            } else {
+                fix(path);
+            }
         }
     }
 }
