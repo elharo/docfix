@@ -74,7 +74,7 @@ public class DocFix {
      */
     public static void main(String[] args) throws IOException {
         int argIndex = 0;
-        if ("--dryrun".equals(args[0])) {
+        if (args.length > 0 && "--dryrun".equals(args[0])) {
             argIndex = 1;
         }
         if (args.length <= argIndex) {
