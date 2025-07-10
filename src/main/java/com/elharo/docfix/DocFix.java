@@ -3,15 +3,13 @@ package com.elharo.docfix;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.comments.JavadocComment;
-import com.github.javaparser.ast.Node;
-// ChatGPT put this in the wrong package intially so the coe wouldn't compile.
+// ChatGPT put this in the wrong package intially so the code wouldn't compile.
 import com.github.javaparser.printer.configuration.PrettyPrinterConfiguration;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 /**
  * Utility class for fixing Javadoc comments to conform to Oracle Javadoc conventions.
