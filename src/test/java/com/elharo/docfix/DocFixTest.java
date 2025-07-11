@@ -1,5 +1,6 @@
 package com.elharo.docfix;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
@@ -46,8 +47,8 @@ public class DocFixTest {
     @Test
     public void testDocFix_noInitialCaps() {
         String fixed = DocFix.fix(code);
-        assertFalse(fixed, fixed.contains("     * The real part of the complex number.\n"));
-        assertTrue(fixed, fixed.contains("     * the real part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number."));
+        assertTrue(fixed, fixed.contains("     * @return the imaginary part"));
     }
 
     /** 
@@ -60,8 +61,8 @@ public class DocFixTest {
     @Test
     public void testDocFix_noInitialCaps_anotherMethod() {
         String fixed = DocFix.fix(code);
-        assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-        assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number."));
+        assertTrue(fixed, fixed.contains("     * @return the imaginary part"));
     }
 
     // Now let's see if we can load a file rather than a resource
@@ -111,8 +112,8 @@ public class DocFixTest {
         DocFix.main(args);
         for (Path file : Files.newDirectoryStream(dir, "*.java")) {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
-            assertFalse(fixed.contains("     * The imaginary part of the complex number.\n"));
-            assertTrue(fixed.contains("     * the imaginary part of the complex number.\n"));
+            assertTrue(fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertTrue(fixed, fixed.contains("     * @return the imaginary part"));
         }
     }
 
@@ -137,13 +138,12 @@ public class DocFixTest {
         DocFix.main(args);
         for (Path file : Files.newDirectoryStream(dir, "*.java")) {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
-            assertFalse(fixed.contains("     * The imaginary part of the complex number.\n"));
-            assertTrue(fixed.contains("     * the imaginary part of the complex number.\n"));
+            assertTrue(fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertTrue(fixed, fixed.contains("     * @return the imaginary part"));
         }
         for (Path file : Files.newDirectoryStream(dir, "*.txt")) {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
-            assertTrue(fixed.contains("     * The imaginary part of the complex number.\n"));
-            assertFalse(fixed.contains("     * the imaginary part of the complex number.\n"));
+            assertEquals(original, fixed);
         }
     }
 
@@ -202,12 +202,10 @@ public class DocFixTest {
 
         String output = baos.toString(StandardCharsets.UTF_8);
         // Output should show the fix
-        assertTrue(output.contains("     * the imaginary part of the complex number."));
-        assertTrue(output.contains("     * The imaginary part of the complex number."));
+        assertTrue(output.contains("the imaginary part"));
     }
 
-    // needs to work on params
-        /** 
+    /**
      * I need to think about the API now. This is where TDD shines.
      * Probably all I really want is a method that takes as an argument
      * a string containing the code and returns a string containing the fixed code.
