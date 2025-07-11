@@ -36,17 +36,6 @@ public class DocFixTest {
         }
     }
 
-    /**
-     * Test that ComplexNumber.java contains the string "ChatGPT".
-     * Mostly this just verifies that we can read a test resource as a
-     * prerequisite for tests of the functionality. This is traditionally
-     * a rather tricky thing to make work, and one I almost always have trouble with.
-     * Copilot+ChatGPT did a pretty good job here.
-     */
-    @Test
-    public void testComplexNumberResourceContainsChatGPT() {
-        assertTrue("Resource does not contain 'ChatGPT'", code.contains("ChatGPT"));
-    }
 
     /** 
      * I need to think about the API now. This is where TDD shines.
@@ -216,5 +205,20 @@ public class DocFixTest {
         // Output should show the fix
         assertTrue(output.contains("     * the imaginary part of the complex number."));
         assertTrue(output.contains("     * The imaginary part of the complex number."));
+    }
+
+    // needs to work on params
+        /** 
+     * I need to think about the API now. This is where TDD shines.
+     * Probably all I really want is a method that takes as an argument
+     * a string containing the code and returns a string containing the fixed code.
+     * I can add overloaded variants that take a file, input stream, or reader.
+     * I would have come up with something much more complex if I jumped straight to implementation.
+     */
+    @Test
+    public void testAtParam() {
+        String fixed = DocFix.fix(code);
+        assertFalse(fixed, fixed.contains("     * @param real The real part"));
+        assertTrue(fixed, fixed.contains("     * @param real the real part"));
     }
 }
