@@ -88,19 +88,41 @@ class DocComment {
    * @return the JavaDoc comment as a string
    */
   String toJava() {
+    // Try to preserve the indentation of the first line
+    String indent = "";
+    if (!blockTags.isEmpty() || (description != null && !description.isEmpty())) {
+      // Find indent from the first non-empty line
+      String[] lines = description.split("\\r?\\n");
+      if (lines.length > 0) {
+        int idx = 0;
+        while (idx < lines.length && lines[idx].trim().isEmpty()) idx++;
+        if (idx < lines.length) {
+          String line = lines[idx];
+          int nonSpace = 0;
+          while (nonSpace < line.length() && Character.isWhitespace(line.charAt(nonSpace))) nonSpace++;
+          indent = line.substring(0, nonSpace);
+        }
+      }
+    }
     StringBuilder sb = new StringBuilder();
     sb.append("/**\n");
     if (description != null && !description.isEmpty()) {
-      sb.append(" * ").append(description).append("\n");
-      if (!blockTags.isEmpty()) {
-        sb.append(" *\n");
+      sb.append(indent).append("     * ").append(description).append("\n");
+    }
+    if (!blockTags.isEmpty()) {
+      sb.append(indent).append("     *\n");
+      for (BlockTag tag : blockTags) {
+        sb.append(indent).append("     * @").append(tag.getType());
+        if (tag.getArgument() != null) {
+          sb.append(" ").append(tag.getArgument());
+        }
+        if (tag.getText() != null && !tag.getText().isEmpty()) {
+          sb.append(" ").append(tag.getText());
+        }
+        sb.append("\n");
       }
     }
-    for (BlockTag tag : blockTags) {
-      sb.append(tag.toJava());
-      sb.append("\n");
-    }
-    sb.append(" */");
+    sb.append(indent).append("     */");
     return sb.toString();
   }
 }
