@@ -205,11 +205,19 @@ public class DocFixTest {
         assertTrue(output.contains("     * the imaginary part of the complex number."));
         assertTrue(output.contains("     * The imaginary part of the complex number."));
     }
-    
+
     @Test
     public void testClassComment() {
         // TODO make fixed a fixture
         String fixed = DocFix.fix(code);
         assertTrue(fixed, fixed.contains("/**\n  * Represents a complex number in the field ℂ.\n */"));
+    }
+
+    // needs to work on params
+    @Test
+    public void testAtParam() {
+        String fixed = DocFix.fix(code);
+        assertFalse(fixed, fixed.contains("     * @param real The real part"));
+        assertTrue(fixed, fixed.contains("     * @param real the real part"));
     }
 }
