@@ -37,9 +37,9 @@ public class DocFix {
         for (Comment comment : allComments) {
             if (comment instanceof JavadocComment) {
                 JavadocComment javadoc = (JavadocComment) comment;
-                // javaparser really doesn't have a representation of the internal structure of Javadoc comments.
-                // It might be useful to create a class that does that.
-                String content = javadoc.getContent();
+                String content = comment.getContent();
+                // TODO how to determine the kind of Javadoc comment?
+                DocComment docComment = DocComment.parse(null, content);
                 String[] lines = content.split("\r?\n", -1); // preserve trailing empty lines
                 for (int i = 0; i < lines.length; i++) {
                     String line = lines[i];

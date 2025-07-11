@@ -36,7 +36,6 @@ public class DocFixTest {
         }
     }
 
-
     /** 
      * I need to think about the API now. This is where TDD shines.
      * Probably all I really want is a method that takes as an argument

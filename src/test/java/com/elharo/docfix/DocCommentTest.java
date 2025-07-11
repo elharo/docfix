@@ -58,4 +58,22 @@ public class DocCommentTest {
     assertEquals("the imaginary part", tags.get(1).getText());
     assertEquals("imaginary", tags.get(1).getArgument());
   }
+
+  @Test
+  public void testToJava() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + "     * constructs a complex number with the specified real and imaginary parts.\n"
+            + "     *\n"
+            + "     * @param real The real part\n"
+            + "     * @param imaginary the imaginary part\n"
+            + "     */");
+    String javaCode = docComment.toJava();
+    assertEquals("/**\n"
+     + "     * Constructs a complex number with the specified real and imaginary parts.\n"
+     + "     *\n"
+     + "     * @param real the real part\n"
+     + "     * @param imaginary the imaginary part\n"
+     + "     */", javaCode);
+  }
 }
