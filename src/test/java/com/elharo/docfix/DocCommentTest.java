@@ -3,6 +3,7 @@ package com.elharo.docfix;
 import static org.junit.Assert.assertEquals;
 
 import com.elharo.docfix.DocComment.Kind;
+import java.util.List;
 import org.junit.Test;
 
 public class DocCommentTest {
@@ -25,5 +26,15 @@ public class DocCommentTest {
             + "     */");
     assertEquals("Constructs a complex number with the specified real and imaginary parts.", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(2, tags.size());
+    assertEquals("param", tags.get(0).getType());
+    assertEquals("The real part", tags.get(0).getText());
+    assertEquals("real", tags.get(0).getArgument());
+    assertEquals("param", tags.get(1).getType());
+    assertEquals("The imaginary part", tags.get(1).getText());
+    assertEquals("imaginary", tags.get(1).getArgument());
+
   }
 }
