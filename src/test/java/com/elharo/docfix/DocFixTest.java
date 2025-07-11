@@ -1,5 +1,6 @@
 package com.elharo.docfix;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
@@ -36,7 +37,6 @@ public class DocFixTest {
         }
     }
 
-
     /** 
      * I need to think about the API now. This is where TDD shines.
      * Probably all I really want is a method that takes as an argument
@@ -47,8 +47,8 @@ public class DocFixTest {
     @Test
     public void testDocFix_noInitialCaps() {
         String fixed = DocFix.fix(code);
-        assertFalse(fixed, fixed.contains("     * The real part of the complex number.\n"));
-        assertTrue(fixed, fixed.contains("     * the real part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * The real part of the complex number.\n"));
+        assertFalse(fixed, fixed.contains("     * the real part of the complex number.\n"));
     }
 
     /** 
@@ -61,8 +61,8 @@ public class DocFixTest {
     @Test
     public void testDocFix_noInitialCaps_anotherMethod() {
         String fixed = DocFix.fix(code);
-        assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-        assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+        assertFalse(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
     }
 
     // Now let's see if we can load a file rather than a resource
@@ -118,7 +118,7 @@ public class DocFixTest {
     }
 
     /** 
-     * At this point, I notice that I haven't actually tested that no .java files are not modified.
+     * At this point, I notice that I haven't actually tested that non .java files are not modified.
      * Let's add a test for that.
      */
     @Test
@@ -136,15 +136,10 @@ public class DocFixTest {
         Files.move(file3, dir.resolve(file3.getFileName()));
         String[] args = { dir.toString() };
         DocFix.main(args);
-        for (Path file : Files.newDirectoryStream(dir, "*.java")) {
-            String fixed = Files.readString(file, StandardCharsets.UTF_8);
-            assertFalse(fixed.contains("     * The imaginary part of the complex number.\n"));
-            assertTrue(fixed.contains("     * the imaginary part of the complex number.\n"));
-        }
         for (Path file : Files.newDirectoryStream(dir, "*.txt")) {
+            String originalContent = Files.readString(file, StandardCharsets.UTF_8);
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
-            assertTrue(fixed.contains("     * The imaginary part of the complex number.\n"));
-            assertFalse(fixed.contains("     * the imaginary part of the complex number.\n"));
+            assertEquals(originalContent, fixed);
         }
     }
 
@@ -179,7 +174,7 @@ public class DocFixTest {
      * Test that DocFix.main() with --dryrun prints the changes but does not modify the file.
      */
     @Test
-    public void testMainDryRunDoesNotModifyFiles() throws IOException {
+    public void testMain_dryRunDoesNotModifyFiles() throws IOException {
         Path file = Files.createTempFile("ComplexNumberDryRun", ".java");
         String original = Files.readString(Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java"), StandardCharsets.UTF_8);
         Files.writeString(file, original, StandardCharsets.UTF_8);
@@ -198,23 +193,22 @@ public class DocFixTest {
 
         String after = Files.readString(file, StandardCharsets.UTF_8);
         // File should not be changed
-        assertTrue(after.contains("     * The imaginary part of the complex number.\n"));
-        assertFalse(after.contains("     * the imaginary part of the complex number.\n"));
+        assertEquals(original, after);
 
         String output = baos.toString(StandardCharsets.UTF_8);
         // Output should show the fix
-        assertTrue(output.contains("     * the imaginary part of the complex number."));
         assertTrue(output.contains("     * The imaginary part of the complex number."));
+        assertFalse(output.contains("     * the imaginary part of the complex number."));
+    }
+
+    @Test
+    public void testClassComment() {
+        // TODO make fixed a fixture
+        String fixed = DocFix.fix(code);
+        assertTrue(fixed, fixed.contains("/**\n  * Represents a complex number in the field ℂ.\n */"));
     }
 
     // needs to work on params
-        /** 
-     * I need to think about the API now. This is where TDD shines.
-     * Probably all I really want is a method that takes as an argument
-     * a string containing the code and returns a string containing the fixed code.
-     * I can add overloaded variants that take a file, input stream, or reader.
-     * I would have come up with something much more complex if I jumped straight to implementation.
-     */
     @Test
     public void testAtParam() {
         String fixed = DocFix.fix(code);

@@ -12,6 +12,9 @@
 
 package com.elharo.math;
 
+/**
+ * represents a complex number in the field ℂ.
+ */
 public class ComplexNumber implements Cloneable {
     /**
      * The real part of the complex number.
@@ -19,7 +22,7 @@ public class ComplexNumber implements Cloneable {
     private final double real;
 
     /**
-     * The imaginary part of the complex number.
+     * the imaginary part of the complex number.
      */
     private final double imaginary;
 
