@@ -39,6 +39,7 @@ class DocComment {
     boolean inBlockTags = false;
     for (String line : lines) {
       String trimmed = line.trim();
+      int indent = line.length() - trimmed.length();
       if (trimmed.startsWith("*")) {
         trimmed = trimmed.substring(1).trim();
       }
@@ -57,7 +58,7 @@ class DocComment {
           arg = null;
           text = parts.length > 1 ? parts[1] : "";
         }
-        blockTags.add(new BlockTag(type, arg, text));
+        blockTags.add(new BlockTag(type, arg, text, indent));
       } else if (!inBlockTags) {
         // Description lines before first block tag
         if (descBuilder.length() > 0) {
@@ -79,5 +80,27 @@ class DocComment {
 
   List<BlockTag> getBlockTags() {
     return blockTags;
+  }
+
+  /**
+   * Converts this DocComment to a JavaDoc comment string.
+   *
+   * @return the JavaDoc comment as a string
+   */
+  String toJava() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("/**\n");
+    if (description != null && !description.isEmpty()) {
+      sb.append(" * ").append(description).append("\n");
+      if (!blockTags.isEmpty()) {
+        sb.append(" *\n");
+      }
+    }
+    for (BlockTag tag : blockTags) {
+      sb.append(tag.toJava());
+      sb.append("\n");
+    }
+    sb.append(" */");
+    return sb.toString();
   }
 }

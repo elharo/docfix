@@ -8,8 +8,9 @@ class BlockTag {
   final String type; // e.g., param, return, throws, deprecated
   final String argument; // e.g., parameter name for @param, exception type for @throws, null otherwise
   final String text; // The text of the tag
+  private final int indent;
 
-  BlockTag(String type, String argument, String text) {
+  BlockTag(String type, String argument, String text, int indent) {
     this.type = type;
     this.argument = argument;
     if (text != null && !text.isEmpty()) {
@@ -18,6 +19,7 @@ class BlockTag {
     } else {
       this.text = text;
     }
+    this.indent = indent;
   }
 
   String getType() {
@@ -30,5 +32,20 @@ class BlockTag {
 
   String getArgument() {
     return argument;
+  }
+
+  String toJava() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < indent; i++) {
+      sb.append(' ');
+    }
+    sb.append("* @").append(type);
+    if (argument != null && !argument.isEmpty()) {
+      sb.append(" ").append(argument);
+    }
+    if (text != null && !text.isEmpty()) {
+      sb.append(" ").append(text);
+    }
+    return sb.toString();
   }
 }
