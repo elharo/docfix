@@ -12,7 +12,12 @@ class BlockTag {
   BlockTag(String type, String argument, String text) {
     this.type = type;
     this.argument = argument;
-    this.text = text;
+    if (text != null && !text.isEmpty()) {
+      char first = text.charAt(0);
+      this.text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
+    } else {
+      this.text = text;
+    }
   }
 
   String getType() {

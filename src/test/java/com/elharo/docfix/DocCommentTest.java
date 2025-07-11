@@ -30,10 +30,10 @@ public class DocCommentTest {
     List<BlockTag> tags = docComment.getBlockTags();
     assertEquals(2, tags.size());
     assertEquals("param", tags.get(0).getType());
-    assertEquals("The real part", tags.get(0).getText());
+    assertEquals("the real part", tags.get(0).getText());
     assertEquals("real", tags.get(0).getArgument());
     assertEquals("param", tags.get(1).getType());
-    assertEquals("The imaginary part", tags.get(1).getText());
+    assertEquals("the imaginary part", tags.get(1).getText());
     assertEquals("imaginary", tags.get(1).getArgument());
   }
 
@@ -43,8 +43,8 @@ public class DocCommentTest {
         "    /**\n"
             + "     * constructs a complex number with the specified real and imaginary parts.\n"
             + "     *\n"
-            + "     * @param real The real part\n"
-            + "     * @param imaginary The imaginary part\n"
+            + "     * @param real the real part\n"
+            + "     * @param imaginary the imaginary part\n"
             + "     */");
     assertEquals("Constructs a complex number with the specified real and imaginary parts.", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
@@ -52,10 +52,10 @@ public class DocCommentTest {
     List<BlockTag> tags = docComment.getBlockTags();
     assertEquals(2, tags.size());
     assertEquals("param", tags.get(0).getType());
-    assertEquals("The real part", tags.get(0).getText());
+    assertEquals("the real part", tags.get(0).getText());
     assertEquals("real", tags.get(0).getArgument());
     assertEquals("param", tags.get(1).getType());
-    assertEquals("The imaginary part", tags.get(1).getText());
+    assertEquals("the imaginary part", tags.get(1).getText());
     assertEquals("imaginary", tags.get(1).getArgument());
   }
 }
