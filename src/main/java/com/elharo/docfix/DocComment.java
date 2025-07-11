@@ -18,7 +18,7 @@ class DocComment {
     this.blockTags = blockTags;
   }
 
-  public static DocComment parse(String text) {
+  static DocComment parse(Kind kind, String text) {
     // Remove opening /** and closing */
     String trimmed = text.trim();
     if (trimmed.startsWith("/**")) {
@@ -40,10 +40,14 @@ class DocComment {
       desc.append(" ");
     }
     String description = desc.toString().trim();
-    return new DocComment(null, description, List.of());
+    return new DocComment(kind, description, List.of());
   }
 
-  public String getDescription() {
+  String getDescription() {
     return description;
+  }
+
+  Kind getKind() {
+    return kind;
   }
 }
