@@ -72,8 +72,8 @@ public class DocFixTest {
         Files.writeString(tempFile, Files.readString(file, StandardCharsets.UTF_8), StandardCharsets.UTF_8);
         DocFix.fix(tempFile);
         String fixed = Files.readString(tempFile, StandardCharsets.UTF_8);
-        assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-        assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number."));
+        assertTrue(fixed, fixed.contains("     * @return the imaginary part"));
     }
 
     /**
@@ -88,8 +88,8 @@ public class DocFixTest {
         String[] args = { tempFile.toString() };
         DocFix.main(args);
         String fixed = Files.readString(tempFile, StandardCharsets.UTF_8);
-        assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-        assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * @return the imaginary part"));
     }
 
     /**

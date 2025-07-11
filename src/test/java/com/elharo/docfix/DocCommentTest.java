@@ -60,6 +60,23 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testParse_return() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Returns a hash code value for this complex number.\n"
+            + "     *\n"
+            + "     * @return a hash code value\n"
+            + "     */\n");
+    assertEquals("Returns a hash code value for this complex number.", docComment.getDescription());
+    assertEquals(Kind.METHOD, docComment.getKind());
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(1, tags.size());
+    assertEquals("return", tags.get(0).getType());
+    assertEquals("a hash code value", tags.get(0).getText());
+  }
+
+  @Test
   public void testToJava() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "/**\n"
@@ -69,11 +86,10 @@ public class DocCommentTest {
             + "     * @param imaginary the imaginary part\n"
             + "     */");
     String javaCode = docComment.toJava();
-    assertEquals("/**\n"
-     + "     * Constructs a complex number with the specified real and imaginary parts.\n"
+    assertEquals("     * Constructs a complex number with the specified real and imaginary parts.\n"
      + "     *\n"
      + "     * @param real the real part\n"
-     + "     * @param imaginary the imaginary part\n"
-     + "     */", javaCode);
+     + "     * @param imaginary the imaginary part\n",
+     javaCode);
   }
 }

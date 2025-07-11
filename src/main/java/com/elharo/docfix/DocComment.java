@@ -57,6 +57,9 @@ class DocComment {
         if (type.equals("return") || type.equals("deprecated")) {
           arg = null;
           text = parts.length > 1 ? parts[1] : "";
+          if (parts.length > 2) {
+            text += " " + parts[2];
+          }
         }
         blockTags.add(new BlockTag(type, arg, text, indent));
       } else if (!inBlockTags) {
@@ -85,7 +88,7 @@ class DocComment {
   /**
    * Converts this DocComment to a JavaDoc comment string.
    *
-   * @return the JavaDoc comment as a string
+   * @return the JavaDoc comment as a string. Does not include the leading "/**" or trailing
    */
   String toJava() {
     // Try to preserve the indentation of the first line
@@ -105,7 +108,6 @@ class DocComment {
       }
     }
     StringBuilder sb = new StringBuilder();
-    sb.append("/**\n");
     if (description != null && !description.isEmpty()) {
       sb.append(indent).append("     * ").append(description).append("\n");
     }
@@ -122,7 +124,6 @@ class DocComment {
         sb.append("\n");
       }
     }
-    sb.append(indent).append("     */");
     return sb.toString();
   }
 }

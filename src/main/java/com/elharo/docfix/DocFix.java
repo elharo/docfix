@@ -40,43 +40,7 @@ public class DocFix {
                 String content = comment.getContent();
                 // TODO how to determine the kind of Javadoc comment?
                 DocComment docComment = DocComment.parse(null, content);
-                String[] lines = content.split("\r?\n", -1); // preserve trailing empty lines
-                for (int i = 0; i < lines.length; i++) {
-                    String line = lines[i];
-                    String trimmed = line.trim();
-                    // Only lowercase the first letter after @param, @return, @throws, etc. if it is uppercase
-                    if (trimmed.matches("\\* +@\\w+ +\\w+ +[A-Z].*")) {
-                        // Find the start of the tag value (after tag and param name)
-                        int atIdx = line.indexOf('@');
-                        if (atIdx != -1) {
-                            int tagEnd = line.indexOf(' ', atIdx); // after @param
-                            if (tagEnd != -1) {
-                                int paramStart = tagEnd + 1;
-                                // skip spaces
-                                while (paramStart < line.length() && line.charAt(paramStart) == ' ') paramStart++;
-                                // skip param name
-                                while (paramStart < line.length() && !Character.isWhitespace(line.charAt(paramStart))) paramStart++;
-                                // skip spaces before value
-                                while (paramStart < line.length() && Character.isWhitespace(line.charAt(paramStart))) paramStart++;
-                                if (paramStart < line.length()) {
-                                    char c = line.charAt(paramStart);
-                                    if (Character.isUpperCase(c)) {
-                                        StringBuilder sb = new StringBuilder(line);
-                                        sb.setCharAt(paramStart, Character.toLowerCase(c));
-                                        lines[i] = sb.toString();
-                                    }
-                                }
-                            }
-                        }
-                    } else if (trimmed.startsWith("* ") && trimmed.length() > 2 && !trimmed.startsWith("* @")) {
-                        char first = trimmed.charAt(2);
-                        if (Character.isUpperCase(first)) {
-                            lines[i] = line.replaceFirst("(\\* )([A-Z])", "$1" + Character.toLowerCase(first));
-                        }
-                    }
-                }
-                String newContent = String.join("\n", lines);
-                javadoc.setContent(newContent);
+                javadoc.setContent(docComment.toJava());
             }
         }
 
