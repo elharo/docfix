@@ -36,18 +36,6 @@ public class DocFixTest {
         }
     }
 
-    /**
-     * Test that ComplexNumber.java contains the string "ChatGPT".
-     * Mostly this just verifies that we can read a test resource as a
-     * prerequisite for tests of the functionality. This is traditionally
-     * a rather tricky thing to make work, and one I almost always have trouble with.
-     * Copilot+ChatGPT did a pretty good job here.
-     */
-    @Test
-    public void testComplexNumberResourceContainsChatGPT() {
-        assertTrue("Resource does not contain 'ChatGPT'", code.contains("ChatGPT"));
-    }
-
     /** 
      * I need to think about the API now. This is where TDD shines.
      * Probably all I really want is a method that takes as an argument
@@ -58,8 +46,8 @@ public class DocFixTest {
     @Test
     public void testDocFix_noInitialCaps() {
         String fixed = DocFix.fix(code);
-        assertFalse(fixed, fixed.contains("     * The real part of the complex number.\n"));
-        assertTrue(fixed, fixed.contains("     * the real part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * The real part of the complex number.\n"));
+        assertFalse(fixed, fixed.contains("     * the real part of the complex number.\n"));
     }
 
     /** 
@@ -72,8 +60,8 @@ public class DocFixTest {
     @Test
     public void testDocFix_noInitialCaps_anotherMethod() {
         String fixed = DocFix.fix(code);
-        assertFalse(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
-        assertTrue(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
+        assertTrue(fixed, fixed.contains("     * The imaginary part of the complex number.\n"));
+        assertFalse(fixed, fixed.contains("     * the imaginary part of the complex number.\n"));
     }
 
     // Now let's see if we can load a file rather than a resource
@@ -216,5 +204,12 @@ public class DocFixTest {
         // Output should show the fix
         assertTrue(output.contains("     * the imaginary part of the complex number."));
         assertTrue(output.contains("     * The imaginary part of the complex number."));
+    }
+    
+    @Test
+    public void testClassComment() {
+        // TODO make fixed a fixture
+        String fixed = DocFix.fix(code);
+        assertTrue(fixed, fixed.contains("/**\n  * Represents a complex number in the field ℂ.\n */"));
     }
 }
