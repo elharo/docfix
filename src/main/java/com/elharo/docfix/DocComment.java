@@ -15,7 +15,12 @@ class DocComment {
 
   DocComment(Kind kind, String description, List<BlockTag> blockTags) {
     this.kind = kind;
-    this.description = description;
+    if (description != null && !description.isEmpty()) {
+      char first = description.charAt(0);
+      this.description = Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1);
+    } else {
+      this.description = description;
+    }
     this.blockTags = blockTags;
   }
 
