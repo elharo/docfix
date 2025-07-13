@@ -65,7 +65,7 @@ class DocComment {
       } else if (!inBlockTags) {
         // Description lines before first block tag
         if (descBuilder.length() > 0) {
-          descBuilder.append(" ");
+          descBuilder.append("\n");
         }
         descBuilder.append(trimmed);
       }
