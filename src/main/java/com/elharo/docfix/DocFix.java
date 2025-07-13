@@ -1,5 +1,7 @@
 package com.elharo.docfix;
 
+import static com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter.setup;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.comments.Comment;
@@ -8,6 +10,7 @@ import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration.ConfigOption;
 
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,21 +35,24 @@ public class DocFix {
         if (compilationUnit == null) {
             return code;
         }
+        compilationUnit = setup(compilationUnit);
 
         List<Comment> allComments = compilationUnit.getAllContainedComments();
         for (Comment comment : allComments) {
             if (comment instanceof JavadocComment) {
                 JavadocComment javadoc = (JavadocComment) comment;
                 String content = comment.getContent();
-                // TODO how to determine the kind of Javadoc comment?
+                // TODO how to determine the kind of Javadoc comment? The node it's attached to
                 DocComment docComment = DocComment.parse(null, content);
                 javadoc.setContent(docComment.toJava());
             }
         }
 
-        DefaultPrinterConfiguration configuration = new DefaultPrinterConfiguration();
+        return LexicalPreservingPrinter.print(compilationUnit);
+
+      /*  DefaultPrinterConfiguration configuration = new DefaultPrinterConfiguration();
         configuration.addOption(new DefaultConfigurationOption(ConfigOption.END_OF_LINE_CHARACTER, "\n"));
-        return compilationUnit.toString(configuration);
+        return compilationUnit.toString(configuration);*/
     }
 
     /**
