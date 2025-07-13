@@ -1,6 +1,7 @@
 package com.elharo.docfix;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.elharo.docfix.DocComment.Kind;
 import java.util.List;
@@ -24,6 +25,10 @@ public class DocCommentTest {
             + "     * @param real The real part\n"
             + "     * @param imaginary The imaginary part\n"
             + "     */");
+    String java = docComment.toJava();
+    assertTrue(docComment.toString(), java.startsWith("     * Constructs"));
+    assertTrue(docComment.toString(), java.contains("     * @param real "));
+    assertTrue(docComment.toString(), java.contains("     *\n"));
     assertEquals("Constructs a complex number with the specified real and imaginary parts.", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
 

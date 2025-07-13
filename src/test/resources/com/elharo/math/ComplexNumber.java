@@ -1,3 +1,5 @@
+package com.elharo.math;
+
 /**
  * Represents a complex number with real and imaginary parts.
  * <p>
@@ -9,9 +11,6 @@
  * @author ChatGPT
  * @author Elliotte Rusty Harold
  */
-
-package com.elharo.math;
-
 public class ComplexNumber implements Cloneable {
     /**
      * The real part of the complex number.
