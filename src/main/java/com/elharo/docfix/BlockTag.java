@@ -34,6 +34,7 @@ class BlockTag {
     return argument;
   }
 
+  // TODO use or delete
   String toJava() {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < indent; i++) {
@@ -47,5 +48,10 @@ class BlockTag {
       sb.append(" ").append(text);
     }
     return sb.toString();
+  }
+
+  @Override
+  public String toString() {
+    return toJava();
   }
 }

@@ -125,4 +125,9 @@ class DocComment {
     sb.append(indent).append("     */");
     return sb.toString();
   }
+
+  @Override
+  public String toString() {
+      return toJava();
+  }
 }
