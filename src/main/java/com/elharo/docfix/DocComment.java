@@ -65,7 +65,7 @@ class DocComment {
       } else if (!inBlockTags) {
         // Description lines before first block tag
         if (descBuilder.length() > 0) {
-          descBuilder.append(" ");
+          descBuilder.append("\n");
         }
         descBuilder.append(trimmed);
       }
@@ -87,6 +87,8 @@ class DocComment {
 
   /**
    * Converts this DocComment to a JavaDoc comment string.
+   * The white space in this is a little off to account for weirdness
+   * in how javaparser serializes.
    *
    * @return the JavaDoc comment as a string. Does not include the leading "/**" or trailing
    */
@@ -102,19 +104,21 @@ class DocComment {
         if (idx < lines.length) {
           String line = lines[idx];
           int nonSpace = 0;
-          while (nonSpace < line.length() && Character.isWhitespace(line.charAt(nonSpace))) nonSpace++;
+          while (nonSpace < line.length() && Character.isWhitespace(line.charAt(nonSpace))) {
+              nonSpace++;
+          }
           indent = line.substring(0, nonSpace);
         }
       }
     }
     StringBuilder sb = new StringBuilder();
     if (description != null && !description.isEmpty()) {
-      sb.append(indent).append("     * ").append(description).append("\n");
+      sb.append(indent).append("     *").append(description).append("\n");
     }
     if (!blockTags.isEmpty()) {
       sb.append(indent).append("     *\n");
       for (BlockTag tag : blockTags) {
-        sb.append(indent).append("     * @").append(tag.getType());
+        sb.append(indent).append("     *@").append(tag.getType());
         if (tag.getArgument() != null) {
           sb.append(" ").append(tag.getArgument());
         }

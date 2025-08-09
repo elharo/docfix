@@ -218,4 +218,11 @@ public class DocFixTest {
         assertFalse(fixed, fixed.contains("     * @param real The real part"));
         assertTrue(fixed, fixed.contains("     * @param real the real part"));
     }
+
+    @Test
+    public void testClassComment() {
+        String fixed = DocFix.fix(code);
+        assertTrue(fixed, fixed.contains(" * Represents a complex number with real and imaginary parts."));
+        assertTrue(fixed, fixed.contains(" * @author ChatGPT"));
+    }
 }
