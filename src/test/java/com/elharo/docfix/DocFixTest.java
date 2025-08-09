@@ -222,7 +222,7 @@ public class DocFixTest {
     @Test
     public void testClassComment() {
         String fixed = DocFix.fix(code);
-        assertTrue(fixed, fixed.contains(" *  Represents a complex number with real and imaginary parts."));
+        assertTrue(fixed, fixed.contains(" * Represents a complex number with real and imaginary parts."));
         assertTrue(fixed, fixed.contains(" * @author ChatGPT"));
     }
 }
