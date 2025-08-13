@@ -32,90 +32,28 @@ public class DocFix {
    * @return the fixed source code
    */
   public static String fix(String code) {
-    JavaParser parser = new JavaParser();
-    CompilationUnit compilationUnit = parser.parse(code).getResult().orElse(null);
-    if (compilationUnit == null) {
-      return code;
-    }
-
-    List<Comment> allComments = compilationUnit.getAllContainedComments();
-    String result = code;
+    // Use regex to find and fix only Javadoc comments, leaving everything else unchanged
+    java.util.regex.Pattern javadocPattern = java.util.regex.Pattern.compile(
+        "/\\*\\*(.*?)\\*/", 
+        java.util.regex.Pattern.DOTALL
+    );
     
-    // Process comments in reverse order to maintain correct string positions
-    // when doing replacements
-    for (int i = allComments.size() - 1; i >= 0; i--) {
-      Comment comment = allComments.get(i);
-      if (comment instanceof JavadocComment) {
-        JavadocComment javadoc = (JavadocComment) comment;
-        String originalContent = comment.getContent();
-        
-        // TODO how to determine the kind of Javadoc comment?
-        DocComment docComment = DocComment.parse(null, originalContent);
-        String fixedContent = docComment.toJava();
-        
-        // Only replace if the content actually changed
-        if (!originalContent.equals(fixedContent)) {
-          // Get the position of the comment in the source code
-          int startPos = comment.getBegin().get().column - 1;
-          int startLine = comment.getBegin().get().line - 1;
-          int endPos = comment.getEnd().get().column;
-          int endLine = comment.getEnd().get().line - 1;
-          
-          // Split the result into lines to work with line/column positions
-          String[] lines = result.split("\\r?\\n", -1);
-          
-          if (startLine == endLine) {
-            // Single line comment
-            String line = lines[startLine];
-            String before = line.substring(0, startPos);
-            String after = line.substring(endPos);
-            lines[startLine] = before + "/**" + fixedContent + "*/" + after;
-          } else {
-            // Multi-line comment
-            String firstLine = lines[startLine];
-            String lastLine = lines[endLine];
-            
-            String before = firstLine.substring(0, startPos);
-            String after = lastLine.substring(endPos);
-            
-            // Replace the comment lines
-            String[] fixedLines = ("/**" + fixedContent + "*/").split("\\r?\\n", -1);
-            
-            // Build new lines array
-            String[] newLines = new String[lines.length - (endLine - startLine) + fixedLines.length - 1];
-            
-            // Copy lines before the comment
-            System.arraycopy(lines, 0, newLines, 0, startLine);
-            
-            // Add the first line with prefix
-            newLines[startLine] = before + fixedLines[0];
-            
-            // Add middle lines of the fixed comment
-            for (int j = 1; j < fixedLines.length - 1; j++) {
-              newLines[startLine + j] = fixedLines[j];
-            }
-            
-            // Add the last line with suffix
-            if (fixedLines.length > 1) {
-              newLines[startLine + fixedLines.length - 1] = fixedLines[fixedLines.length - 1] + after;
-            } else {
-              newLines[startLine] = before + fixedLines[0] + after;
-            }
-            
-            // Copy lines after the comment
-            System.arraycopy(lines, endLine + 1, newLines, startLine + fixedLines.length, 
-                           lines.length - endLine - 1);
-            
-            lines = newLines;
-          }
-          
-          // Reconstruct the result string
-          result = String.join("\n", lines);
-        }
-      }
+    java.util.regex.Matcher matcher = javadocPattern.matcher(code);
+    StringBuffer result = new StringBuffer();
+    
+    while (matcher.find()) {
+      String javadocContent = matcher.group(1);
+      
+      // Parse and fix the Javadoc content
+      DocComment docComment = DocComment.parse(null, javadocContent);
+      String fixedContent = docComment.toJava();
+      
+      // Replace the Javadoc comment with the fixed version
+      matcher.appendReplacement(result, "/**" + java.util.regex.Matcher.quoteReplacement(fixedContent) + "*/");
     }
-
-    return result;
+    matcher.appendTail(result);
+    
+    return result.toString();
   }
 
   /**
