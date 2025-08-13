@@ -1,17 +1,11 @@
 package com.elharo.docfix;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.comments.Comment;
-import com.github.javaparser.ast.comments.JavadocComment;
-import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
-import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
-import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration.ConfigOption;
-
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,40 +26,26 @@ public class DocFix {
    * @return the fixed source code
    */
   public static String fix(String code) {
-    JavaParser parser = new JavaParser();
-    CompilationUnit compilationUnit = parser.parse(code).getResult().orElse(null);
-    if (compilationUnit == null) {
-      return code;
-    }
-
-    List<Comment> allComments = compilationUnit.getAllContainedComments();
-    for (Comment comment : allComments) {
-      if (comment instanceof JavadocComment) {
-        JavadocComment javadoc = (JavadocComment) comment;
-        String content = comment.getContent();
-        // TODO how to determine the kind of Javadoc comment?
-        DocComment docComment = DocComment.parse(null, content);
-        javadoc.setContent(docComment.toJava());
-      }
-    }
-
-    DefaultPrinterConfiguration configuration = new DefaultPrinterConfiguration();
-    configuration.addOption(new DefaultConfigurationOption(ConfigOption.END_OF_LINE_CHARACTER, "\n"));
-    return compilationUnit.toString(configuration);
+    String[] lines = code.split("\\R");
+    List<String> fixedLines = FileParser.parseLines(Arrays.asList(lines));
+    return String.join("\n", fixedLines);
   }
 
   /**
-   * Fixes Javadoc comments in the provided Java source file so that the first
-   * letter
+   * Fixes Javadoc comments in the provided Java source file so that the first letter
    * of each doc comment is lower case. The file is modified in place.
    *
    * @param file the path to the Java source file
    * @throws IOException if an I/O error occurs
    */
   public static void fix(Path file) throws IOException {
-    String code = Files.readString(file, StandardCharsets.UTF_8);
-    String fixed = fix(code);
-    Files.writeString(file, fixed, StandardCharsets.UTF_8);
+    List<String> lines = FileParser.parseFile(file);
+    try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+      for (String line : lines) {
+        writer.write(line);
+        writer.write("\n");
+      }
+    }
   }
 
   /**

@@ -120,8 +120,8 @@ public class FileParserTest {
                 foundConstructorJavadoc = true;
                 assertTrue("Should contain @param real", line.contains("@param real"));
                 assertTrue("Should contain @param imaginary", line.contains("@param imaginary"));
-                assertTrue("Should preserve parameter descriptions", line.contains("The real part"));
-                assertTrue("Should preserve parameter descriptions", line.contains("The imaginary part"));
+                assertTrue("Should preserve parameter descriptions", line.contains("the real part"));
+                assertTrue("Should preserve parameter descriptions", line.contains("the imaginary part"));
                 break;
             }
         }
