@@ -1,7 +1,7 @@
 # docfix
 Fix Common Javadoc Problems
 
-DocFix is a Java utility that automatically fixes common Javadoc formatting issues to conform to Oracle Javadoc conventions. It ensures that Javadoc comments follow proper capitalization rules, particularly making sure that the first sentence and tag descriptions start with lowercase letters.
+DocFix is a Java utility that automatically fixes common Javadoc formatting issues to conform to [Oracle Javadoc conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html). It ensures that Javadoc comments follow proper capitalization rules, particularly making sure that the first sentence and tag descriptions start with lowercase letters.
 
 ## What it fixes
 

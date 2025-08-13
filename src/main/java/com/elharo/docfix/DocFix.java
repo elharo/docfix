@@ -15,7 +15,12 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Utility class for fixing Javadoc comments to conform to Oracle Javadoc conventions.
+ * Utility class for fixing Javadoc comments to conform to Oracle Javadoc
+ * guidelines.
+ * 
+ * @see <a href=
+ *      "https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html">How
+ *      to Write Doc Comments for the Javadoc Tool</a>
  */
 public class DocFix {
 
@@ -50,7 +55,8 @@ public class DocFix {
     }
 
     /**
-     * Fixes Javadoc comments in the provided Java source file so that the first letter
+     * Fixes Javadoc comments in the provided Java source file so that the first
+     * letter
      * of each doc comment is lower case. The file is modified in place.
      *
      * @param file the path to the Java source file
@@ -63,9 +69,11 @@ public class DocFix {
     }
 
     /**
-     * Main method that applies Javadoc fixes to the file specified as the first command line argument.
+     * Main method that applies Javadoc fixes to the file specified as the first
+     * command line argument.
      *
-     * @param args command line arguments; the last argument should be the path to the file to fix
+     * @param args command line arguments; the last argument should be the path to
+     *             the file to fix
      */
     public static void main(String[] args) throws IOException {
         int argIndex = 0;
@@ -82,26 +90,26 @@ public class DocFix {
         Path path = java.nio.file.Paths.get(args[argIndex]);
         if (Files.isDirectory(path)) {
             Files.walk(path, 3)
-                .filter(p -> !Files.isSymbolicLink(p))
-                .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
-                .forEach(p -> {
-                    try {
-                        if (dryrun) {
-                            String original = Files.readString(p, StandardCharsets.UTF_8);
-                            String fixed = fix(original);
-                            if (!original.equals(fixed)) {
-                                java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
-                                java.nio.file.Path relPath = cwd.relativize(p.toAbsolutePath());
-                                System.out.println(relPath);
-                                printChangedLines(original, fixed);
+                    .filter(p -> !Files.isSymbolicLink(p))
+                    .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
+                    .forEach(p -> {
+                        try {
+                            if (dryrun) {
+                                String original = Files.readString(p, StandardCharsets.UTF_8);
+                                String fixed = fix(original);
+                                if (!original.equals(fixed)) {
+                                    java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
+                                    java.nio.file.Path relPath = cwd.relativize(p.toAbsolutePath());
+                                    System.out.println(relPath);
+                                    printChangedLines(original, fixed);
+                                }
+                            } else {
+                                fix(p);
                             }
-                        } else {
-                            fix(p);
+                        } catch (Exception e) {
+                            System.err.println("Failed to fix: " + p + ", " + e.getMessage());
                         }
-                    } catch (Exception e) {
-                        System.err.println("Failed to fix: " + p + ", " + e.getMessage());
-                    }
-                });
+                    });
         } else {
             if (dryrun) {
                 String original = Files.readString(path, StandardCharsets.UTF_8);
@@ -119,7 +127,8 @@ public class DocFix {
     }
 
     /**
-     * Prints only the changed lines between the original and fixed content, showing both old and new lines.
+     * Prints only the changed lines between the original and fixed content, showing
+     * both old and new lines.
      */
     private static void printChangedLines(String original, String fixed) {
         String[] origLines = original.split("\\r?\\n");
