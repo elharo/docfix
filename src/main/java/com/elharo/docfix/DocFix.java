@@ -49,7 +49,7 @@ public class DocFix {
       String fixedContent = docComment.toJava();
       
       // Replace the Javadoc comment with the fixed version
-      matcher.appendReplacement(result, "/**" + java.util.regex.Matcher.quoteReplacement(fixedContent) + "*/");
+      matcher.appendReplacement(result, "/**\n" + java.util.regex.Matcher.quoteReplacement(fixedContent) + "     */");
     }
     matcher.appendTail(result);
     
