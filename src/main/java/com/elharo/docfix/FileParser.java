@@ -36,6 +36,8 @@ public class FileParser {
                 javadocBuilder.append(line);
                 
                 // If the comment doesn't end on the same line, continue reading
+                // TODO this is wrong. */ does not have to be last on the line though it usually is.
+                // This is a claude mistake.
                 if (!trimmed.endsWith("*/")) {
                     javadocBuilder.append("\n");
                     i++; // Move to next line
@@ -45,6 +47,7 @@ public class FileParser {
                         String currentLine = lines.get(i);
                         javadocBuilder.append(currentLine);
                         
+                        // TODO same mistake
                         if (currentLine.trim().endsWith("*/")) {
                             break;
                         }
