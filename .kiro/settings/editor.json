@@ -1,0 +1,10 @@
+{
+  "formatOnSave": true,
+  "formatOnType": false,
+  "java": {
+    "format": {
+      "enabled": true,
+      "formatter": "google-java-format"
+    }
+  }
+}

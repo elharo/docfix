@@ -1,0 +1,8 @@
+{
+  "java": {
+    "formatter": "google-java-format",
+    "options": {
+      "style": "google"
+    }
+  }
+}
