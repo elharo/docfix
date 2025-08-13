@@ -87,10 +87,8 @@ class DocComment {
 
   /**
    * Converts this DocComment to a JavaDoc comment string.
-   * The white space in this is a little off to account for weirdness
-   * in how javaparser serializes.
    *
-   * @return the JavaDoc comment as a string. Does not include the leading "/**" or trailing
+   * @return the JavaDoc comment as a string
    */
   String toJava() {
     // Try to preserve the indentation of the first line
@@ -112,13 +110,14 @@ class DocComment {
       }
     }
     StringBuilder sb = new StringBuilder();
+    sb.append(indent).append("/**\n");
     if (description != null && !description.isEmpty()) {
-      sb.append(indent).append("     *").append(description).append("\n");
+      sb.append(indent).append("     * ").append(description).append("\n");
     }
     if (!blockTags.isEmpty()) {
       sb.append(indent).append("     *\n");
       for (BlockTag tag : blockTags) {
-        sb.append(indent).append("     *@").append(tag.getType());
+        sb.append(indent).append("     * @").append(tag.getType());
         if (tag.getArgument() != null) {
           sb.append(" ").append(tag.getArgument());
         }
@@ -128,6 +127,7 @@ class DocComment {
         sb.append("\n");
       }
     }
+    sb.append(indent).append("*/\n");
     return sb.toString();
   }
 

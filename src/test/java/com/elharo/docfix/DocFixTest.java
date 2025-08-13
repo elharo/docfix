@@ -51,11 +51,17 @@ public class DocFixTest {
         assertTrue(fixed, fixed.contains("     * @return the imaginary part"));
     }
 
-    /** 
+    // #30
+    public void testDocFix_preservesSingleLineComments() {
+      String fixed = DocFix.fix(code);
+      assertTrue(fixed, fixed.contains("if (denominator == 0) { // Check for single line comment preservation"));
+    }
+
+    /**
      * Now I'll add another failing test and see what ChatGPT suggests.
      * OK, not so great. Now it's just replacing two very specific strings.
      * Let's do better.
-     * 
+     *
      * We'll need to do a little work by hand.
      */
     @Test
@@ -79,7 +85,6 @@ public class DocFixTest {
 
     /**
      * Test that DocFix.main() applies fixes to a file given as a command line argument.
-     * This test should fail until the main method is implemented.
      */
     @Test
     public void testMainFixesFile() throws IOException {
@@ -96,7 +101,6 @@ public class DocFixTest {
     /**
      * Test that DocFix.main() applies fixes to all files in a directory given as a command line argument.
      * The directory should contain two files to fix, and the test should verify that both files are fixed.
-     * This test will fail until the main method is updated to support directories.
      */
     @Test
     public void testMainFixesDirectory() throws IOException {
