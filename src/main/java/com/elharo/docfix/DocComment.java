@@ -61,7 +61,7 @@ class DocComment {
           i++;
           trimmed += "\n" + lines[i];
         }
-        BlockTag blockTag = parseBlockTag(trimmed, indent);
+        BlockTag blockTag = BlockTag.parse(trimmed, indent);
         blockTags.add(blockTag);
       } else if (!inBlockTags) {
         // Description lines before first block tag
@@ -72,29 +72,6 @@ class DocComment {
       }
     }
     return new DocComment(kind, descBuilder.toString(), blockTags, tagIndent);
-  }
-
-  // TODO move to BlockTag
-  private static BlockTag parseBlockTag(String trimmed, int indent) {
-    // Parse block tag: e.g. @param real The real part
-    String[] parts = trimmed.split(" ", 3);
-    String type = parts[0].substring(1); // remove '@'
-    String text = "";
-    // For tags like @return, no argument
-    String arg = null;
-    if (type.equals("return") || type.equals("deprecated")) {
-      if (parts.length > 1) {
-        text += parts[1];
-      }
-      if (parts.length > 2) {
-        text += " " + parts[2].trim();
-      }
-    } else {
-       arg = parts.length > 1 ? parts[1] : null;
-       text = parts.length > 2 ? parts[2].trim() : "";
-    }
-    BlockTag blockTag = new BlockTag(type, arg, text, indent);
-    return blockTag;
   }
 
   private static int findIndent(String raw) {

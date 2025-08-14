@@ -7,10 +7,10 @@ class BlockTag {
 
   private final String type; // e.g., param, return, throws, deprecated
   private final String argument; // e.g., parameter name for @param, exception type for @throws, null otherwise
-  String text; // The text of the tag
+  private final String text; // The text of the tag
   private final int indent;
 
-  BlockTag(String type, String argument, String text, int indent) {
+  private BlockTag(String type, String argument, String text, int indent) {
     this.type = type;
     this.argument = argument;
     if (text != null && !text.isEmpty() && shouldLowerCase(text)) {
@@ -20,6 +20,28 @@ class BlockTag {
       this.text = text;
     }
     this.indent = indent;
+  }
+
+  static BlockTag parse(String trimmed, int indent) {
+    // Parse block tag: e.g. @param real The real part
+    String[] parts = trimmed.split(" ", 3);
+    String type = parts[0].substring(1); // remove '@'
+    String text = "";
+    // For tags like @return, no argument
+    String arg = null;
+    if (type.equals("return") || type.equals("deprecated")) {
+      if (parts.length > 1) {
+        text += parts[1];
+      }
+      if (parts.length > 2) {
+        text += " " + parts[2].trim();
+      }
+    } else {
+       arg = parts.length > 1 ? parts[1] : null;
+       text = parts.length > 2 ? parts[2].trim() : "";
+    }
+    BlockTag blockTag = new BlockTag(type, arg, text, indent);
+    return blockTag;
   }
 
   // TODO handle title case ligatures
