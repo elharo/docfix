@@ -69,6 +69,20 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testParse_alignedBlockTags() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Constructs a complex number with the specified real and imaginary parts.\n"
+            + "     *\n"
+            + "     * @param real      The real part.\n"
+            + "     * @param imaginary The imaginary part.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains("@param real      the real part"));
+    assertTrue(java, java.contains("@param imaginary the imaginary part"));
+  }
+
+  @Test
   public void testParse_capitalizes() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
@@ -175,7 +189,7 @@ public class DocCommentTest {
             + "     */");
     String javaCode = docComment.toJava();
     assertTrue(javaCode.contains("Constructs a complex number with the specified real and imaginary parts.\n"));
-    assertTrue(javaCode.contains("@param real the real part\n"));
+    assertTrue(javaCode, javaCode.contains("@param real the real part\n"));
     assertTrue(javaCode.contains("@param imaginary the imaginary part\n"));
   }
 }
