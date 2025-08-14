@@ -7,10 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility class for parsing Java files line by line, with special handling
- * for Javadoc comments.
+ * Read Java files line by line, applying fixes to Javadoc comments.
  */
-public class FileParser {
+class FileParser {
 
     /**
      * Reads a Java file line by line and returns a list of strings.
@@ -22,12 +21,12 @@ public class FileParser {
      * @return a list of strings representing the file content
      * @throws IOException if an I/O error occurs reading the file
      */
-    public static List<String> parseFile(Path path) throws IOException {
+    static List<String> parseFile(Path path) throws IOException {
         List<String> lines = Files.readAllLines(path);
         return parseLines(lines);
     }
 
-    public static List<String> parseLines(List<String> lines) {
+    static List<String> parseLines(List<String> lines) {
         List<String> result = new ArrayList<>();
 
         for (int i = 0; i < lines.size(); i++) {
@@ -51,7 +50,7 @@ public class FileParser {
                         String currentLine = lines.get(i);
                         javadocBuilder.append(currentLine);
 
-                        // TODO same mistake
+                        // TODO same claude sonnet mistake
                         if (currentLine.trim().endsWith("*/")) {
                             break;
                         }

@@ -35,11 +35,11 @@ public class DocCommentTest {
             + " *\n"
             + " * @author John Doe\n"
             + " * @version 1.0\n"
-            + " */");
+            + " */\n");
     String java = docComment.toJava();
     assertTrue(docComment.toString(), java.contains("\n * Represents a complex number and provides methods for common\n"));
     assertTrue(docComment.toString(), java.contains("\n * <p>\n"));
-
+    assertTrue(java.endsWith(" */"));
   }
 
   @Test
