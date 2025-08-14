@@ -90,6 +90,24 @@ public class DocCommentTest {
     assertEquals("imaginary", tags.get(1).getArgument());
   }
 
+  // https://github.com/elharo/docfix/issues/46
+  @Test
+  public void testParse_doesntLowerCaseAcronyms() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * constructs a complex number with the specified real and imaginary parts.\n"
+            + "     *\n"
+            + "     * @param real the real part\n"
+            + "     * @throws IOException IO exception\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(2, tags.size());
+    assertEquals("throws", tags.get(1).getType());
+    assertEquals("IO exception", tags.get(1).getText());
+    assertEquals("IOException", tags.get(1).getArgument());
+  }
+
   @Test
   public void testParse_return() {
     DocComment docComment = DocComment.parse(Kind.METHOD,

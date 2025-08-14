@@ -13,13 +13,37 @@ class BlockTag {
   BlockTag(String type, String argument, String text, int indent) {
     this.type = type;
     this.argument = argument;
-    if (text != null && !text.isEmpty()) {
+    if (text != null && !text.isEmpty() && shouldLowerCase(text)) {
       char first = text.charAt(0);
       this.text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
     } else {
       this.text = text;
     }
     this.indent = indent;
+  }
+
+  // TODO handle title case ligatures
+  /**
+   * @return true iff the first word in the text is capitalized. That is,
+   *     it contains an initial capital letter followed only by non-capital letters.
+   */
+  private boolean shouldLowerCase(String text) {
+    if (!Character.isUpperCase(text.charAt(0))) {
+      return false;
+    }
+
+    // Now we know first character is uppercase.
+    char[] characters = text.toCharArray();
+    for (int i = 1; i < characters.length; i++) {
+      char c = characters[i];
+      if (Character.isWhitespace(c)) { // end of first word
+        return true;
+      }
+      if (Character.isUpperCase(c)) { // There's more than one uppercase letter in the first word
+        return false;
+      }
+    }
+    return true;
   }
 
   String getType() {
