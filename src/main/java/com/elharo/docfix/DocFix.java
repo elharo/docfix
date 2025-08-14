@@ -56,7 +56,7 @@ public class DocFix {
    * @param args command line arguments; the last argument should be the path to
    *             the file to fix
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) {
     int argIndex = 0;
     if (args.length > 0 && "--dryrun".equals(args[0])) {
       argIndex = 1;
@@ -69,40 +69,57 @@ public class DocFix {
     final boolean dryrun = "--dryrun".equals(args[0]);
 
     Path path = java.nio.file.Paths.get(args[argIndex]);
+    
+    // Check if the path exists
+    if (!Files.exists(path)) {
+      System.err.println("Error: File or directory does not exist: " + path);
+      System.exit(1);
+    }
+    
     if (Files.isDirectory(path)) {
-      Files.walk(path, 3)
-          .filter(p -> !Files.isSymbolicLink(p))
-          .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
-          .forEach(p -> {
-            try {
-              if (dryrun) {
-                String original = Files.readString(p, StandardCharsets.UTF_8);
-                String fixed = fix(original);
-                if (!original.equals(fixed)) {
-                  java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
-                  java.nio.file.Path relPath = cwd.relativize(p.toAbsolutePath());
-                  System.out.println(relPath);
-                  printChangedLines(original, fixed);
+      try {
+        Files.walk(path, 3)
+            .filter(p -> !Files.isSymbolicLink(p))
+            .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
+            .forEach(p -> {
+              try {
+                if (dryrun) {
+                  String original = Files.readString(p, StandardCharsets.UTF_8);
+                  String fixed = fix(original);
+                  if (!original.equals(fixed)) {
+                    java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
+                    java.nio.file.Path relPath = cwd.relativize(p.toAbsolutePath());
+                    System.out.println(relPath);
+                    printChangedLines(original, fixed);
+                  }
+                } else {
+                  fix(p);
                 }
-              } else {
-                fix(p);
+              } catch (Exception e) {
+                System.err.println("Failed to fix: " + p + ", " + e.getMessage());
               }
-            } catch (Exception e) {
-              System.err.println("Failed to fix: " + p + ", " + e.getMessage());
-            }
-          });
+            });
+      } catch (IOException e) {
+        System.err.println("Error walking directory " + path + ": " + e.getMessage());
+        System.exit(1);
+      }
     } else {
-      if (dryrun) {
-        String original = Files.readString(path, StandardCharsets.UTF_8);
-        String fixed = fix(original);
-        if (!original.equals(fixed)) {
-          java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
-          java.nio.file.Path relPath = cwd.relativize(path.toAbsolutePath());
-          System.out.println(relPath);
-          printChangedLines(original, fixed);
+      try {
+        if (dryrun) {
+          String original = Files.readString(path, StandardCharsets.UTF_8);
+          String fixed = fix(original);
+          if (!original.equals(fixed)) {
+            java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
+            java.nio.file.Path relPath = cwd.relativize(path.toAbsolutePath());
+            System.out.println(relPath);
+            printChangedLines(original, fixed);
+          }
+        } else {
+          fix(path);
         }
-      } else {
-        fix(path);
+      } catch (IOException e) {
+        System.err.println("Error processing file " + path + ": " + e.getMessage());
+        System.exit(1);
       }
     }
   }
