@@ -51,6 +51,12 @@ public class DocFixTest {
         assertTrue(fixed, fixed.contains("     * @return the imaginary part"));
     }
 
+    @Test
+    public void testDocFix_asterisks() {
+        String fixed = DocFix.fix(code);
+        assertTrue(fixed, fixed.contains("/**\n * Represents a complex number with real and imaginary parts.\n"));
+    }
+
     // #30
     public void testDocFix_preservesSingleLineComments() {
       String fixed = DocFix.fix(code);

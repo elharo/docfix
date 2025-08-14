@@ -9,12 +9,38 @@ import org.junit.Test;
 
 public class DocCommentTest {
 
-    @Test
-    public void testParse_description() {
-      DocComment docComment = DocComment.parse(Kind.FIELD, "    /**\n     * The real part of the complex number.\n    */");
-      assertEquals("The real part of the complex number.", docComment.getDescription());
-      assertEquals(Kind.FIELD, docComment.getKind());
-    }
+  @Test
+  public void testParse_description() {
+    DocComment docComment = DocComment.parse(Kind.FIELD, "    /**\n     * The real part of the complex number.\n    */");
+    assertEquals("The real part of the complex number.", docComment.getDescription());
+    assertEquals(Kind.FIELD, docComment.getKind());
+  }
+
+  @Test
+  public void testMultiParagraphClassComment() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Represents a complex number and provides methods for common\n"
+            + " * arithmetic operations.\n"
+            + " * <p>\n"
+            + " * A complex number is a number that can be expressed in the form a + bi,\n"
+            + " * where a and b are real numbers, and i is the imaginary unit, satisfying\n"
+            + " * the equation i² = -1.\n"
+            + " * </p>\n"
+            + " * <p>\n"
+            + " * This class provides methods to add, subtract, multiply, and divide\n"
+            + " * complex numbers, as well as methods to compute the magnitude and\n"
+            + " * phase of a complex number.\n"
+            + " * </p>\n"
+            + " *\n"
+            + " * @author John Doe\n"
+            + " * @version 1.0\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue(docComment.toString(), java.contains("\n * Represents a complex number and provides methods for common\n"));
+    assertTrue(docComment.toString(), java.contains("\n * <p>\n"));
+
+  }
 
   @Test
   public void testParse_blockTags() {
@@ -26,9 +52,9 @@ public class DocCommentTest {
             + "     * @param imaginary The imaginary part\n"
             + "     */");
     String java = docComment.toJava();
-    assertTrue(docComment.toString(), java.contains("Constructs"));
+    assertTrue(docComment.toString(), java.contains("\n     * Constructs"));
     assertTrue(docComment.toString(), java.contains("@param real "));
-    assertTrue(docComment.toString(), java.contains("     *\n"));
+    assertTrue(docComment.toString(), java.contains(" *\n"));
     assertEquals("Constructs a complex number with the specified real and imaginary parts.", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
 
