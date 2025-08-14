@@ -55,7 +55,7 @@ public class DocCommentTest {
     assertTrue(docComment.toString(), java.contains("\n     * Constructs"));
     assertTrue(docComment.toString(), java.contains("@param real "));
     assertTrue(docComment.toString(), java.contains(" *\n"));
-    assertEquals("Constructs a complex number with the specified real and imaginary parts.", docComment.getDescription());
+    assertEquals("Constructs a complex number with the specified real and imaginary parts.\n", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
 
     List<BlockTag> tags = docComment.getBlockTags();
@@ -77,7 +77,7 @@ public class DocCommentTest {
             + "     * @param real the real part\n"
             + "     * @param imaginary the imaginary part\n"
             + "     */");
-    assertEquals("Constructs a complex number with the specified real and imaginary parts.", docComment.getDescription());
+    assertEquals("Constructs a complex number with the specified real and imaginary parts.\n", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
 
     List<BlockTag> tags = docComment.getBlockTags();
@@ -116,7 +116,7 @@ public class DocCommentTest {
             + "     *\n"
             + "     * @return a hash code value\n"
             + "     */\n");
-    assertEquals("Returns a hash code value for this complex number.", docComment.getDescription());
+    assertEquals("Returns a hash code value for this complex number.\n", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
 
     List<BlockTag> tags = docComment.getBlockTags();
@@ -142,6 +142,26 @@ public class DocCommentTest {
     String java = tags.get(0).toJava();
     assertEquals(java, "     * @throws IllegalArgumentException some exception\n"
         + "     *     if something goes wrong", java);
+  }
+
+  @Test
+  public void testParse_methodCommentWithBlankLines() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "     /**\n"
+            + "      * Parse output timestamp configured for Reproducible Builds' archive entries.\n"
+            + "      *\n"
+            + "      * <p>Either as {@link java.time.format.DateTimeFormatter#ISO_OFFSET_DATE_TIME} or as a number representing seconds\n"
+            + "      * since the epoch (like <a href=\"https://reproducible-builds.org/docs/source-date-epoch/\">SOURCE_DATE_EPOCH</a>).\n"
+            + "      *\n"
+            + "      * <p>Since 3.6.4, if not configured or disabled, the {@code SOURCE_DATE_EPOCH} environment variable is used as\n"
+            + "      * a fallback value, to ease forcing Reproducible Build externally when the build has not enabled it natively in POM.\n"
+            + "      *\n"
+            + "      * @param outputTimestamp the value of {@code project.build.outputTimestamp} (may be {@code null})\n"
+            + "      * @since 3.6.0\n"
+            + "      * @see #parseBuildOutputTimestamp(String)\n"
+            + "      */\n");
+    String description = docComment.getDescription();
+    assertTrue(description, description.startsWith("Parse output timestamp configured for Reproducible Builds' archive entries.\n\n"));
   }
 
   @Test
