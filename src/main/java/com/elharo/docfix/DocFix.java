@@ -28,6 +28,7 @@ public class DocFix {
   public static String fix(String code) {
     String[] lines = code.split("\\R");
     List<String> fixedLines = FileParser.parseLines(Arrays.asList(lines));
+    // TODO preserve line breaks
     return String.join("\n", fixedLines);
   }
 
