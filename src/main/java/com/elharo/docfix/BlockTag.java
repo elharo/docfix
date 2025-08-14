@@ -15,10 +15,14 @@ class BlockTag {
     this.argument = argument;
     if (text != null && !text.isEmpty() && shouldLowerCase(text)) {
       char first = text.charAt(0);
-      this.text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
-    } else {
-      this.text = text;
+      text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
     }
+
+    // Remove trailing period if not a sentence
+    if (!text.contains(". ") && text.endsWith(".")) {
+      text = text.trim().substring(0, text.trim().length() - 1);
+    }
+    this.text = text;
     this.indent = indent;
   }
 

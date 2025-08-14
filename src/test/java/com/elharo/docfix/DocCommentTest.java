@@ -48,8 +48,8 @@ public class DocCommentTest {
         "    /**\n"
             + "     * Constructs a complex number with the specified real and imaginary parts.\n"
             + "     *\n"
-            + "     * @param real The real part\n"
-            + "     * @param imaginary The imaginary part\n"
+            + "     * @param real The real part.\n"
+            + "     * @param imaginary The imaginary part.\n"
             + "     */");
     String java = docComment.toJava();
     assertTrue(docComment.toString(), java.contains("\n     * Constructs"));
