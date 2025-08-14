@@ -126,6 +126,25 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testParse_multilineBlockTag() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Does something.\n"
+            + "     *\n"
+            + "     * @throws IllegalArgumentException some exception\n"
+            + "     *     if something goes wrong\n"
+            + "     */\n");
+    assertEquals(Kind.METHOD, docComment.getKind());
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(1, tags.size());
+    assertEquals("throws", tags.get(0).getType());
+    String java = tags.get(0).toJava();
+    assertEquals(java, "     * @throws IllegalArgumentException some exception\n"
+        + "     *     if something goes wrong", java);
+  }
+
+  @Test
   public void testToJava() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "/**\n"
