@@ -71,7 +71,8 @@ class DocComment {
     return new DocComment(kind, description.toString(), blockTags, tagIndent);
   }
 
-  private static int findIndent(String raw) {
+  // TODO move this to utility class
+  static int findIndent(String raw) {
     int indent = 0;
     for (char c : raw.toCharArray()) {
       if (c == ' ') {
@@ -112,6 +113,7 @@ class DocComment {
       }
     }
     if (!blockTags.isEmpty()) {
+      // TODO use toJava in BlockTag instead
       sb.append(indent).append(" *\n");
       for (BlockTag tag : blockTags) {
         sb.append(indent).append(" * @").append(tag.getType());
@@ -119,8 +121,7 @@ class DocComment {
           sb.append(" ").append(tag.getArgument());
         }
         if (tag.getText() != null && !tag.getText().isEmpty()) {
-          // TODO handle multi-line tag text
-          sb.append(" ").append(tag.getText());
+          sb.append(tag.getSpaces()).append(tag.getText());
         }
         sb.append("\n");
       }
@@ -128,6 +129,7 @@ class DocComment {
     sb.append(indent).append(" */");
     return sb.toString();
   }
+
 
   @Override
   public String toString() {

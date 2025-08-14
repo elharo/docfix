@@ -1,5 +1,7 @@
 package com.elharo.docfix;
 
+import static com.elharo.docfix.DocComment.findIndent;
+
 /**
  * Represents a Javadoc block tag (e.g., @param, @return, @throws, @deprecated, etc.).
  */
@@ -8,9 +10,15 @@ class BlockTag {
   private final String type; // e.g., param, return, throws, deprecated
   private final String argument; // e.g., parameter name for @param, exception type for @throws, null otherwise
   private final String text; // The text of the tag
-  private final int indent;
+  private final int indent; // How many spaces before the comment starts
 
-  private BlockTag(String type, String argument, String text, int indent) {
+  /**
+   * Spaces between the argument and the description.
+   * Most often exactly one space, but can be more if the tags are aligned.
+   */
+  private final String spaces;
+
+  private BlockTag(String type, String argument, String text, int indent, String spaces) {
     this.type = type;
     this.argument = argument;
     if (text != null && !text.isEmpty() && shouldLowerCase(text)) {
@@ -24,6 +32,7 @@ class BlockTag {
     }
     this.text = text;
     this.indent = indent;
+    this.spaces = spaces;
   }
 
   static BlockTag parse(String trimmed, int indent) {
@@ -33,6 +42,7 @@ class BlockTag {
     String text = "";
     // For tags like @return, no argument
     String arg = null;
+    String spaces = " ";
     if (type.equals("return") || type.equals("deprecated")) {
       if (parts.length > 1) {
         text += parts[1];
@@ -43,8 +53,15 @@ class BlockTag {
     } else {
        arg = parts.length > 1 ? parts[1] : null;
        text = parts.length > 2 ? parts[2].trim() : "";
+       if (parts.length > 2) {
+         int x = findIndent(parts[2]);
+         if (x > 1) {
+          spaces = " ".repeat(x + 1);
+         }
+       }
+
     }
-    BlockTag blockTag = new BlockTag(type, arg, text, indent);
+    BlockTag blockTag = new BlockTag(type, arg, text, indent, spaces);
     return blockTag;
   }
 
@@ -94,7 +111,7 @@ class BlockTag {
       sb.append(" ").append(argument);
     }
     if (text != null && !text.isEmpty()) {
-      sb.append(" ").append(text);
+      sb.append(spaces).append(text);
     }
     return sb.toString();
   }
@@ -102,5 +119,9 @@ class BlockTag {
   @Override
   public String toString() {
     return toJava();
+  }
+
+  public String getSpaces() {
+    return this.spaces;
   }
 }
