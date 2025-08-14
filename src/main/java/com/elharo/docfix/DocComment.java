@@ -13,7 +13,10 @@ class DocComment {
   final String description; // Main description (before block tags)
   final List<BlockTag> blockTags;
 
-  DocComment(Kind kind, String description, List<BlockTag> blockTags) {
+  // Indentation to be applied before entire comment
+  private final String indent;
+
+  private DocComment(Kind kind, String description, List<BlockTag> blockTags, int indent) {
     this.kind = kind;
     if (description != null && !description.isEmpty()) {
       char first = description.charAt(0);
@@ -22,10 +25,14 @@ class DocComment {
       this.description = description;
     }
     this.blockTags = blockTags;
+    this.indent = " ".repeat(indent);
   }
 
   static DocComment parse(Kind kind, String raw) {
+    int tagIndent = findIndent(raw);
+
     // Remove leading/trailing comment markers and split into lines
+    // TODO could just keep the beginning and end markers
     String body = raw.trim();
     if (body.startsWith("/**")) {
       body = body.substring(3);
@@ -39,6 +46,7 @@ class DocComment {
     boolean inBlockTags = false;
     for (String line : lines) {
       String trimmed = line.trim();
+      // TODO might need to remove global indent
       int indent = line.length() - trimmed.length();
       if (trimmed.startsWith("*")) {
         trimmed = trimmed.substring(1).trim();
@@ -70,7 +78,21 @@ class DocComment {
         descBuilder.append(trimmed);
       }
     }
-    return new DocComment(kind, descBuilder.toString(), blockTags);
+    return new DocComment(kind, descBuilder.toString(), blockTags, tagIndent);
+  }
+
+  private static int findIndent(String raw) {
+    int indent = 0;
+    for (char c : raw.toCharArray()) {
+      if (c == ' ') {
+        indent++;
+      } else if (c == '\t') {
+        indent += 4; // Assuming tab is equivalent to 4 spaces
+      } else {
+        break; // Stop at first non-space character
+      }
+    }
+    return indent;
   }
 
   Kind getKind() {
@@ -91,43 +113,29 @@ class DocComment {
    * @return the JavaDoc comment as a string
    */
   String toJava() {
-    // Try to preserve the indentation of the first line
-    String indent = "";
-    if (!blockTags.isEmpty() || (description != null && !description.isEmpty())) {
-      // Find indent from the first non-empty line
-      String[] lines = description.split("\\r?\\n");
-      if (lines.length > 0) {
-        int idx = 0;
-        while (idx < lines.length && lines[idx].trim().isEmpty()) idx++;
-        if (idx < lines.length) {
-          String line = lines[idx];
-          int nonSpace = 0;
-          while (nonSpace < line.length() && Character.isWhitespace(line.charAt(nonSpace))) {
-              nonSpace++;
-          }
-          indent = line.substring(0, nonSpace);
-        }
-      }
-    }
     StringBuilder sb = new StringBuilder();
     sb.append(indent).append("/**\n");
     if (description != null && !description.isEmpty()) {
-      sb.append(indent).append("     * ").append(description).append("\n");
+      String[] lines = description.split("\r?\n");
+      for (String line : lines) {
+        sb.append(indent).append(" * ").append(line).append("\n");
+      }
     }
     if (!blockTags.isEmpty()) {
-      sb.append(indent).append("     *\n");
+      sb.append(indent).append(" *\n");
       for (BlockTag tag : blockTags) {
-        sb.append(indent).append("     * @").append(tag.getType());
+        sb.append(indent).append(" * @").append(tag.getType());
         if (tag.getArgument() != null) {
           sb.append(" ").append(tag.getArgument());
         }
         if (tag.getText() != null && !tag.getText().isEmpty()) {
+          // TODO handle multi-line tag text
           sb.append(" ").append(tag.getText());
         }
         sb.append("\n");
       }
     }
-    sb.append(indent).append("*/\n");
+    sb.append(indent).append(" */");
     return sb.toString();
   }
 
