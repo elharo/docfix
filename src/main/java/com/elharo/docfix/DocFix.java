@@ -95,7 +95,7 @@ public class DocFix {
                 } else {
                   fix(p);
                 }
-              } catch (Exception e) {
+              } catch (IOException e) {
                 System.err.println("Failed to fix: " + p + ", " + e.getMessage());
               }
             });
