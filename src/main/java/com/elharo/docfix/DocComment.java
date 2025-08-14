@@ -38,10 +38,10 @@ class DocComment {
       body = body.substring(3);
     }
     if (body.endsWith("*/")) {
-      body = body.substring(0, body.length() - 2);
+      body = body.substring(0, body.length() - 2).trim();
     }
     String[] lines = body.split("\r?\n");
-    StringBuilder descBuilder = new StringBuilder();
+    StringBuilder description = new StringBuilder();
     List<BlockTag> blockTags = new java.util.ArrayList<>();
     boolean inBlockTags = false;
     for (int i = 0; i < lines.length; i++) {
@@ -50,9 +50,6 @@ class DocComment {
       int indent = line.length() - trimmed.length();
       if (trimmed.startsWith("*")) {
         trimmed = trimmed.substring(1).trim();
-      }
-      if (trimmed.isEmpty()) {
-        continue;
       }
       if (trimmed.startsWith("@")) { // starts a new block tag
         inBlockTags = true;
@@ -65,13 +62,13 @@ class DocComment {
         blockTags.add(blockTag);
       } else if (!inBlockTags) {
         // Description lines before first block tag
-        if (descBuilder.length() > 0) {
-          descBuilder.append("\n");
+        if (description.length() > 0) {
+          description.append("\n");
         }
-        descBuilder.append(trimmed);
+        description.append(trimmed);
       }
     }
-    return new DocComment(kind, descBuilder.toString(), blockTags, tagIndent);
+    return new DocComment(kind, description.toString(), blockTags, tagIndent);
   }
 
   private static int findIndent(String raw) {
