@@ -44,9 +44,9 @@ class DocComment {
     StringBuilder descBuilder = new StringBuilder();
     List<BlockTag> blockTags = new java.util.ArrayList<>();
     boolean inBlockTags = false;
-    for (String line : lines) {
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
       String trimmed = line.trim();
-      // TODO might need to remove global indent
       int indent = line.length() - trimmed.length();
       if (trimmed.startsWith("*")) {
         trimmed = trimmed.substring(1).trim();
@@ -54,22 +54,15 @@ class DocComment {
       if (trimmed.isEmpty()) {
         continue;
       }
-      if (trimmed.startsWith("@")) {
+      if (trimmed.startsWith("@")) { // starts a new block tag
         inBlockTags = true;
-        // Parse block tag: e.g. @param real The real part
-        String[] parts = trimmed.split(" ", 3);
-        String type = parts[0].substring(1); // remove '@'
-        String arg = parts.length > 1 ? parts[1] : null;
-        String text = parts.length > 2 ? parts[2] : "";
-        // For tags like @return, no argument
-        if (type.equals("return") || type.equals("deprecated")) {
-          arg = null;
-          text = parts.length > 1 ? parts[1] : "";
-          if (parts.length > 2) {
-            text += " " + parts[2];
-          }
+        // Add any additional lines that are part of the same block tag
+        while (i < lines.length - 1 && !lines[i + 1].trim().startsWith("* @")) {
+          i++;
+          trimmed += "\n" + lines[i];
         }
-        blockTags.add(new BlockTag(type, arg, text, indent));
+        BlockTag blockTag = parseBlockTag(trimmed, indent);
+        blockTags.add(blockTag);
       } else if (!inBlockTags) {
         // Description lines before first block tag
         if (descBuilder.length() > 0) {
@@ -79,6 +72,29 @@ class DocComment {
       }
     }
     return new DocComment(kind, descBuilder.toString(), blockTags, tagIndent);
+  }
+
+  // TODO move to BlockTag
+  private static BlockTag parseBlockTag(String trimmed, int indent) {
+    // Parse block tag: e.g. @param real The real part
+    String[] parts = trimmed.split(" ", 3);
+    String type = parts[0].substring(1); // remove '@'
+    String text = "";
+    // For tags like @return, no argument
+    String arg = null;
+    if (type.equals("return") || type.equals("deprecated")) {
+      if (parts.length > 1) {
+        text += parts[1];
+      }
+      if (parts.length > 2) {
+        text += " " + parts[2].trim();
+      }
+    } else {
+       arg = parts.length > 1 ? parts[1] : null;
+       text = parts.length > 2 ? parts[2].trim() : "";
+    }
+    BlockTag blockTag = new BlockTag(type, arg, text, indent);
+    return blockTag;
   }
 
   private static int findIndent(String raw) {

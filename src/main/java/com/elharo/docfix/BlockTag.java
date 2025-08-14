@@ -5,10 +5,10 @@ package com.elharo.docfix;
  */
 class BlockTag {
 
-  final String type; // e.g., param, return, throws, deprecated
-  final String argument; // e.g., parameter name for @param, exception type for @throws, null otherwise
-  final String text; // The text of the tag
-  final int indent;
+  private final String type; // e.g., param, return, throws, deprecated
+  private final String argument; // e.g., parameter name for @param, exception type for @throws, null otherwise
+  String text; // The text of the tag
+  private final int indent;
 
   BlockTag(String type, String argument, String text, int indent) {
     this.type = type;
@@ -58,7 +58,6 @@ class BlockTag {
     return argument;
   }
 
-  // TODO use or delete
   String toJava() {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < indent; i++) {
