@@ -61,6 +61,20 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testPreserveDoubleSpace() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * <p>getManifest.</p>\n"
+            + "     *\n"
+            + "     * @param config  {@link ManifestConfiguration}\n"
+            + "     * @param entries The entries.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue(java.contains("config  {@link"));
+    assertFalse(java.contains("config {@link"));
+  }
+
+  @Test
   public void testParse_blockTags() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
