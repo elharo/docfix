@@ -21,7 +21,7 @@ class BlockTag {
   private BlockTag(String type, String argument, String text, int indent, String spaces) {
     this.type = type;
     this.argument = argument;
-    if (text != null && !text.isEmpty() && shouldLowerCase(text)) {
+    if (text != null && !text.isEmpty() && shouldLowerCase(type, text)) {
       char first = text.charAt(0);
       text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
     }
@@ -41,9 +41,10 @@ class BlockTag {
     String type = parts[0].substring(1); // remove '@'
     String text = "";
     // For tags like @return, no argument
+    // TODO use a set of these tags
     String arg = null;
     String spaces = " ";
-    if (type.equals("return") || type.equals("deprecated")) {
+    if (type.equals("return") || type.equals("deprecated") || type.equals("author")) {
       if (parts.length > 1) {
         text += parts[1];
       }
@@ -67,7 +68,11 @@ class BlockTag {
    * @return true iff the first word in the text is capitalized. That is,
    *     it contains an initial capital letter followed only by non-capital letters.
    */
-  private boolean shouldLowerCase(String text) {
+  private boolean shouldLowerCase(String type, String text) {
+    if ("author".equals(type)) {
+      return false; // author is usually a proper name
+    }
+
     if (!Character.isUpperCase(text.charAt(0))) {
       return false;
     }
