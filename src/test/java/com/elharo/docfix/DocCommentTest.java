@@ -169,6 +169,22 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testConvertExceptionToThrows() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * constructs a complex number with the specified real and imaginary parts.\n"
+            + "     *\n"
+            + "     * @exception IOException if an I/O error occurs\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(1, tags.size());
+    assertEquals("throws", tags.get(0).getType());
+    assertEquals("if an I/O error occurs", tags.get(0).getText());
+    assertEquals("IOException", tags.get(0).getArgument());
+  }
+
+  @Test
   public void testParse_return() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
