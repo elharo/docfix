@@ -44,6 +44,20 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testAuthorTag() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Represents a complex number and provides methods for common\n"
+            + " * arithmetic operations.\n"
+            + " *\n"
+            + " * @author John Doe\n"
+            + " * @version 1.0\n"
+            + " */\n");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains(" * @author John Doe\n"));
+  }
+
+  @Test
   public void testNoExtraSpaceInBlankLines() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "/**\n"
