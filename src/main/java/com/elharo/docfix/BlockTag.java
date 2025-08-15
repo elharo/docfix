@@ -78,14 +78,19 @@ class BlockTag {
     return blockTag;
   }
 
+  // author is usually a proper name
+  // since, version are usually non-alphabetic
+  // see can begin with upper or lower case, and either way should not be changed
+  private final static Set nonCasedTags = Set.of("see", "author", "since", "version");
+
   // TODO handle title case ligatures
   /**
    * @return true iff the first word in the text is capitalized. That is,
    *     it contains an initial capital letter followed only by non-capital letters.
    */
   private boolean shouldLowerCase(String type, String text) {
-    if ("author".equals(type)) {
-      return false; // author is usually a proper name
+    if (nonCasedTags.contains(type)) {
+      return false;
     }
 
     if (!Character.isUpperCase(text.charAt(0))) {
