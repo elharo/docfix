@@ -2,6 +2,8 @@ package com.elharo.docfix;
 
 import static com.elharo.docfix.DocComment.findIndent;
 
+import java.util.Set;
+
 /**
  * Represents a Javadoc block tag (e.g., @param, @return, @throws, @deprecated, etc.).
  */
@@ -35,16 +37,26 @@ class BlockTag {
     this.spaces = spaces;
   }
 
+  private final static Set<String> noArgumentTags = Set.of(
+      "return",
+      "deprecated",
+      "author",
+      "serial",
+      "see",
+      "serialData",
+      "since",
+      "version"
+  );
+
   static BlockTag parse(String trimmed, int indent) {
     // Parse block tag: e.g. @param real The real part
     String[] parts = trimmed.split(" ", 3);
     String type = parts[0].substring(1); // remove '@'
     String text = "";
     // For tags like @return, no argument
-    // TODO use a set of these tags
     String arg = null;
     String spaces = " ";
-    if (type.equals("return") || type.equals("deprecated") || type.equals("author")) {
+    if (noArgumentTags.contains(type)) {
       if (parts.length > 1) {
         text += parts[1];
       }
