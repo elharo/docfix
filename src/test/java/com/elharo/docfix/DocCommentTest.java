@@ -1,6 +1,7 @@
 package com.elharo.docfix;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.elharo.docfix.DocComment.Kind;
@@ -40,6 +41,23 @@ public class DocCommentTest {
     assertTrue(docComment.toString(), java.contains("\n * Represents a complex number and provides methods for common\n"));
     assertTrue(docComment.toString(), java.contains("\n * <p>\n"));
     assertTrue(java.endsWith(" */"));
+  }
+
+  @Test
+  public void testNoExtraSpaceInBlankLines() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Represents a complex number and provides methods for common\n"
+            + " * arithmetic operations.\n"
+            + " *\n"
+            + " * <p>\n"
+            + " * This class provides methods to add, subtract, multiply, and divide\n"
+            + " * phase of a complex number.\n"
+            + " * </p>\n"
+            + " */\n");
+    String java = docComment.toJava();
+    assertFalse(java.contains("* \n"));
+    assertTrue(java.contains("*\n"));
   }
 
   @Test
