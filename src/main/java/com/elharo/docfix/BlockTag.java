@@ -55,11 +55,8 @@ class BlockTag {
        text = parts.length > 2 ? parts[2].trim() : "";
        if (parts.length > 2) {
          int x = findIndent(parts[2]);
-         if (x > 1) {
-          spaces = " ".repeat(x + 1);
-         }
+         spaces = " ".repeat(x + 1);
        }
-
     }
     BlockTag blockTag = new BlockTag(type, arg, text, indent, spaces);
     return blockTag;
