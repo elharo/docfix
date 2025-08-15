@@ -109,7 +109,13 @@ class DocComment {
     if (description != null && !description.isEmpty()) {
       String[] lines = description.split("\r?\n");
       for (String line : lines) {
-        sb.append(indent).append(" * ").append(line).append("\n");
+        sb.append(indent);
+        sb.append(" *");
+        if (!line.isEmpty()) {
+          sb.append(" ");
+          sb.append(line);
+        }
+        sb.append("\n");
       }
     }
     if (!blockTags.isEmpty()) {
