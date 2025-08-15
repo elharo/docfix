@@ -21,6 +21,9 @@ class BlockTag {
   private final String spaces;
 
   private BlockTag(String type, String argument, String text, int indent, String spaces) {
+    if ("exception".equals(type)) {
+      type = "throws"; // Normalize 'exception' to 'throws'
+    }
     this.type = type;
     this.argument = argument;
     if (text != null && !text.isEmpty() && shouldLowerCase(type, text)) {
