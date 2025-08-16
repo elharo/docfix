@@ -72,6 +72,19 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testAddPeriod() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "  /**\n"
+            + "   * Returns the scheme name\n"
+            + "   *\n"
+            + "   * @return A String containing the scheme name of the PointerPart. \n"
+            + "   *\n"
+            + "   */");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains("Returns the scheme name.\n"));
+  }
+
+  @Test
   public void testNoExtraSpaceInBlankLines() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "/**\n"
