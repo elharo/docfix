@@ -26,6 +26,11 @@ class BlockTag {
     }
     this.type = type;
     this.argument = argument;
+
+    if (text.startsWith("- ")) {
+      text = text.substring(2).trim(); // Remove leading "- "
+    }
+
     if (text != null && !text.isEmpty() && shouldLowerCase(type, text)) {
       char first = text.charAt(0);
       text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
