@@ -11,6 +11,7 @@ conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-to
 - Fixes @param, @return, @throws, and other block tag descriptions to start with lowercase
 - Removes extraneous periods from the end of block tag descriptions
 - Removes extraneous hyphens from the start of block tag descriptions
+- Removes trailing white space from Javadoc comments
 - Maintains proper formatting while applying fixes
 - Preserves the overall structure and content of the documentation
 

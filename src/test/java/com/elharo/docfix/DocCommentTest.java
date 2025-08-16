@@ -88,6 +88,26 @@ public class DocCommentTest {
     assertFalse(java.contains("config {@link"));
   }
 
+
+  @Test
+  public void testCustomTags() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * <p>getManifest.</p>\n"
+            + "     *\n"
+            + "     * @param config  {@link ManifestConfiguration}\n"
+            + "     * @param entries The entries.\n"
+            + "     * @custom.foo    something  something\n"
+            + "     * @bar  something else\n"
+            + "     *    again\n"
+            + "     */");
+    List<BlockTag> blockTags = docComment.getBlockTags();
+    assertEquals(4, blockTags.size());
+    String java = docComment.toJava();
+    assertTrue(java.contains("     * @custom.foo    something  something\n"));
+    assertTrue(java, java.contains("    * @bar  something else\n     *    again\n"));
+  }
+
   @Test
   public void testParse_blockTags() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
