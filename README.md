@@ -9,6 +9,7 @@ conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-to
 
 - Converts the first letter of Javadoc class, method, and field comments to uppercase
 - Fixes @param, @return, @throws, and other block tag descriptions to start with lowercase
+- Adds missing periods to the end of comment descriptions
 - Removes extraneous periods from the end of block tag descriptions
 - Removes extraneous hyphens from the start of block tag descriptions
 - Removes trailing white space from Javadoc comments
