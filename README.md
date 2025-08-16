@@ -13,6 +13,7 @@ and tag descriptions start with lowercase letters.
 - Converts the first letter of Javadoc class, method, and field comments to uppercase
 - Fixes @param, @return, @throws, and other tag descriptions to start with lowercase
 - Removes extraneous periods from the end of Javadoc tags
+- Removes trailing white space from Javadoc comments
 - Maintains proper formatting while applying fixes
 - Preserves the overall structure and content of your documentation
 
