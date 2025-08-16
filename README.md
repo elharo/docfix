@@ -4,17 +4,15 @@ Fix Common Javadoc Problems
 DocFix is a Java utility that automatically fixes common Javadoc
 formatting issues to conform to [Oracle Javadoc
 conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html).
-It ensures that Javadoc comments follow proper
-capitalization rules, particularly making sure that the first sentence
-and tag descriptions start with lowercase letters.
 
 ## What it fixes
 
 - Converts the first letter of Javadoc class, method, and field comments to uppercase
-- Fixes @param, @return, @throws, and other tag descriptions to start with lowercase
-- Removes extraneous periods from the end of Javadoc tags
+- Fixes @param, @return, @throws, and other block tag descriptions to start with lowercase
+- Removes extraneous periods from the end of block tag descriptions
+- Removes extraneous hyphens from the start of block tag descriptions
 - Maintains proper formatting while applying fixes
-- Preserves the overall structure and content of your documentation
+- Preserves the overall structure and content of the documentation
 
 ## Requirements
 
