@@ -58,6 +58,20 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testRemovePeriod() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "  /**\n"
+            + "   * Returns a String containing the scheme name of the PointerPart \n"
+            + "   * or the name of the ShortHand Pointer.       \n"
+            + "   *\n"
+            + "   * @return A String containing the scheme name of the PointerPart. \n"
+            + "   *\n"
+            + "   */");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains("@return a String containing the scheme name of the PointerPart\n"));
+  }
+
+  @Test
   public void testNoExtraSpaceInBlankLines() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "/**\n"

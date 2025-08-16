@@ -62,7 +62,9 @@ class DocComment {
         // Add any additional lines that are part of the same block tag
         while (i < lines.length - 1 && !lines[i + 1].trim().startsWith("* @")) {
           i++;
-          trimmed += "\n" + lines[i];
+          if (!lines[i].trim().endsWith("*")) {
+            trimmed += "\n" + lines[i];
+          }
         }
         BlockTag blockTag = BlockTag.parse(trimmed, indent);
         blockTags.add(blockTag);
