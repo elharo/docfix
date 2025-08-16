@@ -115,6 +115,31 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testRemoveInitialHyphens() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "     /**\n"
+            + "     * Evaluates an XML resource with respect to an XPointer expressions\n"
+            + "     * by checking if it's element and attributes parameters match the\n"
+            + "     * criteria specified in the xpointer expression.\n"
+            + "     *\n"
+            + "     * @param element - The name of the element\n"
+            + "     * @param attributes - The element attributes\n"
+            + "     * @param augs - Additional information that may include infoset augmentations\n"
+            + "     * @param event - An integer indicating\n"
+            + "     *                0 - The start of an element\n"
+            + "     *                1 - The end of an element\n"
+            + "     *                2 - An empty element call\n"
+            + "     * @return - true if the element was resolved by the xpointer\n"
+            + "     * @throws XNIException thrown to signal an error\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains("element the name of the element"));
+    assertTrue(java, java.contains("attributes the element attributes"));
+    assertTrue(java, java.contains("@return true if the"));
+    assertTrue(java, java.contains("0 - The start of an element"));
+  }
+
+  @Test
   public void testParse_alignedBlockTags() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
