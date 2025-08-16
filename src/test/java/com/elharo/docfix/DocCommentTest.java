@@ -174,6 +174,19 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testTrailingBlankLine() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "  /**\n"
+            + "   * Returns true if the expression resolves\n"
+            + "   *\n"
+            + "   * @see org.apache.xerces.xpointer.XPointerPart#isChildFragmentResolved()\n"
+            + "   *\n"
+            + "   */");
+    String java = docComment.toJava();
+    assertTrue(java, java.endsWith("\n   *\n   */"));
+  }
+
+  @Test
   public void testParse_capitalizes() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
