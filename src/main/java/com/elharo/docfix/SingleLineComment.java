@@ -20,6 +20,9 @@ class SingleLineComment extends DocComment {
    */
   @Override
   String toJava() {
+    if (description.isBlank() && blockTags.isEmpty()) {
+      return ""; // No comment to generate
+    }
     StringBuilder sb = new StringBuilder();
     sb.append(indent).append("/** ");
     if (description != null && !description.isEmpty()) {
