@@ -58,6 +58,25 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testEmptyComment() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " *\n"
+            + " *    \n"
+            + " *\n"
+            + " */\n");
+    String java = docComment.toJava();
+    assertEquals("", java);
+  }
+
+  @Test
+  public void testEmptySingleLineComment() {
+    DocComment docComment = DocComment.parse(Kind.CLASS, "   /**   */");
+    String java = docComment.toJava();
+    assertEquals("", java);
+  }
+
+  @Test
   public void testRemovePeriod() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "  /**\n"
