@@ -22,6 +22,9 @@ public class ComplexNumber implements Cloneable {
      */
     private final double imaginary;
 
+    /** The phase (angle) of the complex number in radians. */
+    private double phase;
+
     /**
      * Constructs a complex number with the specified real and imaginary parts.
      *

@@ -38,7 +38,6 @@ class DocComment {
     int tagIndent = findIndent(raw);
 
     // Remove leading/trailing comment markers and split into lines
-    // TODO could just keep the beginning and end markers
     String body = raw.trim();
     boolean singleLine = !body.contains("\n");
     if (body.startsWith("/**")) {
