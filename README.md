@@ -22,7 +22,7 @@ conventional styles.
 
 ## Requirements
 
-- Java 11 or higher
+- Java 8 or higher
 - Maven (for building from source)
 
 ## Building
