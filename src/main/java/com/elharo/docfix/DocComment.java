@@ -148,7 +148,7 @@ class DocComment {
     }
     StringBuilder sb = new StringBuilder();
     sb.append(indent).append("/**\n");
-    if (description != null && !description.isEmpty()) {
+    if (description != null && !description.isBlank()) {
       String[] lines = description.split("\r?\n");
       for (String line : lines) {
         sb.append(indent);
@@ -161,8 +161,10 @@ class DocComment {
       }
     }
     if (!blockTags.isEmpty()) {
+      if (description != null && !description.isBlank()) {
+        sb.append(indent).append(" *\n"); // Blank line between description and block tags
+      }
       // TODO use toJava in BlockTag instead
-      sb.append(indent).append(" *\n");
       for (BlockTag tag : blockTags) {
         sb.append(indent).append(" * @").append(tag.getType());
         if (tag.getArgument() != null) {

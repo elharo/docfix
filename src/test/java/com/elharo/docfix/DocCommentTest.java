@@ -137,6 +137,18 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testTagsOnly() {
+    String raw = "    /**\n"
+        + "     * @param config  {@link ManifestConfiguration}\n"
+        + "     * @param entries the entries\n"
+        + "     */";
+    DocComment docComment = DocComment.parse(Kind.FIELD,
+        raw);
+    String java = docComment.toJava();
+    assertEquals(raw, java);
+  }
+
+  @Test
   public void testExtraAsterisksMultiLine() {
     DocComment docComment = DocComment.parse(Kind.FIELD,
         "/** \n"
