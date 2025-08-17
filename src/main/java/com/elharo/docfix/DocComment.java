@@ -25,10 +25,17 @@ class DocComment {
     this.kind = kind;
     if (description != null && !description.isEmpty()) {
       char first = description.charAt(0);
-      this.description = Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1);
+      description = Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1);
+      // add a period to the end of the description if it doesn't end with one
+      if (!description.trim().endsWith(".")) {
+        description = description.trim() + ".\n";
+      }
+      this.description = description;
     } else {
       this.description = description;
     }
+
+
     this.blockTags = blockTags;
     this.hasTrailingBlankLine = hasTrailingBlankLine;
     this.indent = " ".repeat(indent);
