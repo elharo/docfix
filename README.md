@@ -5,6 +5,11 @@ DocFix is a Java utility that automatically fixes common Javadoc
 formatting issues to conform to [Oracle Javadoc
 conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html).
 
+The goal is to correctly format most real world Javadoc. There are certainly a lot
+of malformed edge conditions that this tool does not handle. This tool is also
+somewhat opinionated, so it will reformat some idiosyncratic Javadoc into more
+conventional styles.
+
 ## What it fixes
 
 - Converts the first letter of Javadoc class, method, and field comments to uppercase
@@ -58,11 +63,6 @@ java -cp target/classes com.elharo.docfix.DocFix src/main/java
 java -cp target/classes com.elharo.docfix.DocFix --dryrun src/main/java
 ```
 
-**Fix all Java files in the current project:**
-```bash
-java -cp target/classes com.elharo.docfix.DocFix .
-```
-
 ### Programmatic Usage
 
 You can also use DocFix programmatically in your Java code:
@@ -112,6 +112,12 @@ public double getReal(double real) {
     return real;
 }
 ```
+
+
+## Reporting Bugs
+
+Use the [GitHub Issue Tracker](https://github.com/elharo/docfix/issues). Please include a sample Javadoc comment
+that this tool can't handle or handles incorrectly.
 
 ## How it works
 
