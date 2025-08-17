@@ -15,7 +15,7 @@ public class SingleLineCommentTest {
 
     assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
     assertEquals(DocComment.Kind.METHOD, comment.getKind());
-    assertEquals("This is a single line comment", comment.getDescription());
+    assertEquals("This is a single line comment.", comment.getDescription());
     assertTrue(comment.getBlockTags().isEmpty());
   }
 
