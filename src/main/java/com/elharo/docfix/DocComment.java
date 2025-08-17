@@ -25,14 +25,13 @@ class DocComment {
     this.kind = kind;
     if (description != null && !description.isEmpty()) {
       char first = description.charAt(0);
-      description = Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1);
+      description = (Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1)).trim();
       // add a period to the end of the description if it doesn't end with a punctuation mark
-      if (!description.trim().endsWith(".") && !description.trim().endsWith("!") && !description.trim().endsWith("?")) {
-        description = description.trim() + ".";
+      if ((Character.isLetterOrDigit(description.charAt(description.length() - 1)))) {
+        description = description + ".";
       }
     }
     this.description = description;
-
     this.blockTags = blockTags;
     this.hasTrailingBlankLine = hasTrailingBlankLine;
     this.indent = " ".repeat(indent);
