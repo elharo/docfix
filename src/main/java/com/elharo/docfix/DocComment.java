@@ -26,9 +26,9 @@ class DocComment {
     if (description != null && !description.isEmpty()) {
       char first = description.charAt(0);
       description = Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1);
-      // add a period to the end of the description if it doesn't end with one
-      if (!description.trim().endsWith(".")) {
-        description = description.trim() + ".\n";
+      // add a period to the end of the description if it doesn't end with a punctuation mark
+      if (!description.trim().endsWith(".") && !description.trim().endsWith("!") && !description.trim().endsWith("?")) {
+        description = description.trim() + ".";
       }
       this.description = description;
     } else {
