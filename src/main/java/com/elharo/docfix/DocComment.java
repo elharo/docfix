@@ -3,8 +3,8 @@ package com.elharo.docfix;
 import java.util.List;
 
 /**
- * Represents a Javadoc comment, including its kind, description, and block
- * tags.
+ * Represents a Javadoc comment, including its kind, description,
+ * and block tags.
  */
 class DocComment {
 
@@ -30,11 +30,8 @@ class DocComment {
       if (!description.trim().endsWith(".") && !description.trim().endsWith("!") && !description.trim().endsWith("?")) {
         description = description.trim() + ".";
       }
-      this.description = description;
-    } else {
-      this.description = description;
     }
-
+    this.description = description;
 
     this.blockTags = blockTags;
     this.hasTrailingBlankLine = hasTrailingBlankLine;
@@ -50,7 +47,9 @@ class DocComment {
     if (body.startsWith("/**")) {
       body = body.substring(3);
     }
-    if (body.endsWith("*/")) {
+    if (body.endsWith("**/")) {
+        body = body.substring(0, body.length() - 3).trim();
+    } else if (body.endsWith("*/")) {
       body = body.substring(0, body.length() - 2).trim();
     }
     
