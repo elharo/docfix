@@ -58,6 +58,7 @@ public class DocFixTest {
     }
 
     // #30
+    @Test
     public void testDocFix_preservesSingleLineComments() {
       String fixed = DocFix.fix(code);
       assertTrue(fixed, fixed.contains("if (denominator == 0) { // Check for single line comment preservation"));
@@ -234,5 +235,11 @@ public class DocFixTest {
         String fixed = DocFix.fix(code);
         assertTrue(fixed, fixed.contains(" * Represents a complex number with real and imaginary parts."));
         assertTrue(fixed, fixed.contains(" * @author ChatGPT"));
+    }
+
+    @Test
+    public void testSingleLineFieldComment() {
+        String fixed = DocFix.fix(code);
+        assertTrue(fixed, fixed.contains("    /** The phase (angle) of the complex number in radians. */\n"));
     }
 }
