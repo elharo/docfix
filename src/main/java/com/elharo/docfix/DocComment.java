@@ -120,15 +120,15 @@ class DocComment {
     return indent;
   }
 
-  Kind getKind() {
+  final Kind getKind() {
     return kind;
   }
 
-  String getDescription() {
+  final String getDescription() {
     return description;
   }
 
-  List<BlockTag> getBlockTags() {
+  final List<BlockTag> getBlockTags() {
     return blockTags;
   }
 
