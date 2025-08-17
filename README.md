@@ -18,6 +18,7 @@ There are malformed edge conditions that this tool does not handle.
 - Fixes @param, @return, @throws, and other block tag descriptions to start with lowercase
 - Removes extraneous periods from the end of block tag descriptions
 - Removes extraneous hyphens from the start of block tag descriptions
+- Removes blank lines in block tag sections
 - Removes trailing white space from Javadoc comments
 - Ensures there's a blank line between the description and the first block tag
 - Ensures there's a line break after /** in multi-line comments
