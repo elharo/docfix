@@ -159,6 +159,23 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testDontLowercaseSee() {
+    DocComment docComment = DocComment.parse(Kind.FIELD,
+        "    /**\n"
+            + "     * Override default behavior so that if deep is true, children are also\n"
+            + "     * toggled.\n"
+            + "     * @see Node\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertEquals(        "    /**\n"
+        + "     * Override default behavior so that if deep is true, children are also\n"
+        + "     * toggled.\n"
+        + "     *\n"
+        + "     * @see Node\n"
+        + "     */", java);
+  }
+
+  @Test
   public void testEmpty() {
     DocComment docComment = DocComment.parse(Kind.FIELD, "");
     String java = docComment.toJava();
