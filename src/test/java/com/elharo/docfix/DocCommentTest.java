@@ -128,6 +128,13 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testEmpty() {
+    DocComment docComment = DocComment.parse(Kind.FIELD, "");
+    String java = docComment.toJava();
+    assertEquals("", java);
+  }
+
+  @Test
   public void testPreserveDoubleSpace() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "    /**\n"
