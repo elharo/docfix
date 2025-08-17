@@ -106,7 +106,25 @@ public class DocCommentTest {
     DocComment docComment = DocComment.parse(Kind.FIELD,
         "/** a single line comment */");
     String java = docComment.toJava();
-    assertEquals(java, "/** A single line comment. */");
+    assertEquals("/** A single line comment. */", java);
+  }
+
+  @Test
+  public void testExtraAsterisks() {
+    DocComment docComment = DocComment.parse(Kind.FIELD,
+        "/** a single line comment **/");
+    String java = docComment.toJava();
+    assertEquals("/** A single line comment. */", java);
+  }
+
+  @Test
+  public void testExtraAsterisksMultiLine() {
+    DocComment docComment = DocComment.parse(Kind.FIELD,
+        "/** \n"
+            + "* a longer comment\n"
+            + "**/\n");
+    String java = docComment.toJava();
+    assertEquals("/**\n * A longer comment.\n */", java);
   }
 
   @Test
