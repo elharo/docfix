@@ -5,10 +5,12 @@ DocFix is a Java utility that automatically fixes common Javadoc
 formatting issues to conform to [Oracle Javadoc
 conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html).
 
-The goal is to correctly format most real world Javadoc. There are certainly a lot
-of malformed edge conditions that this tool does not handle. This tool is also
-somewhat opinionated, so it will reformat some idiosyncratic Javadoc into more
-conventional styles.
+The goal is to correctly format most real world Javadoc. 
+It maintains proper formatting while applying fixes
+and preserves the overall structure and content of the documentation.
+This tool is opinionated, so it will reformat some idiosyncratic Javadoc
+into more conventional styles.
+There are malformed edge conditions that this tool does not handle.
 
 ## What it fixes
 
@@ -17,8 +19,7 @@ conventional styles.
 - Removes extraneous periods from the end of block tag descriptions
 - Removes extraneous hyphens from the start of block tag descriptions
 - Removes trailing white space from Javadoc comments
-- Maintains proper formatting while applying fixes
-- Preserves the overall structure and content of the documentation
+- Ensures there's a blank line between the description and the first block tag
 
 ## Requirements
 
