@@ -89,7 +89,7 @@ class BlockTag {
    *     it contains an initial capital letter followed only by non-capital letters.
    */
   private boolean shouldLowerCase(String type, String text) {
-    if ("author".equals(type)) {
+    if ("author".equals(type) || "see".equals(type)) {
       return false; // author is usually a proper name
     }
 
