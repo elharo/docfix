@@ -89,6 +89,14 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testSingleLine() {
+    DocComment docComment = DocComment.parse(Kind.FIELD,
+        "/** a single line comment */");
+    String java = docComment.toJava();
+    assertEquals(java, "/** A single line comment. */");
+  }
+
+  @Test
   public void testPreserveDoubleSpace() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "    /**\n"

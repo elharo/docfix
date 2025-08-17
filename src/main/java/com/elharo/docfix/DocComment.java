@@ -18,9 +18,9 @@ class DocComment {
   final boolean hasTrailingBlankLine; // Whether there's a blank line after the last block tag
 
   // Indentation to be applied before entire comment
-  private final String indent;
+  protected final String indent;
 
-  private DocComment(Kind kind, String description, List<BlockTag> blockTags, int indent,
+  protected DocComment(Kind kind, String description, List<BlockTag> blockTags, int indent,
       boolean hasTrailingBlankLine) {
     this.kind = kind;
     if (description != null && !description.isEmpty()) {
@@ -40,11 +40,18 @@ class DocComment {
     // Remove leading/trailing comment markers and split into lines
     // TODO could just keep the beginning and end markers
     String body = raw.trim();
+    boolean singleLine = !body.contains("\n");
     if (body.startsWith("/**")) {
       body = body.substring(3);
     }
     if (body.endsWith("*/")) {
       body = body.substring(0, body.length() - 2).trim();
+    }
+    
+    // If it's a single line comment with no block tags, return a SingleLineComment
+    if (singleLine && !body.contains("@")) {
+      String description = body.trim();
+      return new SingleLineComment(kind, description, tagIndent);
     }
     String[] lines = body.split("\r?\n");
     StringBuilder description = new StringBuilder();
@@ -113,15 +120,15 @@ class DocComment {
     return indent;
   }
 
-  Kind getKind() {
+  final Kind getKind() {
     return kind;
   }
 
-  String getDescription() {
+  final String getDescription() {
     return description;
   }
 
-  List<BlockTag> getBlockTags() {
+  final List<BlockTag> getBlockTags() {
     return blockTags;
   }
 
