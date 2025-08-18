@@ -19,13 +19,11 @@ class DocComment {
   final Kind kind;
   final String description; // Main description (before block tags)
   final List<BlockTag> blockTags;
-  final boolean hasTrailingBlankLine; // Whether there's a blank line after the last block tag
 
   // Indentation to be applied before entire comment
   protected final String indent;
 
-  protected DocComment(Kind kind, String description, List<BlockTag> blockTags, int indent,
-      boolean hasTrailingBlankLine) {
+  protected DocComment(Kind kind, String description, List<BlockTag> blockTags, int indent) {
     this.kind = kind;
     if (description != null && !description.isEmpty()) {
       char first = description.charAt(0);
@@ -38,7 +36,6 @@ class DocComment {
     }
     this.description = description;
     this.blockTags = sortTags(blockTags);
-    this.hasTrailingBlankLine = hasTrailingBlankLine;
     this.indent = " ".repeat(indent);
   }
 
@@ -170,25 +167,7 @@ class DocComment {
       }
     }
 
-    // Check for trailing blank lines after all block tags
-    boolean hasTrailingBlankLine = false;
-    if (!blockTags.isEmpty()) {
-      // Look for blank lines after the last block tag
-      for (int i = lines.length - 1; i >= 0; i--) {
-        String line = lines[i].trim();
-        if (line.startsWith("*")) {
-          line = line.substring(1).trim();
-        }
-        if (line.isEmpty()) {
-          hasTrailingBlankLine = true;
-          break;
-        } else if (line.startsWith("@")) {
-          // Found the last block tag, no trailing blank line
-          break;
-        }
-      }
-    }
-    return new DocComment(kind, description.toString(), blockTags, tagIndent, hasTrailingBlankLine);
+    return new DocComment(kind, description.toString(), blockTags, tagIndent);
   }
 
   // TODO move this to utility class
@@ -255,9 +234,6 @@ class DocComment {
           sb.append(tag.getSpaces()).append(tag.getText());
         }
         sb.append("\n");
-      }
-      if (hasTrailingBlankLine) {
-        sb.append(indent).append(" *\n");
       }
     }
     sb.append(indent).append(" */");

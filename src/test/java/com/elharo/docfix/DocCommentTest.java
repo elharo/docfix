@@ -207,6 +207,24 @@ public class DocCommentTest {
     assertFalse(java.contains("config {@link"));
   }
 
+  @Test
+  public void testRemoveTrailingBlankLine() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "  /**\n"
+            + "   * Attribute represents an XML attribute.\n"
+            + "   *\n"
+            + "   * @author Joe Smith\n"
+            + "   * @since PR-DOM-Level-1-19980818\n"
+            + "   * @xerces.internal\n"
+            + "   *\n"
+            + "   */");
+
+    BlockTag lastTag = docComment.getBlockTags().get(2);
+    assertEquals("xerces.internal", lastTag.getType());
+    assertEquals("", lastTag.getText());
+    String java = docComment.toJava();
+    assertTrue(java, java.endsWith("@xerces.internal\n   */"));
+  }
 
   @Test
   public void testCustomTags() {
@@ -443,19 +461,6 @@ public class DocCommentTest {
     String java = docComment.toJava();
     assertTrue(java, java.contains("@param real      the real part"));
     assertTrue(java, java.contains("@param imaginary the imaginary part"));
-  }
-
-  @Test
-  public void testTrailingBlankLine() {
-    DocComment docComment = DocComment.parse(Kind.METHOD,
-        "  /**\n"
-            + "   * Returns true if the expression resolves\n"
-            + "   *\n"
-            + "   * @see org.apache.xerces.xpointer.XPointerPart#isChildFragmentResolved()\n"
-            + "   *\n"
-            + "   */");
-    String java = docComment.toJava();
-    assertTrue(java, java.endsWith("\n   *\n   */"));
   }
 
   @Test
