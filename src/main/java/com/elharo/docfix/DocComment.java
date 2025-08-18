@@ -1,6 +1,10 @@
 package com.elharo.docfix;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a Javadoc comment, including its kind, description,
@@ -38,19 +42,9 @@ class DocComment {
     this.indent = " ".repeat(indent);
   }
 
-  private List<BlockTag> sortTags(List<BlockTag> blockTags) {
-    if (blockTags == null || blockTags.size() <= 1) {
-      return blockTags;
-    }
+  private final static Map<String, Integer> tagOrder = new HashMap<>();
 
-    // Create a list with original indices to preserve order for same-type tags
-    List<java.util.AbstractMap.SimpleEntry<BlockTag, Integer>> tagWithIndex = new java.util.ArrayList<>();
-    for (int i = 0; i < blockTags.size(); i++) {
-      tagWithIndex.add(new java.util.AbstractMap.SimpleEntry<>(blockTags.get(i), i));
-    }
-
-    // Define the standard tag order
-    java.util.Map<String, Integer> tagOrder = new java.util.HashMap<>();
+  static {
     tagOrder.put("author", 0);
     tagOrder.put("version", 1);
     tagOrder.put("param", 2);
@@ -62,6 +56,18 @@ class DocComment {
     tagOrder.put("serialField", 7); // Same priority as serial
     tagOrder.put("serialData", 7); // Same priority as serial
     tagOrder.put("deprecated", 8);
+  }
+
+  private static List<BlockTag> sortTags(List<BlockTag> blockTags) {
+    if (blockTags == null || blockTags.size() <= 1) {
+      return blockTags;
+    }
+
+    // Create a list with original indices to preserve order for same-type tags
+    List<AbstractMap.SimpleEntry<BlockTag, Integer>> tagWithIndex = new ArrayList<>();
+    for (int i = 0; i < blockTags.size(); i++) {
+      tagWithIndex.add(new AbstractMap.SimpleEntry<>(blockTags.get(i), i));
+    }
 
     tagWithIndex.sort((entry1, entry2) -> {
       BlockTag tag1 = entry1.getKey();
@@ -76,10 +82,12 @@ class DocComment {
       Integer order2 = tagOrder.get(type2);
 
       // Unknown/custom tags get highest priority (sorted last)
-      if (order1 == null)
+      if (order1 == null) {
         order1 = Integer.MAX_VALUE;
-      if (order2 == null)
+      }
+      if (order2 == null) {
         order2 = Integer.MAX_VALUE;
+      }
 
       // First sort by tag type priority
       int orderComparison = order1.compareTo(order2);
@@ -87,7 +95,7 @@ class DocComment {
         return orderComparison;
       }
 
-      // For throws tags, sort alphabetically by exception name (case insensitive)
+      // For throws tags, sort alphabetically by exception name (case-insensitive)
       if ("throws".equals(type1) && "throws".equals(type2)) {
         String arg1 = tag1.getArgument();
         String arg2 = tag2.getArgument();
@@ -96,7 +104,9 @@ class DocComment {
         }
       }
 
-      // For tags of the same type (except throws), preserve original order
+      // For tags of the same type (except throws), preserve original order.
+      // This isn't fully compatible with the guidelines, but we have no way of
+      // knowing which authors were added first and so forth.
       return Integer.compare(index1, index2);
     });
 
