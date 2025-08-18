@@ -32,9 +32,13 @@ class DocComment {
       }
     }
     this.description = description;
-    this.blockTags = blockTags;
+    this.blockTags = sortTags(blockTags);
     this.hasTrailingBlankLine = hasTrailingBlankLine;
     this.indent = " ".repeat(indent);
+  }
+
+  private List<BlockTag> sortTags(List<BlockTag> blockTags) {
+    return blockTags;
   }
 
   static DocComment parse(Kind kind, String raw) {

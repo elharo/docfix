@@ -228,6 +228,21 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testSortTags() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * a class\n"
+            + "     *\n"
+            + "     * @version 1.0\n"
+            + "     * @author Barney Google\n"
+            + "     */");
+    List<BlockTag> blockTags = docComment.getBlockTags();
+    assertEquals(2, blockTags.size());
+    assertEquals("author", blockTags.get(0).getType());
+    assertEquals("version", blockTags.get(1).getType());
+  }
+
+  @Test
   public void testParse_blockTags() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
