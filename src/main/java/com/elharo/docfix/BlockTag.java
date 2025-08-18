@@ -3,6 +3,8 @@ package com.elharo.docfix;
 import static com.elharo.docfix.DocComment.findIndent;
 
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents a Javadoc block tag (e.g., @param, @return, @throws, @deprecated, etc.).
@@ -25,6 +27,17 @@ class BlockTag {
       type = "throws"; // Normalize 'exception' to 'throws'
     }
     this.type = type;
+
+    if (argument != null && argument.endsWith("\n")) {
+      argument = argument.trim();
+      Pattern pattern = Pattern.compile("^\\*\\s*");
+      Matcher matcher = pattern.matcher(text);
+      if (matcher.find()) {
+        // Remove the indent from start of the description so it moves to the previous line
+        text = matcher.replaceFirst("");
+      }
+    }
+
     this.argument = argument;
 
     if (text.startsWith("- ")) {
@@ -74,7 +87,7 @@ class BlockTag {
     } else {
        arg = parts.length > 1 ? parts[1] : null;
        text = parts.length > 2 ? parts[2].trim() : "";
-       if (parts.length > 2) {
+       if (parts.length > 2 && !text.startsWith("*")) {
          int x = findIndent(parts[2]);
          spaces = " ".repeat(x + 1);
        }

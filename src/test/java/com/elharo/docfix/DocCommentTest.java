@@ -207,6 +207,21 @@ public class DocCommentTest {
     assertFalse(java.contains("config {@link"));
   }
 
+  @Test
+  public void testTwoLineParam() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * Foo\n"
+            + "     *\n"
+            + "     * @param config\n"
+            + "     *    Something something\n"
+            + "     * @param entries \n"
+            + "     *    The entries.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains("@param config something something\n"));
+    assertTrue(java, java.contains("@param entries the entries\n"));
+  }
 
   @Test
   public void testCustomTags() {
