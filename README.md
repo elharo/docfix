@@ -24,6 +24,7 @@ There are malformed edge conditions that this tool does not handle.
 - Ensures there's a blank line between the description and the first block tag
 - Ensures there's a line break after /** in multi-line comments
 - Reorders block tags in order @author, @version, @param, @return, @throws, @see, @since, @serial, @deprecated
+- Ensures description immediately follows @param on same line
 
 ## Requirements
 
