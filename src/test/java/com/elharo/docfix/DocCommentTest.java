@@ -297,7 +297,7 @@ public class DocCommentTest {
             + "     */");
     List<BlockTag> blockTags = docComment.getBlockTags();
     
-    // @throws tags should be sorted alphabetically by exception name (case insensitive)
+    // @throws tags should be sorted alphabetically by exception name (case-insensitive)
     assertEquals(4, blockTags.size());
     assertEquals("throws", blockTags.get(0).getType());
     assertEquals("AException", blockTags.get(0).getArgument());
