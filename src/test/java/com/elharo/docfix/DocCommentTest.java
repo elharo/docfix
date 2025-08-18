@@ -104,6 +104,17 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testDontAddPeriod() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "  /**\n"
+            + "   * Returns the scheme name<p>\n"
+            + "   * @return A String containing the scheme name of the PointerPart. \n"
+            + "   */");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains("Returns the scheme name<p>\n"));
+  }
+
+  @Test
   public void testNoExtraSpaceInBlankLines() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "/**\n"
@@ -229,7 +240,7 @@ public class DocCommentTest {
     assertTrue(docComment.toString(), java.contains("\n     * Constructs"));
     assertTrue(docComment.toString(), java.contains("@param real "));
     assertTrue(docComment.toString(), java.contains(" *\n"));
-    assertEquals("Constructs a complex number with the specified real and imaginary parts.\n", docComment.getDescription());
+    assertEquals("Constructs a complex number with the specified real and imaginary parts.", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
 
     List<BlockTag> tags = docComment.getBlockTags();
@@ -303,7 +314,7 @@ public class DocCommentTest {
             + "     * @param real the real part\n"
             + "     * @param imaginary the imaginary part\n"
             + "     */");
-    assertEquals("Constructs a complex number with the specified real and imaginary parts.\n", docComment.getDescription());
+    assertEquals("Constructs a complex number with the specified real and imaginary parts.", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
 
     List<BlockTag> tags = docComment.getBlockTags();
@@ -358,7 +369,7 @@ public class DocCommentTest {
             + "     *\n"
             + "     * @return a hash code value\n"
             + "     */\n");
-    assertEquals("Returns a hash code value for this complex number.\n", docComment.getDescription());
+    assertEquals("Returns a hash code value for this complex number.", docComment.getDescription());
     assertEquals(Kind.METHOD, docComment.getKind());
 
     List<BlockTag> tags = docComment.getBlockTags();
