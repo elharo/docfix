@@ -10,7 +10,7 @@ import java.util.Collections;
 class SingleLineComment extends DocComment {
 
   SingleLineComment(Kind kind, String description, int indent) {
-    super(kind, description, Collections.emptyList(), indent, false);
+    super(kind, description, Collections.emptyList(), indent);
   }
 
   /**
