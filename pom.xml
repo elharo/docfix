@@ -9,6 +9,7 @@
   <version>1.0-SNAPSHOT</version>
 
   <name>docfix</name>
+  <description>A library that fixes Javadoc comments to fit Oracle guidelines</description>
   <url>https://github.com/elharo/docfix</url>
 
   <properties>
