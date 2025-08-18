@@ -228,6 +228,159 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testSortTags() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * a class\n"
+            + "     *\n"
+            + "     * @version 1.0\n"
+            + "     * @author Barney Google\n"
+            + "     */");
+    List<BlockTag> blockTags = docComment.getBlockTags();
+    assertEquals(2, blockTags.size());
+    assertEquals("author", blockTags.get(0).getType());
+    assertEquals("version", blockTags.get(1).getType());
+  }
+
+  @Test
+  public void testSortTagsComprehensive() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method with many tags\n"
+            + "     *\n"
+            + "     * @custom.tag custom tag\n"
+            + "     * @deprecated this is deprecated\n"
+            + "     * @see SomeClass\n"
+            + "     * @throws IOException if IO fails\n"
+            + "     * @param name the name parameter\n"
+            + "     * @since 1.0\n"
+            + "     * @throws IllegalArgumentException if argument is invalid\n"
+            + "     * @return the result\n"
+            + "     * @param age the age parameter\n"
+            + "     * @author John Doe\n"
+            + "     * @version 2.0\n"
+            + "     * @serial serial info\n"
+            + "     */");
+    List<BlockTag> blockTags = docComment.getBlockTags();
+    
+    // Expected order: @author, @version, @param (name), @param (age), @return, 
+    // @throws (IllegalArgumentException), @throws (IOException), @see, @since, @serial, @deprecated, @custom.tag
+    assertEquals(12, blockTags.size());
+    assertEquals("author", blockTags.get(0).getType());
+    assertEquals("version", blockTags.get(1).getType());
+    assertEquals("param", blockTags.get(2).getType());
+    assertEquals("name", blockTags.get(2).getArgument());
+    assertEquals("param", blockTags.get(3).getType());
+    assertEquals("age", blockTags.get(3).getArgument());
+    assertEquals("return", blockTags.get(4).getType());
+    assertEquals("throws", blockTags.get(5).getType());
+    assertEquals("IllegalArgumentException", blockTags.get(5).getArgument());
+    assertEquals("throws", blockTags.get(6).getType());
+    assertEquals("IOException", blockTags.get(6).getArgument());
+    assertEquals("see", blockTags.get(7).getType());
+    assertEquals("since", blockTags.get(8).getType());
+    assertEquals("serial", blockTags.get(9).getType());
+    assertEquals("deprecated", blockTags.get(10).getType());
+    assertEquals("custom.tag", blockTags.get(11).getType());
+  }
+
+  @Test
+  public void testSortTagsThrowsAlphabetical() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method with multiple throws tags\n"
+            + "     *\n"
+            + "     * @throws ZException last exception\n"
+            + "     * @throws IOException io exception\n"
+            + "     * @throws IllegalArgumentException illegal arg\n"
+            + "     * @throws AException first exception\n"
+            + "     */");
+    List<BlockTag> blockTags = docComment.getBlockTags();
+    
+    // @throws tags should be sorted alphabetically by exception name (case insensitive)
+    assertEquals(4, blockTags.size());
+    assertEquals("throws", blockTags.get(0).getType());
+    assertEquals("AException", blockTags.get(0).getArgument());
+    assertEquals("throws", blockTags.get(1).getType());
+    assertEquals("IllegalArgumentException", blockTags.get(1).getArgument());
+    assertEquals("throws", blockTags.get(2).getType());
+    assertEquals("IOException", blockTags.get(2).getArgument());
+    assertEquals("throws", blockTags.get(3).getType());
+    assertEquals("ZException", blockTags.get(3).getArgument());
+  }
+
+  @Test
+  public void testSortTagsPreserveOrderWithinType() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method with multiple same-type tags\n"
+            + "     *\n"
+            + "     * @see SecondClass\n"
+            + "     * @see FirstClass\n"
+            + "     * @custom.foo second custom\n"
+            + "     * @custom.foo first custom\n"
+            + "     */");
+    List<BlockTag> blockTags = docComment.getBlockTags();
+    
+    // Non-throws tags should preserve original order within same type
+    assertEquals(4, blockTags.size());
+    assertEquals("see", blockTags.get(0).getType());
+    assertEquals("SecondClass", blockTags.get(0).getText());
+    assertEquals("see", blockTags.get(1).getType());
+    assertEquals("FirstClass", blockTags.get(1).getText());
+    assertEquals("custom.foo", blockTags.get(2).getType());
+    assertEquals("second", blockTags.get(2).getArgument());
+    assertEquals("custom", blockTags.get(2).getText());
+    assertEquals("custom.foo", blockTags.get(3).getType());
+    assertEquals("first", blockTags.get(3).getArgument());
+    assertEquals("custom", blockTags.get(3).getText());
+  }
+
+  @Test
+  public void testSortTagsSerialVariants() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method with serial variants\n"
+            + "     *\n"
+            + "     * @serialData some data\n"
+            + "     * @serialField some field\n"
+            + "     * @serial some serial\n"
+            + "     */");
+    List<BlockTag> blockTags = docComment.getBlockTags();
+    
+    // All serial variants should be grouped together in the serial position
+    assertEquals(3, blockTags.size());
+    assertEquals("serialData", blockTags.get(0).getType());
+    assertEquals("serialField", blockTags.get(1).getType());
+    assertEquals("serial", blockTags.get(2).getType());
+  }
+
+  @Test
+  public void testSortTagsThrowsCaseInsensitive() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method with case-sensitive exception names\n"
+            + "     *\n"
+            + "     * @throws ioException lowercase io\n"
+            + "     * @throws IOException uppercase IO\n"
+            + "     * @throws IllegalArgumentException mixed case\n"
+            + "     * @throws aException lowercase a\n"
+            + "     */");
+    List<BlockTag> blockTags = docComment.getBlockTags();
+    
+    // @throws tags should be sorted case-insensitively by exception name
+    assertEquals(4, blockTags.size());
+    assertEquals("throws", blockTags.get(0).getType());
+    assertEquals("aException", blockTags.get(0).getArgument());
+    assertEquals("throws", blockTags.get(1).getType());
+    assertEquals("IllegalArgumentException", blockTags.get(1).getArgument());
+    assertEquals("throws", blockTags.get(2).getType());
+    assertEquals("ioException", blockTags.get(2).getArgument());
+    assertEquals("throws", blockTags.get(3).getType());
+    assertEquals("IOException", blockTags.get(3).getArgument());
+  }
+
+  @Test
   public void testParse_blockTags() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
