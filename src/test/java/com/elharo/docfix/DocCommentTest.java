@@ -411,8 +411,8 @@ public class DocCommentTest {
   }
 
   @Test
-  public void testPreserveNoSpaceAfterAsterisk() {
-    // Test the edge case where there's no space after the asterisk
+  public void testAddSpaceAfterAsteriskWhenMissing() {
+    // Test that a space is added after asterisk when missing but content exists
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "/**\n"
             + " *This is a comment with no space after asterisk\n"
@@ -420,14 +420,23 @@ public class DocCommentTest {
             + " */");
     
     String description = docComment.getDescription();
+    String java = docComment.toJava();
     
-    // The first line should have no leading space (since there was none after asterisk)
-    assertTrue("Should handle no space after asterisk", 
+    // The description should parse the content correctly
+    assertTrue("Should handle content with no space after asterisk", 
         description.contains("This is a comment with no space after asterisk"));
     
     // The second line should preserve its indentation
     assertTrue("Should preserve indentation even when first line has no space", 
         description.contains("  But this line has indentation"));
+    
+    // The generated Java output should add the missing space after asterisk
+    assertTrue("Generated Java should add space after asterisk for first line", 
+        java.contains(" * This is a comment with no space after asterisk"));
+    
+    // The generated Java output should preserve indentation for the second line
+    assertTrue("Generated Java should preserve indentation for second line", 
+        java.contains(" *   But this line has indentation"));
   }
 
   @Test
