@@ -227,6 +227,28 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testRemoveMultipleTrailingBlankLine() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * \n"
+            + " * <p>\n"
+            + " * A read-only list of elements for traversal purposes.\n"
+            + " * Changes to the document from which this list was generated\n"
+            + " * are not reflected in this list. Changes to the individual \n"
+            + " * <code>Element</code> objects in the list are reflected.\n"
+            + " * </p>\n"
+            + " * \n"
+            + " * @author Elliotte Rusty Harold\n"
+            + " * @version 1.3.0\n"
+            + " * \n"
+            + " *\n"
+            + " */");
+
+    String java = docComment.toJava();
+    assertTrue(java, java.endsWith("@version 1.3.0\n */"));
+  }
+
+  @Test
   public void testCustomTags() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "    /**\n"
