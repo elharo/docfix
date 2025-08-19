@@ -1,5 +1,7 @@
 package com.elharo.docfix;
 
+import static com.elharo.docfix.DocFix.detectLineEnding;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -119,6 +121,9 @@ class DocComment {
   static DocComment parse(Kind kind, String raw) {
     int tagIndent = findIndent(raw);
 
+    String lineEnding = detectLineEnding(raw);
+    raw = raw.replace(lineEnding, "\n"); // Normalize line endings
+
     // Remove leading/trailing comment markers and split into lines
     String body = raw.trim();
     boolean singleLine = !body.contains("\n");
@@ -136,7 +141,7 @@ class DocComment {
       String description = body.trim();
       return new SingleLineComment(kind, description, tagIndent);
     }
-    String[] lines = body.split("\r?\n");
+    String[] lines = body.split("\n");
     StringBuilder description = new StringBuilder();
     List<BlockTag> blockTags = new java.util.ArrayList<>();
     boolean inBlockTags = false;

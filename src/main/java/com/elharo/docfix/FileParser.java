@@ -1,6 +1,9 @@
 package com.elharo.docfix;
 
+import static com.elharo.docfix.DocFix.detectLineEnding;
+
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -22,11 +25,19 @@ class FileParser {
    * @throws IOException if an I/O error occurs reading the file
    */
   static List<String> parseFile(Path path) throws IOException {
-    List<String> lines = Files.readAllLines(path);
-    return parseLines(lines);
+    // TODO This is almost the same as DocFix.fix(Path file)
+    // TODO handle encoding; might not be UTF-8
+    String code = Files.readString(path, StandardCharsets.UTF_8);
+    String lineEnding = detectLineEnding(code);
+    String[] lines = code.split("\\R");
+    return parseLines(lines, lineEnding);
   }
 
-  static List<String> parseLines(List<String> lines) {
+  static List<String> parseLines(String[] lines, String lineEnding) {
+    return parseLines(List.of(lines), lineEnding);
+  }
+
+  static List<String> parseLines(List<String> lines, String lineEnding) {
     List<String> result = new ArrayList<>();
 
     for (int i = 0; i < lines.size(); i++) {
@@ -42,7 +53,7 @@ class FileParser {
         // TODO this is wrong. */ does not have to be last on the line though it usually is.
         // This is a claude mistake.
         if (!trimmed.endsWith("*/")) {
-          javadocBuilder.append("\n");
+          javadocBuilder.append(lineEnding);
           i++; // Move to next line
 
           // Read until we find the end of the Javadoc comment
@@ -55,13 +66,14 @@ class FileParser {
               break;
             }
 
-            javadocBuilder.append("\n");
+            javadocBuilder.append(lineEnding);
             i++;
           }
         }
 
         String originalComment = javadocBuilder.toString();
         String fixedComment = DocComment.parse(null, originalComment).toJava();
+        fixedComment = fixedComment.replace("\n", lineEnding);
         result.add(fixedComment);
       } else {
         // Regular line, add as-is

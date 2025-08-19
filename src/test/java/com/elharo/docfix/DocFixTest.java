@@ -57,6 +57,14 @@ public class DocFixTest {
         assertTrue(fixed, fixed.contains("/**\n * Represents a complex number with real and imaginary parts.\n"));
     }
 
+    @Test
+    public void testPreserveLineEndings() {
+        code = code.replace('\n', '\r');
+        String fixed = DocFix.fix(code);
+        assertFalse(fixed.contains("\n"));
+        assertTrue(fixed.contains("/**\r * Represents a complex number with real and imaginary parts.\r"));
+    }
+
     // #30
     @Test
     public void testDocFix_preservesSingleLineComments() {

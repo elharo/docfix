@@ -7,10 +7,13 @@ conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-to
 
 The goal is to correctly format most real world Javadoc. 
 It maintains proper formatting while applying fixes
-and preserves the overall structure and content of the documentation.
+and preserving the overall structure and content of the documentation.
 This tool is opinionated, so it will reformat some idiosyncratic Javadoc
 into more conventional styles.
+
 There are malformed edge conditions that this tool does not handle.
+These are typically cases where the code doesn't compile or the Javadoc is
+so malformed that it cannot be handled by the javadoc tool.
 
 ## What it fixes
 
