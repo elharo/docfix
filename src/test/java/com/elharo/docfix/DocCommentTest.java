@@ -377,6 +377,88 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testPreserveIndentationAfterAsterisk() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * This class represents an XML element. Each\n"
+            + " * element has the following properties:\n"
+            + " *\n"
+            + " * <ul>\n"
+            + " *   <li>Local name</li>\n"
+            + " *   <li>Prefix (which may be null or the empty string)</li>\n"
+            + " *   <li>Namespace URI (which may be null or the empty string)</li>\n"
+            + " *   <li>A list of attributes</li>\n"
+            + " *   <li>A list of namespace declarations for this element\n"
+            + " *       (not including those inherited from its parent)</li>\n"
+            + " *   <li>A list of child nodes</li>\n"
+            + " * </ul>\n"
+            + " */");
+    
+    String description = docComment.getDescription();
+    String java = docComment.toJava();
+    
+    // Check that indentation is preserved in the description
+    assertTrue("Should preserve indentation for list items", 
+        description.contains("  <li>Local name</li>"));
+    assertTrue("Should preserve indentation for continuation lines", 
+        description.contains("      (not including those inherited from its parent)"));
+    
+    // Check that the generated Java output preserves indentation
+    assertTrue("Generated Java should preserve list item indentation", 
+        java.contains(" *   <li>Local name</li>"));
+    assertTrue("Generated Java should preserve continuation line indentation", 
+        java.contains(" *       (not including those inherited from its parent)"));
+  }
+
+  @Test
+  public void testPreserveNoSpaceAfterAsterisk() {
+    // Test the edge case where there's no space after the asterisk
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " *This is a comment with no space after asterisk\n"
+            + " *   But this line has indentation\n"
+            + " */");
+    
+    String description = docComment.getDescription();
+    
+    // The first line should have no leading space (since there was none after asterisk)
+    assertTrue("Should handle no space after asterisk", 
+        description.contains("This is a comment with no space after asterisk"));
+    
+    // The second line should preserve its indentation
+    assertTrue("Should preserve indentation even when first line has no space", 
+        description.contains("  But this line has indentation"));
+  }
+
+  @Test
+  public void testPreserveMultipleSpacesAfterAsterisk() {
+    // Test that multiple spaces are preserved for code formatting
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Example code:\n"
+            + " *     int x = 5;\n"
+            + " *     if (x > 0) {\n"
+            + " *         System.out.println(\"positive\");\n"
+            + " *     }\n"
+            + " */");
+    
+    String description = docComment.getDescription();
+    String java = docComment.toJava();
+    
+    // Check that code indentation is preserved
+    assertTrue("Should preserve code indentation", 
+        description.contains("    int x = 5;"));
+    assertTrue("Should preserve nested code indentation", 
+        description.contains("        System.out.println(\"positive\");"));
+    
+    // Check in generated output
+    assertTrue("Generated Java should preserve code indentation", 
+        java.contains(" *     int x = 5;"));
+    assertTrue("Generated Java should preserve nested code indentation", 
+        java.contains(" *         System.out.println(\"positive\");"));
+  }
+
+  @Test
   public void testSortTagsSerialVariants() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"

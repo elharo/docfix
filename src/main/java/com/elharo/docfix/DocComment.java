@@ -150,7 +150,17 @@ class DocComment {
       String trimmed = line.trim();
       int indent = line.length() - trimmed.length();
       if (trimmed.startsWith("*")) {
-        trimmed = trimmed.substring(1).trim();
+        // Remove asterisk and at most one space after it to preserve indentation
+        String afterAsterisk = trimmed.substring(1);
+        if (afterAsterisk.startsWith(" ")) {
+          // Remove one space after asterisk, but preserve additional spaces for indentation
+          trimmed = afterAsterisk.substring(1);
+        } else {
+          // No space after asterisk
+          trimmed = afterAsterisk;
+        }
+        // Trim trailing spaces but preserve leading spaces for indentation
+        trimmed = trimmed.replaceAll("\\s+$", "");
       }
       if (trimmed.startsWith("@")) { // starts a new block tag
         inBlockTags = true;
