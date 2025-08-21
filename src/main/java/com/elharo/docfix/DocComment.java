@@ -142,74 +142,26 @@ class DocComment {
       return new SingleLineComment(kind, description, tagIndent);
     }
     String[] lines = body.split("\n");
-    
-    // First pass: extract content after asterisk and analyze indentation
-    String[] processedLines = new String[lines.length];
-    int minIndentAfterAsterisk = Integer.MAX_VALUE;
-    boolean hasNonEmptyContent = false;
-    
-    for (int i = 0; i < lines.length; i++) {
-      String line = lines[i];
-      String trimmed = line.trim();
-      
-      if (trimmed.startsWith("*")) {
-        // Remove asterisk and at most one space after it
-        String afterAsterisk = trimmed.substring(1);
-        if (afterAsterisk.startsWith(" ")) {
-          afterAsterisk = afterAsterisk.substring(1);
-        }
-        // Trim trailing spaces but preserve leading spaces for indentation analysis
-        afterAsterisk = afterAsterisk.stripTrailing();
-        
-        // Analyze indentation only for non-empty content
-        if (!afterAsterisk.isEmpty()) {
-          hasNonEmptyContent = true;
-          int leadingSpaces = 0;
-          for (char c : afterAsterisk.toCharArray()) {
-            if (c == ' ') {
-              leadingSpaces++;
-            } else {
-              break;
-            }
-          }
-          minIndentAfterAsterisk = Math.min(minIndentAfterAsterisk, leadingSpaces);
-        }
-        
-        processedLines[i] = afterAsterisk;
-      } else {
-        processedLines[i] = trimmed;
-      }
-    }
-    
-    // If all non-empty lines have excess indentation, remove the common excess
-    if (hasNonEmptyContent && minIndentAfterAsterisk > 0) {
-      for (int i = 0; i < processedLines.length; i++) {
-        if (processedLines[i] != null && !processedLines[i].isEmpty()) {
-          // Remove the common excess indentation
-          if (processedLines[i].length() >= minIndentAfterAsterisk) {
-            boolean allSpaces = true;
-            for (int j = 0; j < minIndentAfterAsterisk; j++) {
-              if (processedLines[i].charAt(j) != ' ') {
-                allSpaces = false;
-                break;
-              }
-            }
-            if (allSpaces) {
-              processedLines[i] = processedLines[i].substring(minIndentAfterAsterisk);
-            }
-          }
-        }
-      }
-    }
-    
-    // Second pass: build description and block tags using processed content
     StringBuilder description = new StringBuilder();
     List<BlockTag> blockTags = new java.util.ArrayList<>();
     boolean inBlockTags = false;
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
-      String trimmed = processedLines[i];
-      int indent = line.length() - line.trim().length();
+      String trimmed = line.trim();
+      int indent = line.length() - trimmed.length();
+      if (trimmed.startsWith("*")) {
+        // Remove asterisk and at most one space after it to preserve indentation
+        String afterAsterisk = trimmed.substring(1);
+        if (afterAsterisk.startsWith(" ")) {
+          // Remove one space after asterisk, but preserve additional spaces for indentation
+          trimmed = afterAsterisk.substring(1);
+        } else {
+          // No space after asterisk
+          trimmed = afterAsterisk;
+        }
+        // Trim trailing spaces but preserve leading spaces for indentation
+        trimmed = trimmed.stripTrailing();
+      }
       if (trimmed.stripLeading().startsWith("@")) { // starts a new block tag
         inBlockTags = true;
         trimmed = trimmed.stripLeading();
