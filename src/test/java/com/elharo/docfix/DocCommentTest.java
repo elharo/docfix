@@ -716,4 +716,74 @@ public class DocCommentTest {
     assertTrue(javaCode, javaCode.contains("@param real the real part\n"));
     assertTrue(javaCode.contains("@param imaginary the imaginary part\n"));
   }
+
+  @Test
+  public void testRemovePostAsteriskExcessIndenting() {
+    // Test the issue described in GitHub issue #112:
+    // When every line has more than one space after asterisk, reduce to single space
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     *  Retrieve the context node-set.\n"
+            + "     *  This is a live list. It is not a copy.\n"
+            + "     *  Do not modify it.\n"
+            + "     *\n"
+            + "     *  @return the context node-set\n"
+            + "     */");
+    
+    String description = docComment.getDescription();
+    String java = docComment.toJava();
+    
+    // The description should have normalized indentation (excess removed)
+    assertTrue("Should normalize description to single space after asterisk", 
+        description.contains("Retrieve the context node-set.\nThis is a live list. It is not a copy.\nDo not modify it."));
+    
+    // The generated Java output should have single space after asterisk
+    assertTrue("Generated Java should have single space after asterisk", 
+        java.contains(" * Retrieve the context node-set.\n"));
+    assertTrue("Generated Java should have single space after asterisk for all lines", 
+        java.contains(" * This is a live list. It is not a copy.\n"));
+    assertTrue("Generated Java should have single space after asterisk for block tags", 
+        java.contains(" * @return the context node-set\n"));
+    
+    // Should not have double spaces after asterisk
+    assertFalse("Should not have double spaces after asterisk", 
+        java.contains(" *  "));
+  }
+
+  @Test
+  public void testPreserveRelativeIndentingWithExcessCommonIndenting() {
+    // Test that relative indenting is preserved when removing common excess indenting
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     *  Example code:\n"
+            + "     *      int x = 5;\n"
+            + "     *      if (x > 0) {\n"
+            + "     *          System.out.println(\"positive\");\n"
+            + "     *      }\n"
+            + "     *\n"
+            + "     *  @param x the input value\n"
+            + "     */");
+    
+    String description = docComment.getDescription();
+    String java = docComment.toJava();
+    
+    // Description should have normalized base indentation but preserve relative indenting
+    // Original: 1 space common excess, so we remove 1 space from all lines
+    // "Example code:" (1->0), "      int x = 5;" (6->5 but wait, that's wrong analysis)
+    // Let me recalculate: after removing asterisk+space:
+    // " Example code:" (1 leading space)
+    // "     int x = 5;" (5 leading spaces) 
+    // "     if (x > 0) {" (5 leading spaces)
+    // "         System.out.println..." (9 leading spaces)
+    // Min = 1, so remove 1 from all:
+    // "Example code:" (0 spaces), "    int x = 5;" (4 spaces), etc.
+    assertTrue("Should preserve relative indentation in code blocks", 
+        description.contains("Example code:\n    int x = 5;\n    if (x > 0) {\n        System.out.println(\"positive\");\n    }"));
+    
+    // Generated Java should preserve relative indentation
+    assertTrue("Generated Java should preserve relative code indentation", 
+        java.contains(" *     int x = 5;\n"));
+    assertTrue("Generated Java should preserve nested code indentation", 
+        java.contains(" *         System.out.println(\"positive\");\n"));
+  }
 }
