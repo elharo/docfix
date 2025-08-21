@@ -786,4 +786,35 @@ public class DocCommentTest {
     assertTrue("Generated Java should preserve nested code indentation", 
         java.contains(" *         System.out.println(\"positive\");\n"));
   }
+
+  @Test
+  public void testFirstLineOnSameLineAsOpeningComment() {
+    // Test the specific case from issue #112 where first line is on same line as /**
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /** Retrieve the context node-set.\n"
+            + "     *  This is a live list. It is not a copy.\n"
+            + "     *  Do not modify it.\n"
+            + "     *\n"
+            + "     *  @return the context node-set\n"
+            + "     */");
+    
+    String description = docComment.getDescription();
+    String java = docComment.toJava();
+    
+    // This should be normalized to remove excess indentation
+    assertTrue("Should include first line in description", 
+        description.contains("Retrieve the context node-set"));
+    assertTrue("Should normalize first line correctly",
+        description.equals("Retrieve the context node-set.\nThis is a live list. It is not a copy.\nDo not modify it."));
+    
+    // Should not have extra spaces after asterisk in output
+    assertFalse("Should not have double spaces after asterisk", 
+        java.contains(" *  "));
+        
+    // Should have proper normalized output
+    assertTrue("Should have properly normalized output", 
+        java.contains(" * Retrieve the context node-set.\n"));
+    assertTrue("Should have normalized block tags", 
+        java.contains(" * @return the context node-set\n"));
+  }
 }
