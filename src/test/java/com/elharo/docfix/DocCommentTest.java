@@ -104,6 +104,18 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testExtraSpaceBeforeTag() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /** Create a new context.\n"
+            + "     *\n"
+            + "     *  @param contextSupport the context-support\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertFalse(java, java.contains("context-support."));
+    assertTrue(java, java.contains("* @param contextSupport the context-support\n"));
+  }
+
+  @Test
   public void testDontAddPeriod() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "  /**\n"
