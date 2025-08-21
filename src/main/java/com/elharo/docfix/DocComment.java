@@ -166,7 +166,7 @@ class DocComment {
         inBlockTags = true;
         trimmed = trimmed.stripLeading();
         // Add any additional lines that are part of the same block tag
-        while (i < lines.length - 1 && !lines[i + 1].trim().startsWith("* @")) {
+        while (i < lines.length - 1 && !lines[i + 1].matches("^\\s*\\*\\s*@.*")) {
           i++;
           if (!lines[i].trim().endsWith("*")) {
             trimmed += "\n" + lines[i];

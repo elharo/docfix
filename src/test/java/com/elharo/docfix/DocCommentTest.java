@@ -109,10 +109,12 @@ public class DocCommentTest {
         "    /** Create a new context.\n"
             + "     *\n"
             + "     *  @param contextSupport the context-support\n"
+            + "     *  @param prefix the prefix\n"
             + "     */");
     String java = docComment.toJava();
     assertFalse(java, java.contains("context-support."));
     assertTrue(java, java.contains("* @param contextSupport the context-support\n"));
+    assertTrue(java, java.contains("* @param prefix the prefix\n"));
   }
 
   @Test
