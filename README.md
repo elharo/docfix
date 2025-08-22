@@ -93,13 +93,13 @@ DocFix.fix(Paths.get("path/to/MyClass.java"));
 **Before:**
 ```java
 /**
- * The real part of the complex number.
+ *  The real part of the complex number
  */
 private final double real;
 
 /**
- * @param real The real part
- * @return The result
+ * @param real The real part.
+ * @return The result.
  */
 public double getReal(double real) {
     return real;
@@ -109,7 +109,7 @@ public double getReal(double real) {
 **After:**
 ```java
 /**
- * the real part of the complex number.
+ * The real part of the complex number.
  */
 private final double real;
 
