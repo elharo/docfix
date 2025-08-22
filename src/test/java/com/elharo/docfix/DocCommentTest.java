@@ -146,6 +146,51 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testDeindent() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/** Represents a complex number and provides methods for common\n"
+            + " *  arithmetic operations.\n"
+            + " *\n"
+            + " *  This class provides methods to add, subtract, multiply, and divide\n"
+            + " *  phase of a complex number.\n"
+            + " */\n");
+    String java = docComment.toJava();
+    assertFalse(java, java.contains("*  "));
+    assertTrue(java.contains(" * Represents"));
+    assertTrue(java.contains(" * arithmetic operations."));
+  }
+
+  @Test
+  public void testFindPostAsteriskIndent() {
+    String docComment =
+        "/** Represents a complex number and provides methods for common\n"
+            + " *  arithmetic operations.\n"
+            + " *\n"
+            + " *  This class provides methods to add, subtract, multiply, and divide\n"
+            + " *  phase of a complex number.\n"
+            + " */\n";
+    assertEquals(2, DocComment.findPostAsteriskIndent(docComment));
+  }
+
+  @Test
+  public void testFindPostAsteriskIndentWithBlockTags() {
+    String docComment =
+        "  /**\n"
+            + "   *  List all the nodes selected by this XPath\n"
+            + "   *  expression. If multiple nodes match, multiple nodes\n"
+            + "   *  are returned. Nodes are returned\n"
+            + "   *  in document-order, as defined by the XPath\n"
+            + "   *  specification. If the expression selects a non-node-set\n"
+            + "   *  (i.e. a number, boolean, or string) then a List\n"
+            + "   *  containing just that one object is returned.\n"
+            + "   *\n"
+            + "   * @param node the node, node-set or Context object for evaluation. \n"
+            + "   *     This value can be null.\n"
+            + "   */\n";
+    assertEquals(2, DocComment.findPostAsteriskIndent(docComment));
+  }
+
+  @Test
   public void testSingleLine() {
     DocComment docComment = DocComment.parse(Kind.FIELD,
         "/** a single line comment */");
