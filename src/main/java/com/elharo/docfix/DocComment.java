@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a Javadoc comment, including its kind, description,
- * and block tags.
+ * Represents a Javadoc comment, including its kind, description, and block tags.
  */
 class DocComment {
 
@@ -119,10 +118,11 @@ class DocComment {
   }
 
   static DocComment parse(Kind kind, String raw) {
-    int tagIndent = findIndent(raw);
-
     String lineEnding = detectLineEnding(raw);
     raw = raw.replace(lineEnding, "\n"); // Normalize line endings
+
+    int tagIndent = findIndent(raw);
+    int postAsteriskIndent = findPostAsteriskIndent(raw);
 
     // Remove leading/trailing comment markers and split into lines
     String body = raw.trim();
@@ -153,8 +153,8 @@ class DocComment {
         // Remove asterisk and at most one space after it to preserve indentation
         String afterAsterisk = trimmed.substring(1);
         if (afterAsterisk.startsWith(" ")) {
-          // Remove one space after asterisk, but preserve additional spaces for indentation
-          trimmed = afterAsterisk.substring(1);
+          // Remove spaces after asterisk, but preserve spaces for indentation
+          trimmed = afterAsterisk.substring(postAsteriskIndent);
         } else {
           // No space after asterisk
           trimmed = afterAsterisk;
@@ -184,6 +184,30 @@ class DocComment {
     }
 
     return new DocComment(kind, description.toString(), blockTags, tagIndent);
+  }
+
+  // visible for testing
+  static int findPostAsteriskIndent(String raw) {
+    String[] lines = raw.split("\n");
+    int minSpaces = -1;
+    // ignore first line after /**
+    for (int i = 1; i < lines.length; i++) {
+      String line = lines[i].trim();
+      if (line.startsWith("* @")) {
+        break; // Stop at first block tag
+      }
+      if (line.startsWith("*") && !line.endsWith("*/") && !"*".equals(line)) {
+        int lineIndent = findIndent(line.substring(1));
+        if (minSpaces == -1 || lineIndent < minSpaces) {
+          minSpaces = lineIndent;
+        }
+      }
+    }
+
+    if (minSpaces < 1) {
+      minSpaces = 1; // Ensure at least one space after the asterisk
+    }
+    return minSpaces;
   }
 
   // TODO move this to utility class
