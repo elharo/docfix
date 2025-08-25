@@ -16,7 +16,13 @@ import java.util.List;
  *      "https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html">How
  *      to Write Doc Comments for the Javadoc Tool</a>
  */
-public class DocFix {
+public final class DocFix {
+
+  /**
+   * Private constructor to prevent instantiation of this utility class.
+   */
+  private DocFix() {
+  }
 
   /**
    * Fixes Javadoc comments in the code so that the first letter
