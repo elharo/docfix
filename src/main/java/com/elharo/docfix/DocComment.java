@@ -159,8 +159,6 @@ class DocComment {
           // No space after asterisk
           trimmed = afterAsterisk;
         }
-        // Trim trailing spaces but preserve leading spaces for indentation
-        trimmed = trimmed.stripTrailing();
       }
       if (trimmed.stripLeading().startsWith("@")) { // starts a new block tag
         inBlockTags = true;
