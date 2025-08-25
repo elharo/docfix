@@ -1,7 +1,5 @@
 package com.elharo.docfix;
 
-import static com.elharo.docfix.DocComment.findIndent;
-
 import java.util.Set;
 
 /**
@@ -75,7 +73,7 @@ class BlockTag {
        arg = parts.length > 1 ? parts[1] : null;
        text = parts.length > 2 ? parts[2].trim() : "";
        if (parts.length > 2) {
-         int x = findIndent(parts[2]);
+         int x = Strings.findIndent(parts[2]);
          spaces = " ".repeat(x + 1);
        }
     }
