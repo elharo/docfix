@@ -58,11 +58,14 @@ public class DocFix {
    * @throws IOException if an I/O error occurs
    */
   public static void fix(Path file) throws IOException {
-    List<String> lines = FileParser.parseFile(file);
+    String code = Files.readString(file, StandardCharsets.UTF_8);
+    String lineEnding = detectLineEnding(code);
+    String[] rawLines = code.split("\\R");
+    List<String> fixedLines = FileParser.parseLines(rawLines, lineEnding);
     try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
-      for (String line : lines) {
+      for (String line : fixedLines) {
         writer.write(line);
-        writer.write("\n");
+        writer.write(lineEnding);
       }
     }
   }
