@@ -42,7 +42,7 @@ class FileParser {
 
     for (int i = 0; i < lines.size(); i++) {
       String line = lines.get(i);
-      String trimmed = line.trim();
+      String trimmed = line.stripLeading();
 
       // Check if this line starts a Javadoc comment
       if (trimmed.startsWith("/**")) {
