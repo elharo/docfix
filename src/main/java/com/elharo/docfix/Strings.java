@@ -1,7 +1,9 @@
 package com.elharo.docfix;
 
-class Strings {
+final class Strings {
 
+  // Private constructor to prevent instantiation
+  private Strings() {}
   static int findIndent(String s) {
     int indent = 0;
     for (char c : s.toCharArray()) {
