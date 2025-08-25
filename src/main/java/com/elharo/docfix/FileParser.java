@@ -25,7 +25,6 @@ class FileParser {
    * @throws IOException if an I/O error occurs reading the file
    */
   static List<String> parseFile(Path path) throws IOException {
-    // TODO This is almost the same as DocFix.fix(Path file)
     // TODO handle encoding; might not be UTF-8
     String code = Files.readString(path, StandardCharsets.UTF_8);
     String lineEnding = detectLineEnding(code);
@@ -42,7 +41,7 @@ class FileParser {
 
     for (int i = 0; i < lines.size(); i++) {
       String line = lines.get(i);
-      String trimmed = line.trim();
+      String trimmed = line.stripLeading();
 
       // Check if this line starts a Javadoc comment
       if (trimmed.startsWith("/**")) {

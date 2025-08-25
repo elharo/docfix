@@ -11,7 +11,7 @@ package com.elharo.math;
  * @author ChatGPT
  * @author Elliotte Rusty Harold
  */
-public class ComplexNumber implements Cloneable {
+public class ComplexNumber implements Cloneable { 
     /**
      * The real part of the complex number.
      */
