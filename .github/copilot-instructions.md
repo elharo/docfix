@@ -6,6 +6,5 @@ This project uses Java 11 and Maven 3.9.x.
 The package is com.elharo.docfix.
 Use Google code style for Java code.
 The project aims to fix Javadoc comments so that they conform to the Oracle Javadoc conventions.
-Use JavaParser to parse Java code and Javadoc comments.
 The project includes a test case that requires fixing a Javadoc comment in a class named ComplexNumber.java.
 The test case is located in src/test/java/com/elharo/math/ComplexNumberTest
