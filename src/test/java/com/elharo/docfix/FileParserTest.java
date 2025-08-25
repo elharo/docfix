@@ -22,7 +22,7 @@ public class FileParserTest {
     List<String> result = FileParser.parseFile(file);
 
     // Verify we got some results
-    assertTrue("Result should not be empty", !result.isEmpty());
+    assertFalse("Result should not be empty", result.isEmpty());
 
     // Check that the class-level Javadoc comment is combined into a single string
     boolean foundClassJavadoc = false;
