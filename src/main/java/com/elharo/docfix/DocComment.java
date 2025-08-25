@@ -170,7 +170,7 @@ class DocComment {
             trimmed += "\n" + lines[i];
           }
         }
-        BlockTag blockTag = BlockTag.parse(trimmed, indent);
+        BlockTag blockTag = BlockTag.parse(trimmed);
         blockTags.add(blockTag);
       } else if (!inBlockTags) {
         // Description lines before first block tag
@@ -247,16 +247,8 @@ class DocComment {
       if (description != null && !description.isBlank()) {
         sb.append(indent).append(" *\n"); // Blank line between description and block tags
       }
-      // TODO use toJava in BlockTag instead
       for (BlockTag tag : blockTags) {
-        sb.append(indent).append(" * @").append(tag.getType());
-        if (tag.getArgument() != null) {
-          sb.append(" ").append(tag.getArgument());
-        }
-        if (tag.getText() != null && !tag.getText().isEmpty()) {
-          sb.append(tag.getSpaces()).append(tag.getText());
-        }
-        sb.append("\n");
+        sb.append(indent).append(tag.toJava());
       }
     }
     sb.append(indent).append(" */");

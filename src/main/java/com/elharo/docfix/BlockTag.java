@@ -10,7 +10,6 @@ class BlockTag {
   private final String type; // e.g., param, return, throws, deprecated
   private final String argument; // e.g., parameter name for @param, exception type for @throws, null otherwise
   private final String text; // The text of the tag
-  private final int indent; // How many spaces before the comment starts
 
   /**
    * Spaces between the argument and the description.
@@ -18,7 +17,7 @@ class BlockTag {
    */
   private final String spaces;
 
-  private BlockTag(String type, String argument, String text, int indent, String spaces) {
+  private BlockTag(String type, String argument, String text, String spaces) {
     if ("exception".equals(type)) {
       type = "throws"; // Normalize 'exception' to 'throws'
     }
@@ -39,7 +38,6 @@ class BlockTag {
       text = text.trim().substring(0, text.trim().length() - 1);
     }
     this.text = text;
-    this.indent = indent;
     this.spaces = spaces;
   }
 
@@ -54,7 +52,7 @@ class BlockTag {
       "version"
   );
 
-  static BlockTag parse(String trimmed, int indent) {
+  static BlockTag parse(String trimmed) {
     // Parse block tag: e.g. @param real The real part
     String[] parts = trimmed.split(" ", 3);
     String type = parts[0].substring(1); // remove '@'
@@ -77,7 +75,7 @@ class BlockTag {
          spaces = " ".repeat(x + 1);
        }
     }
-    BlockTag blockTag = new BlockTag(type, arg, text, indent, spaces);
+    BlockTag blockTag = new BlockTag(type, arg, text, spaces);
     return blockTag;
   }
 
@@ -123,19 +121,17 @@ class BlockTag {
 
   String toJava() {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < indent; i++) {
-      sb.append(' ');
-    }
-    sb.append("* @").append(type);
+    sb.append(" * @").append(type);
     if (argument != null && !argument.isEmpty()) {
       sb.append(" ").append(argument);
     }
     if (text != null && !text.isEmpty()) {
       sb.append(spaces).append(text);
     }
+    sb.append("\n");
     return sb.toString();
   }
-
+  
   @Override
   public String toString() {
     return toJava();
