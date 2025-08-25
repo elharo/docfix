@@ -121,7 +121,7 @@ class DocComment {
     String lineEnding = detectLineEnding(raw);
     raw = raw.replace(lineEnding, "\n"); // Normalize line endings
 
-    int tagIndent = findIndent(raw);
+    int tagIndent = Strings.findIndent(raw);
     int postAsteriskIndent = findPostAsteriskIndent(raw);
 
     // Remove leading/trailing comment markers and split into lines
@@ -195,7 +195,7 @@ class DocComment {
         break; // Stop at first block tag
       }
       if (line.startsWith("*") && !line.endsWith("*/") && !"*".equals(line)) {
-        int lineIndent = findIndent(line.substring(1));
+        int lineIndent = Strings.findIndent(line.substring(1));
         if (minSpaces == -1 || lineIndent < minSpaces) {
           minSpaces = lineIndent;
         }
@@ -206,21 +206,6 @@ class DocComment {
       minSpaces = 1; // Ensure at least one space after the asterisk
     }
     return minSpaces;
-  }
-
-  // TODO move this to utility class
-  static int findIndent(String raw) {
-    int indent = 0;
-    for (char c : raw.toCharArray()) {
-      if (c == ' ') {
-        indent++;
-      } else if (c == '\t') {
-        indent += 4; // Assuming tab is equivalent to 4 spaces
-      } else {
-        break; // Stop at first non-space character
-      }
-    }
-    return indent;
   }
 
   final Kind getKind() {

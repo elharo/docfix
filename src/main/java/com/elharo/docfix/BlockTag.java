@@ -1,6 +1,6 @@
 package com.elharo.docfix;
 
-import static com.elharo.docfix.DocComment.findIndent;
+import static com.elharo.docfix.Strings.findIndent;
 
 import java.util.Set;
 
