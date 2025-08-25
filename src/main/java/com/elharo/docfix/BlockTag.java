@@ -123,19 +123,17 @@ class BlockTag {
 
   String toJava() {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < indent; i++) {
-      sb.append(' ');
-    }
-    sb.append("* @").append(type);
+    sb.append(" * @").append(type);
     if (argument != null && !argument.isEmpty()) {
       sb.append(" ").append(argument);
     }
     if (text != null && !text.isEmpty()) {
       sb.append(spaces).append(text);
     }
+    sb.append("\n");
     return sb.toString();
   }
-
+  
   @Override
   public String toString() {
     return toJava();

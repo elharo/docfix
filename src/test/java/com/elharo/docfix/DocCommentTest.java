@@ -322,8 +322,8 @@ public class DocCommentTest {
     List<BlockTag> blockTags = docComment.getBlockTags();
     assertEquals(4, blockTags.size());
     String java = docComment.toJava();
-    assertTrue(java.contains("     * @custom.foo    something  something\n"));
-    assertTrue(java, java.contains("    * @bar  something else\n     *    again\n"));
+    assertTrue(java, java.contains("     * @custom.foo   something  something\n"));
+    assertTrue(java, java.contains("     * @bar something else\n     *    again\n"));
   }
 
   @Test
@@ -723,8 +723,8 @@ public class DocCommentTest {
     assertEquals(1, tags.size());
     assertEquals("throws", tags.get(0).getType());
     String java = tags.get(0).toJava();
-    assertEquals(java, "     * @throws IllegalArgumentException some exception\n"
-        + "     *     if something goes wrong", java);
+    assertEquals(java, " * @throws IllegalArgumentException some exception\n"
+        + "     *     if something goes wrong\n", java);
   }
 
   @Test
