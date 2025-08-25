@@ -170,7 +170,7 @@ class DocComment {
             trimmed += "\n" + lines[i];
           }
         }
-        BlockTag blockTag = BlockTag.parse(trimmed, indent);
+        BlockTag blockTag = BlockTag.parse(trimmed);
         blockTags.add(blockTag);
       } else if (!inBlockTags) {
         // Description lines before first block tag
