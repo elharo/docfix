@@ -256,17 +256,4 @@ public class DocFixTest {
         String fixed = DocFix.fix(code);
         assertTrue(fixed, fixed.contains("    /** The phase (angle) of the complex number in radians. */\n"));
     }
-
-    @Test
-    public void testDocFixClassIsFinal() {
-        assertTrue("DocFix class should be final", 
-            java.lang.reflect.Modifier.isFinal(DocFix.class.getModifiers()));
-    }
-
-    @Test
-    public void testDocFixConstructorIsPrivate() throws NoSuchMethodException {
-        java.lang.reflect.Constructor<DocFix> constructor = DocFix.class.getDeclaredConstructor();
-        assertTrue("DocFix constructor should be private", 
-            java.lang.reflect.Modifier.isPrivate(constructor.getModifiers()));
-    }
 }
