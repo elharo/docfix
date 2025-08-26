@@ -21,7 +21,7 @@ class DocComment {
   final String description; // Main description (before block tags)
   final List<BlockTag> blockTags;
 
-  // Indentation to be applied before entire comment
+  // Indentation to be applied before each line of the comment
   protected final String indent;
 
   protected DocComment(Kind kind, String description, List<BlockTag> blockTags, int indent) {
