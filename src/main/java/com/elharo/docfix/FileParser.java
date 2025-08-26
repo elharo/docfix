@@ -1,7 +1,5 @@
 package com.elharo.docfix;
 
-import static com.elharo.docfix.Strings.detectLineEnding;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,7 +25,7 @@ class FileParser {
   static List<String> parseFile(Path path) throws IOException {
     // TODO handle encoding; might not be UTF-8
     String code = Files.readString(path, StandardCharsets.UTF_8);
-    String lineEnding = detectLineEnding(code);
+    String lineEnding = Strings.detectLineEnding(code);
     String[] lines = code.split("\\R");
     return parseLines(lines, lineEnding);
   }
