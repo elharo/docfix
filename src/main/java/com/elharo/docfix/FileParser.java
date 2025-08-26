@@ -1,44 +1,21 @@
 package com.elharo.docfix;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Read Java files line by line, applying fixes to Javadoc comments.
  */
-class FileParser {
-
-  /**
-   * Reads a Java file line by line and returns a list of strings.
-   * If a line starts a Javadoc comment, reads all lines until the end
-   * of the Javadoc comment, fixes the comment, and stores that as a single string.
-   * Otherwise, stores each individual line as a separate string.
-   *
-   * @param path the path to the Java file to read
-   * @return a list of strings representing the file content
-   * @throws IOException if an I/O error occurs reading the file
-   */
-  static List<String> parseFile(Path path) throws IOException {
-    // TODO handle encoding; might not be UTF-8
-    String code = Files.readString(path, StandardCharsets.UTF_8);
-    String lineEnding = Strings.detectLineEnding(code);
-    String[] lines = code.split("\\R");
-    return parseLines(lines, lineEnding);
-  }
+final class FileParser {
+  
+  private FileParser() {}
 
   static List<String> parseLines(String[] lines, String lineEnding) {
-    return parseLines(List.of(lines), lineEnding);
-  }
-
-  static List<String> parseLines(List<String> lines, String lineEnding) {
+    List<String> lines1 = List.of(lines);
     List<String> result = new ArrayList<>();
 
-    for (int i = 0; i < lines.size(); i++) {
-      String line = lines.get(i);
+    for (int i = 0; i < lines1.size(); i++) {
+      String line = lines1.get(i);
       String trimmed = line.stripLeading();
 
       // Check if this line starts a Javadoc comment
@@ -54,8 +31,8 @@ class FileParser {
           i++; // Move to next line
 
           // Read until we find the end of the Javadoc comment
-          while (i < lines.size()) {
-            String currentLine = lines.get(i);
+          while (i < lines1.size()) {
+            String currentLine = lines1.get(i);
             javadocBuilder.append(currentLine);
 
             // TODO same claude sonnet mistake
@@ -80,4 +57,5 @@ class FileParser {
 
     return result;
   }
+
 }

@@ -5,12 +5,10 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Utility class for fixing Javadoc comments to conform to Oracle Javadoc
- * guidelines.
+ * Utility class for fixing Javadoc comments to conform to Oracle Javadoc guidelines.
  * 
  * @see <a href=
  *      "https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html">How
@@ -34,7 +32,7 @@ public final class DocFix {
   public static String fix(String code) {
     String lineEnding = Strings.detectLineEnding(code);
     String[] lines = code.split("\\R");
-    List<String> fixedLines = FileParser.parseLines(Arrays.asList(lines), lineEnding);
+    List<String> fixedLines = FileParser.parseLines(lines, lineEnding);
     return String.join(lineEnding, fixedLines);
   }
 
@@ -46,6 +44,7 @@ public final class DocFix {
    * @throws IOException if an I/O error occurs
    */
   public static void fix(Path file) throws IOException {
+    // TODO handle encoding; might not be UTF-8
     String code = Files.readString(file, StandardCharsets.UTF_8);
     String lineEnding = Strings.detectLineEnding(code);
     String[] rawLines = code.split("\\R");
