@@ -1,6 +1,6 @@
 package com.elharo.docfix;
 
-import static com.elharo.docfix.DocFix.detectLineEnding;
+import static com.elharo.docfix.Strings.detectLineEnding;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

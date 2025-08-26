@@ -17,4 +17,21 @@ final class Strings {
     }
     return indent;
   }
+
+  /**
+   * Detects the line ending used in the provided code.
+   * It checks for Windows (\r\n), Mac (\r), and Unix (\n) line endings.
+   *
+   * @param code the source code to analyze
+   * @return the detected line ending as a string
+   */
+  static String detectLineEnding(String code) {
+    String lineEnding = "\n";
+    if (code.contains("\r\n")) {
+      lineEnding = "\r\n";
+    } else if (code.contains("\r")) {
+      lineEnding = "\r";
+    }
+    return lineEnding;
+  }
 }
