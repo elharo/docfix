@@ -3,7 +3,9 @@ package com.elharo.docfix;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -93,7 +95,7 @@ public final class DocFix {
         }
         try {
           encoding = Charset.forName(args[argIndex + 1]);
-        } catch (Exception e) {
+        } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
           System.err.println("Error: Invalid charset name: " + args[argIndex + 1]);
           System.exit(1);
         }

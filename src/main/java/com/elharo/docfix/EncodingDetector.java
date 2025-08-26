@@ -30,8 +30,8 @@ final class EncodingDetector {
     byte[] buffer = new byte[4096];
     int bytesRead;
     
-    try (InputStream is = Files.newInputStream(file)) {
-      bytesRead = is.read(buffer);
+    try (InputStream in = Files.newInputStream(file)) {
+      bytesRead = in.read(buffer);
     }
     
     if (bytesRead == -1) {
@@ -172,7 +172,7 @@ final class EncodingDetector {
              content.contains("void ") ||
              content.contains("/**") ||
              content.contains("*/");
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       // If decoding fails, this charset is not suitable
       return false;
     }
