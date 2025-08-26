@@ -9,15 +9,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class DocFixTest {
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     /**
      * Holds the contents of ComplexNumber.java test resource.
@@ -255,5 +261,79 @@ public class DocFixTest {
     public void testSingleLineFieldComment() {
         String fixed = DocFix.fix(code);
         assertTrue(fixed, fixed.contains("    /** The phase (angle) of the complex number in radians. */\n"));
+    }
+
+    /**
+     * Test that DocFix works with explicit UTF-8 encoding.
+     */
+    @Test
+    public void testFixWithUTF8Encoding() throws IOException {
+        Path tempFile = temporaryFolder.newFile("test.java").toPath();
+        String javaCode = "/** Constructs a new object with café. */\npublic class Test {}";
+        Files.writeString(tempFile, javaCode, StandardCharsets.UTF_8);
+        
+        // Fix with explicit UTF-8 encoding
+        DocFix.fix(tempFile, StandardCharsets.UTF_8);
+        
+        String result = Files.readString(tempFile, StandardCharsets.UTF_8);
+        assertTrue("Should fix Javadoc comment", result.contains("/** Constructs a new object with café. */"));
+    }
+
+    /**
+     * Test that DocFix works with explicit ISO-8859-1 encoding.
+     */
+    @Test
+    public void testFixWithISO88591Encoding() throws IOException {
+        Path tempFile = temporaryFolder.newFile("test.java").toPath();
+        String javaCode = "/** Constructs a new object with ñoño and ü. */\npublic class Test {}";
+        Files.writeString(tempFile, javaCode, StandardCharsets.ISO_8859_1);
+        
+        // Fix with explicit ISO-8859-1 encoding
+        DocFix.fix(tempFile, StandardCharsets.ISO_8859_1);
+        
+        String result = Files.readString(tempFile, StandardCharsets.ISO_8859_1);
+        assertTrue("Should fix Javadoc comment", result.contains("/** Constructs a new object with ñoño and ü. */"));
+    }
+
+    /**
+     * Test that DocFix auto-detects encoding when none is specified.
+     */
+    @Test
+    public void testFixWithAutoDetection() throws IOException {
+        Path tempFile = temporaryFolder.newFile("test.java").toPath();
+        String javaCode = "/** Constructs a new object with résumé. */\npublic class Test {}";
+        Files.writeString(tempFile, javaCode, StandardCharsets.UTF_8);
+        
+        // Fix with auto-detection (null encoding)
+        DocFix.fix(tempFile, null);
+        
+        String result = Files.readString(tempFile, StandardCharsets.UTF_8);
+        assertTrue("Should fix Javadoc comment", result.contains("/** Constructs a new object with résumé. */"));
+    }
+
+    /**
+     * Test command line parsing with encoding flag.
+     */
+    @Test
+    public void testMainWithEncodingFlag() throws IOException {
+        Path tempFile = temporaryFolder.newFile("test.java").toPath();
+        String javaCode = "/**\n * Constructs A new object with naïve approach.\n * @param value The value with émotions\n */\npublic class Test {}";
+        Files.writeString(tempFile, javaCode, StandardCharsets.UTF_8);
+        
+        // Capture System.out to check for output
+        PrintStream oldOut = System.out;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(baos, true, StandardCharsets.UTF_8));
+        
+        try {
+            String[] args = { "--dryrun", "-encoding", "UTF-8", tempFile.toString() };
+            DocFix.main(args);
+        } finally {
+            System.setOut(oldOut);
+        }
+        
+        String output = baos.toString(StandardCharsets.UTF_8);
+        assertTrue("Should show @param changes", output.contains("@param value the value"));
+        assertTrue("Should preserve non-ASCII characters in @param", output.contains("the value with émotions"));
     }
 }

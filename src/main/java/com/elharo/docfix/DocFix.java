@@ -2,7 +2,10 @@ package com.elharo.docfix;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -44,12 +47,26 @@ public final class DocFix {
    * @throws IOException if an I/O error occurs
    */
   public static void fix(Path file) throws IOException {
-    // TODO handle encoding; might not be UTF-8
-    String code = Files.readString(file, StandardCharsets.UTF_8);
+    fix(file, null);
+  }
+
+  /**
+   * Fixes Javadoc comments in the provided Java source file so that the first letter
+   * of each doc comment is lower case. The file is modified in place.
+   *
+   * @param file the path to the Java source file
+   * @param encoding the character encoding to use, or null to auto-detect
+   * @throws IOException if an I/O error occurs
+   */
+  public static void fix(Path file, Charset encoding) throws IOException {
+    if (encoding == null) {
+      encoding = EncodingDetector.detectEncoding(file);
+    }
+    String code = Files.readString(file, encoding);
     String lineEnding = Strings.detectLineEnding(code);
     String[] rawLines = code.split("\\R");
     List<String> fixedLines = FileParser.parseLines(rawLines, lineEnding);
-    try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+    try (Writer writer = Files.newBufferedWriter(file, encoding)) {
       for (String line : fixedLines) {
         writer.write(line);
         writer.write(lineEnding);
@@ -61,20 +78,40 @@ public final class DocFix {
    * Main method that applies Javadoc fixes to the file specified as the first
    * command line argument.
    *
-   * @param args command line arguments; the last argument should be the path to
-   *             the file to fix
+   * @param args command line arguments; supported flags: [--dryrun] [-encoding charset] <file-or-directory>
    */
   public static void main(String[] args) {
     int argIndex = 0;
-    if (args.length > 0 && "--dryrun".equals(args[0])) {
-      argIndex = 1;
+    boolean dryrun = false;
+    Charset encoding = null;
+    
+    // Parse command line arguments
+    while (argIndex < args.length && args[argIndex].startsWith("-")) {
+      if ("--dryrun".equals(args[argIndex])) {
+        dryrun = true;
+        argIndex++;
+      } else if ("-encoding".equals(args[argIndex])) {
+        if (argIndex + 1 >= args.length) {
+          System.err.println("Error: -encoding flag requires a charset name");
+          System.exit(1);
+        }
+        try {
+          encoding = Charset.forName(args[argIndex + 1]);
+        } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
+          System.err.println("Error: Invalid charset name: " + args[argIndex + 1]);
+          System.exit(1);
+        }
+        argIndex += 2;
+      } else {
+        System.err.println("Error: Unknown flag: " + args[argIndex]);
+        System.exit(1);
+      }
     }
+    
     if (args.length <= argIndex) {
-      System.err.println("Usage: java DocFix [--dryrun] <file-or-directory>");
+      System.err.println("Usage: java DocFix [--dryrun] [-encoding charset] <file-or-directory>");
       System.exit(1);
     }
-
-    final boolean dryrun = "--dryrun".equals(args[0]);
 
     Path path = java.nio.file.Paths.get(args[argIndex]);
     
@@ -84,6 +121,9 @@ public final class DocFix {
       System.exit(1);
     }
     
+    final boolean finalDryrun = dryrun;
+    final Charset finalEncoding = encoding;
+    
     if (Files.isDirectory(path)) {
       try {
         Files.walk(path, 3)
@@ -91,8 +131,9 @@ public final class DocFix {
             .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
             .forEach(p -> {
               try {
-                if (dryrun) {
-                  String original = Files.readString(p, StandardCharsets.UTF_8);
+                if (finalDryrun) {
+                  Charset charset = finalEncoding != null ? finalEncoding : EncodingDetector.detectEncoding(p);
+                  String original = Files.readString(p, charset);
                   String fixed = fix(original);
                   if (!original.equals(fixed)) {
                     java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
@@ -101,7 +142,7 @@ public final class DocFix {
                     printChangedLines(original, fixed);
                   }
                 } else {
-                  fix(p);
+                  fix(p, finalEncoding);
                 }
               } catch (IOException e) {
                 System.err.println("Failed to fix: " + p + ", " + e.getMessage());
@@ -114,7 +155,8 @@ public final class DocFix {
     } else {
       try {
         if (dryrun) {
-          String original = Files.readString(path, StandardCharsets.UTF_8);
+          Charset charset = encoding != null ? encoding : EncodingDetector.detectEncoding(path);
+          String original = Files.readString(path, charset);
           String fixed = fix(original);
           if (!original.equals(fixed)) {
             java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
@@ -123,7 +165,7 @@ public final class DocFix {
             printChangedLines(original, fixed);
           }
         } else {
-          fix(path);
+          fix(path, encoding);
         }
       } catch (IOException e) {
         System.err.println("Error processing file " + path + ": " + e.getMessage());
