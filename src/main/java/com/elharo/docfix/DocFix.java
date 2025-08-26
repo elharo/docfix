@@ -32,28 +32,10 @@ public final class DocFix {
    * @return the fixed source code
    */
   public static String fix(String code) {
-    String lineEnding = detectLineEnding(code);
+    String lineEnding = Strings.detectLineEnding(code);
     String[] lines = code.split("\\R");
     List<String> fixedLines = FileParser.parseLines(Arrays.asList(lines), lineEnding);
     return String.join(lineEnding, fixedLines);
-  }
-
-  /**
-   * Detects the line ending used in the provided code.
-   * It checks for Windows (\r\n), Mac (\r), and Unix (\n) line endings.
-   *
-   * @param code the source code to analyze
-   * @return the detected line ending as a string
-   */
-  // TODO move to utility class
-  static String detectLineEnding(String code) {
-    String lineEnding = "\n";
-    if (code.contains("\r\n")) {
-      lineEnding = "\r\n";
-    } else if (code.contains("\r")) {
-      lineEnding = "\r";
-    }
-    return lineEnding;
   }
 
   /**
@@ -65,7 +47,7 @@ public final class DocFix {
    */
   public static void fix(Path file) throws IOException {
     String code = Files.readString(file, StandardCharsets.UTF_8);
-    String lineEnding = detectLineEnding(code);
+    String lineEnding = Strings.detectLineEnding(code);
     String[] rawLines = code.split("\\R");
     List<String> fixedLines = FileParser.parseLines(rawLines, lineEnding);
     try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
