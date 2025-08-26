@@ -59,17 +59,14 @@ public final class DocFix {
    * @throws IOException if an I/O error occurs
    */
   public static void fix(Path file, Charset encoding) throws IOException {
-    Charset charset;
     if (encoding == null) {
-      charset = EncodingDetector.detectEncoding(file);
-    } else {
-      charset = encoding;
+      encoding = EncodingDetector.detectEncoding(file);
     }
-    String code = Files.readString(file, charset);
+    String code = Files.readString(file, encoding);
     String lineEnding = Strings.detectLineEnding(code);
     String[] rawLines = code.split("\\R");
     List<String> fixedLines = FileParser.parseLines(rawLines, lineEnding);
-    try (Writer writer = Files.newBufferedWriter(file, charset)) {
+    try (Writer writer = Files.newBufferedWriter(file, encoding)) {
       for (String line : fixedLines) {
         writer.write(line);
         writer.write(lineEnding);
