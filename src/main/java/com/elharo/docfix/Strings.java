@@ -4,6 +4,14 @@ final class Strings {
 
   // Private constructor to prevent instantiation
   private Strings() {}
+  
+  /**
+   * Finds the number of spaces at the beginning of a string,
+   * counting tabs as 4 spaces each
+   *
+   * @param s the string to analyze
+   * @return the indentation in spaces
+   */
   static int findIndent(String s) {
     int indent = 0;
     for (char c : s.toCharArray()) {
