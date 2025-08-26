@@ -59,7 +59,12 @@ public final class DocFix {
    * @throws IOException if an I/O error occurs
    */
   public static void fix(Path file, Charset encoding) throws IOException {
-    Charset charset = encoding != null ? encoding : EncodingDetector.detectEncoding(file);
+    Charset charset;
+    if (encoding == null) {
+      charset = EncodingDetector.detectEncoding(file);
+    } else {
+      charset = encoding;
+    }
     String code = Files.readString(file, charset);
     String lineEnding = Strings.detectLineEnding(code);
     String[] rawLines = code.split("\\R");

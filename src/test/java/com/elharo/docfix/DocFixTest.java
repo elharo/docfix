@@ -334,5 +334,6 @@ public class DocFixTest {
         
         String output = baos.toString(StandardCharsets.UTF_8);
         assertTrue("Should show changes", output.contains("@param value the value"));
+        assertFalse("Should not change class comment that is already correct", output.contains("* Constructs a new object"));
     }
 }

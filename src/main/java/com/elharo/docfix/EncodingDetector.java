@@ -172,8 +172,8 @@ final class EncodingDetector {
              content.contains("void ") ||
              content.contains("/**") ||
              content.contains("*/");
-    } catch (RuntimeException e) {
-      // If decoding fails, this charset is not suitable
+    } catch (IndexOutOfBoundsException e) {
+      // If buffer parameters are invalid, this charset is not suitable
       return false;
     }
   }
