@@ -24,7 +24,7 @@ class DocComment {
 
   protected DocComment(Kind kind, String description, List<BlockTag> blockTags, int indent) {
     this.kind = kind;
-    if (description != null && !description.isEmpty()) {
+    if (description != null && !description.isBlank()) {
       char first = description.charAt(0);
       description = (Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1)).trim();
       // add a period to the end of the description if it doesn't end with a
@@ -145,8 +145,7 @@ class DocComment {
     boolean inBlockTags = false;
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
-      String trimmed = line.trim();
-      int indent = line.length() - trimmed.length();
+      String trimmed = line.stripLeading();
       if (trimmed.startsWith("*")) {
         // Remove asterisk and at most one space after it to preserve indentation
         String afterAsterisk = trimmed.substring(1);
