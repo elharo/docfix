@@ -327,6 +327,27 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testPreserveTrailingWhiteSpaceInDescription() {
+    // as long as nothing else in the line is changed
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * <p>\n"
+            + "     * Sets the name the document type declaration specifies \n"
+            + "     * for the root element. In an invalid document, this may \n"
+            + "     * not be the same as the actual root element name. \n"
+            + "     * </p>\n"
+            + "     *\n"
+            + "     * @param name the root element name given by\n"
+            + "     *     the document type declaration\n"
+            + "     * @throws IllegalNameException if the root element name is not\n"
+            + "     *     a legal XML 1.0 name\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains("Sets the name the document type declaration specifies \n"));
+    assertTrue(java, java.contains(" not be the same as the actual root element name. \n"));
+  }
+
+  @Test
   public void testSortTags() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "    /**\n"
