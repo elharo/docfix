@@ -782,4 +782,23 @@ public class DocCommentTest {
     assertTrue(javaCode, javaCode.contains("@param real the real part\n"));
     assertTrue(javaCode.contains("@param imaginary the imaginary part\n"));
   }
+
+  @Test
+  public void testPreservePeriodInMultilineBlockTag() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + "     * Creates a new attribute.\n"
+            + "     *\n"
+            + "     * @throws IllegalDataException if the value contains characters\n"
+            + "     *     which are not legal in XML such as vertical tab or a null.\n"
+            + "     *     Characters such as \" and &amp; are legal, but will be\n"
+            + "     *     automatically escaped when the attribute is serialized.\n"
+            + "     */");
+    String javaCode = docComment.toJava();
+    
+    // The period after "serialized" should be preserved because the text
+    // contains multiple sentences (indicated by ". " after "null")
+    assertTrue("Period after 'serialized' should be preserved", 
+        javaCode.contains("automatically escaped when the attribute is serialized."));
+  }
 }

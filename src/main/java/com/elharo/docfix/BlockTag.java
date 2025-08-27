@@ -34,7 +34,8 @@ class BlockTag {
     }
 
     // Remove trailing period if not a sentence
-    if (!text.contains(". ") && text.endsWith(".")) {
+    // Check for periods followed by space or newline to detect multiple sentences
+    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".")) {
       text = text.trim().substring(0, text.trim().length() - 1);
     }
     this.text = text;
