@@ -164,7 +164,7 @@ final class EncodingDetector {
     // we could check for multiple encodings in a single pass
     // Look for common Java keywords and patterns. package and import appear
     // very early in most files and allow for early exit. Every valid Java
-    // file must contains one of class, interface, or enum and these also
+    // file must contains one of class, interface, record, or enum and these also
     // appear reasonably early in the file.
     return content.contains("package") ||
            content.contains("import") ||
