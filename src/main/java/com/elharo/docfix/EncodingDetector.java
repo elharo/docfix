@@ -166,10 +166,11 @@ final class EncodingDetector {
     // very early in most files and allow for early exit. Every valid Java
     // file must contains one of class, interface, or enum and these also
     // appear reasonably early in the file.
-    return content.contains("package ") ||
-           content.contains("import ") ||
-           content.contains("class ") ||
-           content.contains("interface ") ||
-           content.contains("enum ");
+    return content.contains("package") ||
+           content.contains("import") ||
+           content.contains("class") ||
+           content.contains("interface") ||
+           content.contains("record") ||
+           content.contains("enum");
   }
 }
