@@ -158,19 +158,18 @@ final class EncodingDetector {
    */
   private static boolean containsJavaKeywords(byte[] buffer, int length, Charset charset) {
     String content = new String(buffer, 0, length, charset);
-    
+
     // TODO: replace with the AhoCorasick algorithm here
-    // Look for common Java keywords and patterns
+    // By using AhoCorasick with byte strings instead of strings,
+    // we could check for multiple encodings in a single pass
+    // Look for common Java keywords and patterns. package and import appear
+    // very early in most files and allow for early exit. Every valid Java
+    // file must contains one of class, interface, or enum and these also
+    // appear reasonably early in the file.
     return content.contains("package ") ||
            content.contains("import ") ||
-           content.contains("public ") ||
-           content.contains("private ") ||
-           content.contains("protected ") ||
            content.contains("class ") ||
            content.contains("interface ") ||
-           content.contains("enum ") ||
-           content.contains("void ") ||
-           content.contains("/**") ||
-           content.contains("*/");
+           content.contains("enum ");
   }
 }
