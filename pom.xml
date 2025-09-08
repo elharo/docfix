@@ -14,8 +14,8 @@
   <url>https://github.com/elharo/docfix</url>
 
   <modules>
-    <module>docfix-library</module>
-    <module>docfix-maven-plugin</module>
+    <module>core</module>
+    <module>maven-plugin</module>
   </modules>
 
   <licenses>
@@ -53,9 +53,7 @@
 
   <inceptionYear>2025</inceptionYear>
 
-  <dependencies>
-    <!-- No dependencies at parent level -->
-  </dependencies>
+
 
   <build>
     <pluginManagement>
