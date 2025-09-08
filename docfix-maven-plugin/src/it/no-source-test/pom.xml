@@ -5,11 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.elharo.docfix.it</groupId>
-  <artifactId>basic-test</artifactId>
+  <artifactId>no-source-test</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <description>IT basic test</description>
+  <description>IT test with no source directory</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,7 +21,7 @@
     <plugins>
       <plugin>
         <groupId>com.elharo.docfix</groupId>
-        <artifactId>docfix</artifactId>
+        <artifactId>docfix-maven-plugin</artifactId>
         <version>@project.version@</version>
         <executions>
           <execution>

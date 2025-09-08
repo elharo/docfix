@@ -5,23 +5,24 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.elharo.docfix.it</groupId>
-  <artifactId>no-source-test</artifactId>
+  <artifactId>dryrun-test</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <description>IT test with no source directory</description>
+  <description>IT dry-run test</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
+    <docfix.dryrun>true</docfix.dryrun>
   </properties>
 
   <build>
     <plugins>
       <plugin>
         <groupId>com.elharo.docfix</groupId>
-        <artifactId>docfix</artifactId>
+        <artifactId>docfix-maven-plugin</artifactId>
         <version>@project.version@</version>
         <executions>
           <execution>
