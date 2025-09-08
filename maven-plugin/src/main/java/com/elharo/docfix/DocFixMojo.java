@@ -46,8 +46,6 @@ public class DocFixMojo extends AbstractMojo {
     @Parameter(property = "docfix.dryrun", defaultValue = "false")
     private boolean dryrun;
 
-
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!sourceDirectory.exists()) {
