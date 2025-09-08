@@ -89,14 +89,9 @@ The plugin processes all Java files in `src/main/java` by default and does not t
   mvn com.elharo.docfix:docfix:fix -Ddocfix.dryrun=true
   ```
 
-- **Skip execution:** Skip the plugin entirely:
-  ```bash
-  mvn com.elharo.docfix:docfix:fix -Ddocfix.skip=true
-  ```
-
 - **Custom encoding:** Specify character encoding:
   ```bash
-  mvn com.elharo.docfix:docfix:fix -Dencoding=UTF-8
+  mvn com.elharo.docfix:docfix:fix -Dencoding=ISO-8859-1
   ```
 
 #### Adding to Your Project

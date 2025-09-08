@@ -41,24 +41,37 @@ public class DocFixMojo extends AbstractMojo {
     private String encoding;
 
     /**
-     * Skip execution of the plugin.
-     */
-    @Parameter(property = "docfix.skip", defaultValue = "false")
-    private boolean skip;
-
-    /**
      * Dry run mode - show what would be changed without modifying files.
      */
     @Parameter(property = "docfix.dryrun", defaultValue = "false")
     private boolean dryrun;
 
+    /**
+     * Set the source directory for testing purposes.
+     * @param sourceDirectory the source directory
+     */
+    public void setSourceDirectory(File sourceDirectory) {
+        this.sourceDirectory = sourceDirectory;
+    }
+
+    /**
+     * Set the encoding for testing purposes.
+     * @param encoding the character encoding
+     */
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    /**
+     * Set dry run mode for testing purposes.
+     * @param dryrun true for dry run mode
+     */
+    public void setDryrun(boolean dryrun) {
+        this.dryrun = dryrun;
+    }
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (skip) {
-            getLog().info("Skipping DocFix execution");
-            return;
-        }
-
         if (!sourceDirectory.exists()) {
             getLog().warn("Source directory does not exist: " + sourceDirectory);
             return;
@@ -69,13 +82,13 @@ public class DocFixMojo extends AbstractMojo {
             return;
         }
 
-        getLog().info("Processing Java files in: " + sourceDirectory);
-
         try {
             Charset charset = Charset.forName(encoding);
             processDirectory(sourceDirectory.toPath(), charset);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new MojoExecutionException("Failed to fix Javadoc comments", e);
+        } catch (IllegalArgumentException e) {
+            throw new MojoExecutionException("Invalid encoding: " + encoding, e);
         }
     }
 

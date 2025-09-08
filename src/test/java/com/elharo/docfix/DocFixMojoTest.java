@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
-import java.lang.reflect.Field;
 
 import static org.junit.Assert.*;
 
@@ -49,10 +48,9 @@ public class DocFixMojoTest {
 
         // Create and configure the Mojo
         DocFixMojo mojo = new DocFixMojo();
-        setField(mojo, "sourceDirectory", srcMainJava);
-        setField(mojo, "encoding", "UTF-8");
-        setField(mojo, "dryrun", false);
-        setField(mojo, "skip", false);
+        mojo.setSourceDirectory(srcMainJava);
+        mojo.setEncoding("UTF-8");
+        mojo.setDryrun(false);
 
         // Execute the mojo
         mojo.execute();
@@ -86,10 +84,9 @@ public class DocFixMojoTest {
 
         // Create and configure the Mojo for dry run
         DocFixMojo mojo = new DocFixMojo();
-        setField(mojo, "sourceDirectory", srcMainJava);
-        setField(mojo, "encoding", "UTF-8");
-        setField(mojo, "dryrun", true);
-        setField(mojo, "skip", false);
+        mojo.setSourceDirectory(srcMainJava);
+        mojo.setEncoding("UTF-8");
+        mojo.setDryrun(true);
 
         // Execute the mojo
         mojo.execute();
@@ -100,44 +97,18 @@ public class DocFixMojoTest {
     }
 
     @Test
-    public void testMojoSkip() throws Exception {
-        // Create a temporary project structure
-        File projectRoot = temporaryFolder.newFolder("test-project");
-        File srcMainJava = new File(projectRoot, "src/main/java");
-        File srcDir = new File(srcMainJava, "com/example");
-        srcDir.mkdirs();
+    public void testMojoWithNonExistentDirectory() throws Exception {
+        // Create a non-existent directory
+        File nonExistentDir = new File(temporaryFolder.getRoot(), "non-existent");
 
-        // Create a test Java file with Javadoc issues
-        File testFile = new File(srcDir, "TestClass.java");
-        String originalContent = "package com.example;\n\n" +
-            "/**\n" +
-            " * test class\n" +
-            " */\n" +
-            "public class TestClass {\n" +
-            "}\n";
-        Files.writeString(testFile.toPath(), originalContent, StandardCharsets.UTF_8);
-
-        // Create and configure the Mojo with skip=true
+        // Create and configure the Mojo
         DocFixMojo mojo = new DocFixMojo();
-        setField(mojo, "sourceDirectory", srcMainJava);
-        setField(mojo, "encoding", "UTF-8");
-        setField(mojo, "dryrun", false);
-        setField(mojo, "skip", true);
+        mojo.setSourceDirectory(nonExistentDir);
+        mojo.setEncoding("UTF-8");
+        mojo.setDryrun(false);
 
-        // Execute the mojo
+        // Execute the mojo - should not throw exception
         mojo.execute();
-
-        // Verify the file was NOT modified when skip=true
-        String afterContent = Files.readString(testFile.toPath(), StandardCharsets.UTF_8);
-        assertEquals("File should not be modified when skip=true", originalContent, afterContent);
-    }
-
-    /**
-     * Helper method to set private fields using reflection.
-     */
-    private void setField(Object target, String fieldName, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(target, value);
+        // Test passes if no exception is thrown
     }
 }
