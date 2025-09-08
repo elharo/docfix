@@ -103,7 +103,7 @@ public class DocFixMojo extends AbstractMojo {
         if (!original.equals(fixed)) {
             Path basePath = sourceDirectory.toPath();
             Path relativePath = basePath.relativize(file);
-            getLog().info("Fixing: " + relativePath);
+            getLog().debug("Fixing: " + relativePath);
             Files.writeString(file, fixed, charset);
         }
     }
