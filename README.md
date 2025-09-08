@@ -72,6 +72,56 @@ java -cp target/classes com.elharo.docfix.DocFix src/main/java
 java -cp target/classes com.elharo.docfix.DocFix --dryrun src/main/java
 ```
 
+### Maven Plugin
+
+You can also use DocFix as a Maven plugin to fix Javadoc comments during your build process:
+
+```bash
+mvn com.elharo.docfix:docfix:fix
+```
+
+The plugin processes all Java files in `src/main/java` by default and does not touch files in `src/test/java`.
+
+#### Maven Plugin Options
+
+- **Dry-run mode:** Preview changes without modifying files:
+  ```bash
+  mvn com.elharo.docfix:docfix:fix -Ddocfix.dryrun=true
+  ```
+
+- **Skip execution:** Skip the plugin entirely:
+  ```bash
+  mvn com.elharo.docfix:docfix:fix -Ddocfix.skip=true
+  ```
+
+- **Custom encoding:** Specify character encoding:
+  ```bash
+  mvn com.elharo.docfix:docfix:fix -Dencoding=UTF-8
+  ```
+
+#### Adding to Your Project
+
+To include the plugin in your project's build process, add it to your `pom.xml`:
+
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>com.elharo.docfix</groupId>
+      <artifactId>docfix</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>fix</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
 ### Programmatic Usage
 
 You can also use DocFix programmatically in your Java code:
