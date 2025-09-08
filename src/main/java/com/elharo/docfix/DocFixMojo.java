@@ -46,29 +46,7 @@ public class DocFixMojo extends AbstractMojo {
     @Parameter(property = "docfix.dryrun", defaultValue = "false")
     private boolean dryrun;
 
-    /**
-     * Set the source directory for testing purposes.
-     * @param sourceDirectory the source directory
-     */
-    public void setSourceDirectory(File sourceDirectory) {
-        this.sourceDirectory = sourceDirectory;
-    }
 
-    /**
-     * Set the encoding for testing purposes.
-     * @param encoding the character encoding
-     */
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
-    }
-
-    /**
-     * Set dry run mode for testing purposes.
-     * @param dryrun true for dry run mode
-     */
-    public void setDryrun(boolean dryrun) {
-        this.dryrun = dryrun;
-    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
