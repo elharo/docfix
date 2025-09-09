@@ -53,8 +53,6 @@
 
   <inceptionYear>2025</inceptionYear>
 
-
-
   <build>
     <pluginManagement>
       <plugins>
