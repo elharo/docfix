@@ -11,8 +11,6 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -60,49 +58,30 @@ public class DocFixMojo extends AbstractMojo {
 
         try {
             Charset charset = Charset.forName(encoding);
-            processDirectory(sourceDirectory.toPath(), charset);
+            Path basePath = sourceDirectory.toPath();
+            
+            DocFix.fixDirectory(basePath, dryrun, charset, new DocFix.FileProcessingCallback() {
+                @Override
+                public void onFileWouldBeFixed(Path file) {
+                    Path relativePath = basePath.relativize(file);
+                    getLog().info("Would fix: " + relativePath);
+                }
+
+                @Override
+                public void onFileFixed(Path file) {
+                    Path relativePath = basePath.relativize(file);
+                    getLog().debug("Fixing: " + relativePath);
+                }
+
+                @Override
+                public void onError(Path file, IOException error) {
+                    getLog().error("Failed to process file: " + file, error);
+                }
+            });
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to fix Javadoc comments", e);
         } catch (IllegalArgumentException e) {
             throw new MojoExecutionException("Invalid encoding: " + encoding, e);
-        }
-    }
-
-    private void processDirectory(Path directory, Charset charset) throws IOException {
-        Files.walk(directory, 3)
-            .filter(p -> !Files.isSymbolicLink(p))
-            .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
-            .forEach(p -> {
-                try {
-                    if (dryrun) {
-                        processDryRun(p, charset);
-                    } else {
-                        processFile(p, charset);
-                    }
-                } catch (IOException e) {
-                    getLog().error("Failed to process file: " + p, e);
-                }
-            });
-    }
-
-    private void processDryRun(Path file, Charset charset) throws IOException {
-        String original = Files.readString(file, charset);
-        String fixed = DocFix.fix(original);
-        if (!original.equals(fixed)) {
-            Path basePath = sourceDirectory.toPath();
-            Path relativePath = basePath.relativize(file);
-            getLog().info("Would fix: " + relativePath);
-        }
-    }
-
-    private void processFile(Path file, Charset charset) throws IOException {
-        String original = Files.readString(file, charset);
-        String fixed = DocFix.fix(original);
-        if (!original.equals(fixed)) {
-            Path basePath = sourceDirectory.toPath();
-            Path relativePath = basePath.relativize(file);
-            getLog().debug("Fixing: " + relativePath);
-            Files.writeString(file, fixed, charset);
         }
     }
 }
