@@ -75,7 +75,7 @@ public final class DocFix {
   }
 
   /**
-   * Fixes Javadoc comments Java files in the provided directory according to Oracle Javadoc guidelines.
+   * Fixes Javadoc comments in Java files in the provided directory according to Oracle Javadoc guidelines.
    * The file is modified in place.
    *
    * @param path the directory to scan for Java source files
