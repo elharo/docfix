@@ -193,15 +193,53 @@ public class DocFixTest {
         Files.writeString(file1, original, StandardCharsets.UTF_8);
         Files.writeString(file2, original, StandardCharsets.UTF_8);
         Path dir = Files.createTempDirectory("docfix_test_dir");
-        Path subdirectory = Files.createDirectories(dir.resolve("com/elharo/docfix"));
+        Path subdirectory = Files.createDirectories(dir.resolve("sub/dir"));
         Files.move(file1, subdirectory.resolve(file1.getFileName()));
         Files.move(file2, subdirectory.resolve(file2.getFileName()));
         String[] args = { dir.toString() };
         DocFix.main(args);
-        for (Path file : Files.newDirectoryStream(dir, "*.java")) {
+        
+        // Verify that files in the subdirectory were processed correctly
+        for (Path file : Files.newDirectoryStream(subdirectory, "*.java")) {
             String fixed = Files.readString(file, StandardCharsets.UTF_8);
             assertFalse(fixed.contains("     * The imaginary part of the complex number.\n"));
             assertTrue(fixed.contains("     * the imaginary part of the complex number.\n"));
+        }
+    }
+
+    /**
+     * Test that DocFix.main() can traverse deep directory structures beyond 3 levels.
+     * This verifies that the depth limit allows for realistic filesystem structures.
+     */
+    @Test
+    public void testMainFixesDeepSubDirectories() throws IOException {
+        Path file1 = Files.createTempFile("ComplexNumber1", ".java");
+        Path file2 = Files.createTempFile("ComplexNumber2", ".java");
+        String original = Files.readString(Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java"), StandardCharsets.UTF_8);
+        Files.writeString(file1, original, StandardCharsets.UTF_8);
+        Files.writeString(file2, original, StandardCharsets.UTF_8);
+        
+        // Create a deep directory structure: level1/level2/level3/level4/level5/level6
+        Path dir = Files.createTempDirectory("docfix_deep_test_dir");
+        Path deepSubdirectory = Files.createDirectories(dir.resolve("level1/level2/level3/level4/level5/level6"));
+        Files.move(file1, deepSubdirectory.resolve(file1.getFileName()));
+        Files.move(file2, deepSubdirectory.resolve(file2.getFileName()));
+        
+        String[] args = { dir.toString() };
+        DocFix.main(args);
+        
+        // Debug: check if any files were found in the deep subdirectory
+        int fileCount = 0;
+        for (Path file : Files.newDirectoryStream(deepSubdirectory, "*.java")) {
+            fileCount++;
+        }
+        assertTrue("Should find files in deep subdirectory", fileCount > 0);
+        
+        // Verify that files in the deep subdirectory were processed correctly
+        for (Path file : Files.newDirectoryStream(deepSubdirectory, "*.java")) {
+            String fixed = Files.readString(file, StandardCharsets.UTF_8);
+            assertFalse("Should have fixed capitalization", fixed.contains("     * The imaginary part of the complex number.\n"));
+            assertTrue("Should contain fixed capitalization", fixed.contains("     * the imaginary part of the complex number.\n"));
         }
     }
 
