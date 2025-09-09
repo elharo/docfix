@@ -95,7 +95,7 @@ public class ComplexNumber implements Cloneable {
      */
     public ComplexNumber divide(ComplexNumber other) {
         double denominator = other.real * other.real + other.imaginary * other.imaginary;
-        if (denominator == 0) {
+        if (denominator == 0) { // Check for single line comment preservation
             throw new ArithmeticException("Division by zero");
         }
         double realPart = (this.real * other.real + this.imaginary * other.imaginary) / denominator;
