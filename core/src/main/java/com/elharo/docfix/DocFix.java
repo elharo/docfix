@@ -107,62 +107,7 @@ public final class DocFix {
         });
   }
 
-  /**
-   * Fixes Javadoc comments in Java files in the provided directory according to Oracle Javadoc guidelines.
-   * This version accepts a callback interface for custom handling of file processing results.
-   *
-   * @param path the directory to scan for Java source files
-   * @param dryrun whether to run in dry-run mode (preview changes without modifying files)
-   * @param encoding the character encoding to use, or null to auto-detect
-   * @param callback callback to handle processing results
-   * @throws IOException if an I/O error occurs
-   */
-  public static void fixDirectory(Path path, boolean dryrun, Charset encoding, FileProcessingCallback callback) throws IOException {
-    Files.walk(path, 3)
-        .filter(p -> !Files.isSymbolicLink(p))
-        .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
-        .forEach(p -> {
-          try {
-            Charset charset = encoding != null ? encoding : EncodingDetector.detectEncoding(p);
-            String original = Files.readString(p, charset);
-            String fixed = fix(original);
-            if (!original.equals(fixed)) {
-              if (dryrun) {
-                callback.onFileWouldBeFixed(p);
-              } else {
-                Files.writeString(p, fixed, charset);
-                callback.onFileFixed(p);
-              }
-            }
-          } catch (IOException e) {
-            callback.onError(p, e);
-          }
-        });
-  }
 
-  /**
-   * Callback interface for handling file processing results in fixDirectory.
-   */
-  public interface FileProcessingCallback {
-    /**
-     * Called when a file would be fixed in dry-run mode.
-     * @param file the file that would be fixed
-     */
-    void onFileWouldBeFixed(Path file);
-
-    /**
-     * Called when a file has been fixed.
-     * @param file the file that was fixed
-     */
-    void onFileFixed(Path file);
-
-    /**
-     * Called when an error occurs processing a file.
-     * @param file the file that caused the error
-     * @param error the error that occurred
-     */
-    void onError(Path file, IOException error);
-  }
 
   /**
    * Main method that applies Javadoc fixes to the file specified as the first

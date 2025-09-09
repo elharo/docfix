@@ -60,24 +60,7 @@ public class DocFixMojo extends AbstractMojo {
             Charset charset = Charset.forName(encoding);
             Path basePath = sourceDirectory.toPath();
             
-            DocFix.fixDirectory(basePath, dryrun, charset, new DocFix.FileProcessingCallback() {
-                @Override
-                public void onFileWouldBeFixed(Path file) {
-                    Path relativePath = basePath.relativize(file);
-                    getLog().info("Would fix: " + relativePath);
-                }
-
-                @Override
-                public void onFileFixed(Path file) {
-                    Path relativePath = basePath.relativize(file);
-                    getLog().debug("Fixing: " + relativePath);
-                }
-
-                @Override
-                public void onError(Path file, IOException error) {
-                    getLog().error("Failed to process file: " + file, error);
-                }
-            });
+            DocFix.fixDirectory(basePath, dryrun, charset);
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to fix Javadoc comments", e);
         } catch (IllegalArgumentException e) {
