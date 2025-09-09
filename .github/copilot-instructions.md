@@ -110,6 +110,7 @@ java -cp target/classes com.elharo.docfix.DocFix src/main/java
 ## Project Standards
 - Use Java 11+ language features
 - Follow Google Java code style
+- Include a linefeed as the final character of each source code file
 - Package structure: com.elharo.docfix
 - Write JUnit 4 tests for new functionality
 - Maintain immutability where possible
