@@ -110,7 +110,10 @@ java -cp target/classes com.elharo.docfix.DocFix src/main/java
 ## Project Standards
 - Use Java 11+ language features
 - Follow Google Java code style
+- Include a linefeed as the final character of each source code file
 - Package structure: com.elharo.docfix
 - Write JUnit 4 tests for new functionality
 - Maintain immutability where possible
 - Handle edge cases in Javadoc parsing gracefully
+- Do not use reflection to test. Unit test through public and package private APIs.
+- Do not catch raw java.lang.Exception or java.lang.RuntimeException unless absolutely required by a third party method that throws an undifferentiated exception. Catch only more specific subclasses. Assume most runtime exceptions indicate bugs that should be fixed by preventing the exception from being thrown rather than catching it.
