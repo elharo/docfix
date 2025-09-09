@@ -83,7 +83,7 @@ public final class DocFix {
    * @throws IOException if an I/O error occurs
    */
   public static void fixDirectory(Path path, boolean finalDryrun, Charset encoding) throws IOException {
-    Files.walk(path, 127)
+    Files.walk(path, 63)
         .filter(p -> !Files.isSymbolicLink(p))
         .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
         .forEach(p -> {
