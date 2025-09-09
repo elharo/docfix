@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
  * Utility class for fixing Javadoc comments to conform to Oracle Javadoc guidelines.
- * 
+ *
  * @see <a href=
  *      "https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html">How
  *      to Write Doc Comments for the Javadoc Tool</a>
@@ -51,8 +51,8 @@ public final class DocFix {
   }
 
   /**
-   * Fixes Javadoc comments in the provided Java source file so that the first letter
-   * of each doc comment is lower case. The file is modified in place.
+   * Fixes Javadoc comments in the provided Java source file according to Oracle Javadoc guidelines.
+   * The file is modified in place.
    *
    * @param file the path to the Java source file
    * @param encoding the character encoding to use, or null to auto-detect
@@ -75,6 +75,39 @@ public final class DocFix {
   }
 
   /**
+   * Fixes Javadoc comments Java files in the provided directory according to Oracle Javadoc guidelines.
+   * The file is modified in place.
+   *
+   * @param path the directory to scan for Java source files
+   * @param encoding the character encoding to use, or null to auto-detect
+   * @throws IOException if an I/O error occurs
+   */
+  public static void fixDirectory(Path path, boolean finalDryrun, Charset encoding) throws IOException {
+    Files.walk(path, 3)
+        .filter(p -> !Files.isSymbolicLink(p))
+        .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
+        .forEach(p -> {
+          try {
+            if (finalDryrun) {
+              Charset charset = encoding != null ? encoding : EncodingDetector.detectEncoding(p);
+              String original = Files.readString(p, charset);
+              String fixed = fix(original);
+              if (!original.equals(fixed)) {
+                Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
+                Path relPath = cwd.relativize(p.toAbsolutePath());
+                System.out.println(relPath);
+                printChangedLines(original, fixed);
+              }
+            } else {
+              fix(p, encoding);
+            }
+          } catch (IOException e) {
+            System.err.println("Failed to fix: " + p + ", " + e.getMessage());
+          }
+        });
+  }
+
+  /**
    * Main method that applies Javadoc fixes to the file specified as the first
    * command line argument.
    *
@@ -84,7 +117,7 @@ public final class DocFix {
     int argIndex = 0;
     boolean dryrun = false;
     Charset encoding = null;
-    
+
     // Parse command line arguments
     while (argIndex < args.length && args[argIndex].startsWith("-")) {
       if ("--dryrun".equals(args[argIndex])) {
@@ -107,49 +140,25 @@ public final class DocFix {
         System.exit(1);
       }
     }
-    
+
     if (args.length <= argIndex) {
       System.err.println("Usage: java DocFix [--dryrun] [-encoding charset] <file-or-directory>");
       System.exit(1);
     }
 
-    Path path = java.nio.file.Paths.get(args[argIndex]);
-    
+    Path path = Paths.get(args[argIndex]);
+
     // Check if the path exists
     if (!Files.exists(path)) {
       System.err.println("Error: File or directory does not exist: " + path);
       System.exit(1);
     }
-    
-    final boolean finalDryrun = dryrun;
-    final Charset finalEncoding = encoding;
-    
+
     if (Files.isDirectory(path)) {
       try {
-        Files.walk(path, 3)
-            .filter(p -> !Files.isSymbolicLink(p))
-            .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
-            .forEach(p -> {
-              try {
-                if (finalDryrun) {
-                  Charset charset = finalEncoding != null ? finalEncoding : EncodingDetector.detectEncoding(p);
-                  String original = Files.readString(p, charset);
-                  String fixed = fix(original);
-                  if (!original.equals(fixed)) {
-                    java.nio.file.Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
-                    java.nio.file.Path relPath = cwd.relativize(p.toAbsolutePath());
-                    System.out.println(relPath);
-                    printChangedLines(original, fixed);
-                  }
-                } else {
-                  fix(p, finalEncoding);
-                }
-              } catch (IOException e) {
-                System.err.println("Failed to fix: " + p + ", " + e.getMessage());
-              }
-            });
-      } catch (IOException e) {
-        System.err.println("Error walking directory " + path + ": " + e.getMessage());
+        fixDirectory(path, dryrun, encoding);
+      } catch (IOException ex) {
+        System.err.println("Error walking directory " + path + ": " + ex.getMessage());
         System.exit(1);
       }
     } else {
