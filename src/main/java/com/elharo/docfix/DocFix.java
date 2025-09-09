@@ -93,7 +93,7 @@ public final class DocFix {
               String original = Files.readString(p, charset);
               String fixed = fix(original);
               if (!original.equals(fixed)) {
-                Path cwd = java.nio.file.Paths.get("").toAbsolutePath();
+                Path cwd = Paths.get("").toAbsolutePath();
                 Path relPath = cwd.relativize(p.toAbsolutePath());
                 System.out.println(relPath);
                 printChangedLines(original, fixed);
