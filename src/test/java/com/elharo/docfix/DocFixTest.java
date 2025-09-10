@@ -2,6 +2,7 @@ package com.elharo.docfix;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
@@ -335,5 +336,34 @@ public class DocFixTest {
         String output = baos.toString(StandardCharsets.UTF_8);
         assertTrue("Should show @param changes", output.contains("@param value the value"));
         assertTrue("Should preserve non-ASCII characters in @param", output.contains("the value with émotions"));
+    }
+
+    /**
+     * Test that DocFix can traverse deep directory structures beyond the original 3-level limit.
+     * This test verifies that the increased depth limit allows processing of realistically deep directories.
+     */
+    @Test
+    public void testDeepDirectoryTraversalSupported() throws IOException {
+        Path file1 = Files.createTempFile("ComplexNumber1", ".java");
+        Path file2 = Files.createTempFile("ComplexNumber2", ".java");
+        String original = Files.readString(Paths.get("src/test/resources/com/elharo/math/ComplexNumber.java"), StandardCharsets.UTF_8);
+        Files.writeString(file1, original, StandardCharsets.UTF_8);
+        Files.writeString(file2, original, StandardCharsets.UTF_8);
+        
+        // Create a deep directory structure: level1/level2/level3/level4/level5/level6
+        Path dir = Files.createTempDirectory("docfix_deep_test_dir");
+        Path deepSubdirectory = Files.createDirectories(dir.resolve("level1/level2/level3/level4/level5/level6"));
+        Files.move(file1, deepSubdirectory.resolve(file1.getFileName()));
+        Files.move(file2, deepSubdirectory.resolve(file2.getFileName()));
+        
+        String[] args = { dir.toString() };
+        DocFix.main(args);
+        
+        // Verify that files in the deep subdirectory were processed correctly
+        for (Path file : Files.newDirectoryStream(deepSubdirectory, "*.java")) {
+            String fixed = Files.readString(file, StandardCharsets.UTF_8);
+            assertNotEquals("DocFix should modify the content", original, fixed);
+            assertTrue("Should contain the fix", fixed.contains("     * @param real the real part"));
+        }
     }
 }
