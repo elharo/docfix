@@ -8,58 +8,13 @@ DocFix is a multi-module Maven project with two artifacts:
 
 ## Prerequisites
 
-### 1. Sonatype OSSRH Account
+Before releasing, ensure you have completed the one-time setup requirements:
 
-Create a Sonatype OSSRH account and request access to the `com.elharo.docfix` groupId:
+- Sonatype OSSRH account with access to `com.elharo.docfix` groupId
+- GPG key for artifact signing
+- Maven settings.xml configured with credentials
 
-1. Create a [Sonatype JIRA account](https://issues.sonatype.org/secure/Signup!default.jspa)
-2. Create a ticket to request access to the `com.elharo.docfix` groupId
-3. Wait for approval (usually takes 1-2 business days)
-
-### 2. GPG Key Setup
-
-Generate a GPG key pair for signing artifacts:
-
-```bash
-# Generate a new GPG key
-gpg --gen-key
-
-# List your keys to get the key ID
-gpg --list-secret-keys --keyid-format LONG
-
-# Export the public key to a key server
-gpg --keyserver hkp://pool.sks-keyservers.net --send-keys YOUR_KEY_ID
-gpg --keyserver hkp://keyserver.ubuntu.com --send-keys YOUR_KEY_ID
-```
-
-### 3. Maven Settings Configuration
-
-Configure your `~/.m2/settings.xml` with Sonatype credentials and GPG settings:
-
-```xml
-<settings>
-  <servers>
-    <server>
-      <id>ossrh</id>
-      <username>your-sonatype-username</username>
-      <password>your-sonatype-password</password>
-    </server>
-  </servers>
-  
-  <profiles>
-    <profile>
-      <id>ossrh</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <gpg.executable>gpg</gpg.executable>
-        <gpg.keyname>YOUR_KEY_ID</gpg.keyname>
-      </properties>
-    </profile>
-  </profiles>
-</settings>
-```
+For detailed setup instructions, see the [Sonatype OSSRH Guide](https://central.sonatype.org/publish/publish-guide/).
 
 ## Release Process
 
