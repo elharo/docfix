@@ -117,3 +117,4 @@ java -cp target/classes com.elharo.docfix.DocFix src/main/java
 - Handle edge cases in Javadoc parsing gracefully
 - Do not use reflection to test. Unit test through public and package private APIs.
 - Do not catch raw java.lang.Exception or java.lang.RuntimeException unless absolutely required by a third party method that throws an undifferentiated exception. Catch only more specific subclasses. Assume most runtime exceptions indicate bugs that should be fixed by preventing the exception from being thrown rather than catching it.
+- When writing a PR description include a link to the issue that is being fixed such as "fixes #146" assuming the PR completely resolves the issue.
