@@ -801,4 +801,72 @@ public class DocCommentTest {
     assertTrue("Period after 'serialized' should be preserved", 
         javaCode.contains("automatically escaped when the attribute is serialized."));
   }
+
+  @Test
+  public void testRemovePeriodWithCodeBlock() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + "     * Does something.\n"
+            + "     *\n"
+            + "     * @param tryCancelFutures    Useful to set to {@code false} if a timeout is specified in plugin config.\n"
+            + "     */");
+    String javaCode = docComment.toJava();
+    
+    // The period should be removed from the @param description since it's a single sentence
+    assertTrue("Period should be removed from @param description with {@code} block", 
+        javaCode.contains("useful to set to {@code false} if a timeout is specified in plugin config\n"));
+    assertFalse("Period should not be present at end of @param description", 
+        javaCode.contains("plugin config.\n"));
+  }
+
+  @Test
+  public void testIssue151_PeriodNotRemovedInMultilineParam() {
+    // This reproduces the exact issue from GitHub issue #151
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + "     * Stop/Shutdown/Interrupt scheduler and its children (if any).\n"
+            + "     *\n"
+            + "     * @param tryCancelFutures    Useful to set to {@code false} if a timeout is specified in plugin config.\n"
+            + "     *                            When the runner of\n"
+            + "     *                            {@link ParallelComputer#getSuite(org.junit.runners.model.RunnerBuilder, Class[])}\n"
+            + "     *                            is finished in\n"
+            + "     *                            {@link org.junit.runners.Suite#run(org.junit.runner.notification.RunNotifier)}\n"
+            + "     *                            all the thread-pools created by {@link ParallelComputerBuilder.PC} are already dead.\n"
+            + "     *                            See the unit test {@code ParallelComputerBuilder#timeoutAndForcedShutdown()}.\n"
+            + "     */");
+    String javaCode = docComment.toJava();
+    
+    // The period should be removed from the @param description
+    // Note: This currently fails because the period is NOT removed when it should be
+    assertFalse("Period should be removed from @param description ending in period", 
+        javaCode.contains("timeoutAndForcedShutdown()}.\n"));
+    assertTrue("Period should be removed from @param description", 
+        javaCode.contains("timeoutAndForcedShutdown()}\n"));
+  }
+
+  @Test
+  public void testRemovePeriodWithMultilineParam_DebugOnly() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + "     * Stop/Shutdown/Interrupt scheduler and its children (if any).\n"
+            + "     *\n"
+            + "     * @param tryCancelFutures    Useful to set to {@code false} if a timeout is specified in plugin config.\n"
+            + "     *                            When the runner of\n"
+            + "     *                            {@link ParallelComputer#getSuite(org.junit.runners.model.RunnerBuilder, Class[])}\n"
+            + "     *                            is finished all the thread-pools are already dead.\n"
+            + "     */");
+    String javaCode = docComment.toJava();
+    
+    // Debug the block tag
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(1, tags.size());
+    BlockTag tag = tags.get(0);
+    System.out.println("Tag text: '" + tag.getText() + "'");
+    System.out.println("Tag text contains '. ': " + tag.getText().contains(". "));
+    System.out.println("Tag text contains '.\\n': " + tag.getText().contains(".\n"));
+    System.out.println("Tag text ends with '.': " + tag.getText().endsWith("."));
+    
+    // This case contains multiple sentences (period in middle), so period should be preserved
+    // This is actually correct behavior - we should NOT remove the period here
+  }
 }
