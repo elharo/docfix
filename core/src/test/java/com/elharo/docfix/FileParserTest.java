@@ -2,6 +2,7 @@ package com.elharo.docfix;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -147,5 +148,120 @@ public class FileParserTest {
       }
     }
     assertTrue("Should find constructor Javadoc", foundConstructorJavadoc);
+  }
+
+  @Test
+  public void testBlankCommentIsRemoved() {
+    // Test that empty Javadoc comments are completely removed, not replaced with blank lines
+    String[] input = {
+        "package test;",
+        "",
+        "/**",
+        " */",
+        "class TestClass {",
+        "    public void method() {}",
+        "}"
+    };
+    
+    String[] expected = {
+        "package test;",
+        "",
+        "class TestClass {",
+        "    public void method() {}",
+        "}"
+    };
+    
+    List<String> result = FileParser.parseLines(input, "\n");
+    
+    assertEquals("Result should have " + expected.length + " lines", expected.length, result.size());
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals("Line " + i + " should match", expected[i], result.get(i));
+    }
+  }
+
+  @Test
+  public void testBlankCommentSingleLineIsRemoved() {
+    // Test that empty single-line Javadoc comments are completely removed
+    String[] input = {
+        "package test;",
+        "",
+        "/** */",
+        "class TestClass {",
+        "    public void method() {}",
+        "}"
+    };
+    
+    String[] expected = {
+        "package test;",
+        "",
+        "class TestClass {",
+        "    public void method() {}",
+        "}"
+    };
+    
+    List<String> result = FileParser.parseLines(input, "\n");
+    
+    assertEquals("Result should have " + expected.length + " lines", expected.length, result.size());
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals("Line " + i + " should match", expected[i], result.get(i));
+    }
+  }
+
+  @Test
+  public void testBlankCommentWithIndentationIsRemoved() {
+    // Test that empty indented Javadoc comments are completely removed
+    String[] input = {
+        "package test;",
+        "",
+        "class TestClass {",
+        "    /**",
+        "     */",
+        "    void method() {}",
+        "}"
+    };
+    
+    String[] expected = {
+        "package test;",
+        "",
+        "class TestClass {",
+        "    void method() {}",
+        "}"
+    };
+    
+    List<String> result = FileParser.parseLines(input, "\n");
+    
+    assertEquals("Result should have " + expected.length + " lines", expected.length, result.size());
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals("Line " + i + " should match", expected[i], result.get(i));
+    }
+  }
+
+  @Test
+  public void testNonEmptyCommentIsKept() {
+    // Test that non-empty comments are still processed normally
+    String[] input = {
+        "package test;",
+        "",
+        "/**",
+        " * This is a comment",
+        " */",
+        "class TestClass {",
+        "}"
+    };
+    
+    String[] expected = {
+        "package test;",
+        "",
+        "/**\n * This is a comment.\n */",
+        "class TestClass {",
+        "}"
+    };
+    
+    List<String> result = FileParser.parseLines(input, "\n");
+    
+    assertEquals("Result should have " + expected.length + " lines", expected.length, result.size());
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals("Line " + i + " should match", expected[i], result.get(i));
+    }
   }
 }
