@@ -34,8 +34,7 @@ class BlockTag {
     }
 
     // Remove trailing period if not a sentence
-    // Check for periods followed by space or newline to detect multiple sentences
-    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".")) {
+    if (!containsMultipleSentences(text) && text.endsWith(".")) {
       text = text.trim().substring(0, text.trim().length() - 1);
     }
     this.text = text;
@@ -106,6 +105,33 @@ class BlockTag {
       }
     }
     return true;
+  }
+
+  /**
+   * Determines if the text contains multiple sentences.
+   * A multiple sentence text typically has a period followed by a space and then a capital letter,
+   * or other clear sentence separators.
+   */
+  private static boolean containsMultipleSentences(String text) {
+    if (text == null || text.isEmpty()) {
+      return false;
+    }
+    
+    // Normalize the text by replacing newlines and multiple spaces with single spaces
+    // This helps detect sentence boundaries that span across line breaks
+    String normalized = text.replaceAll("\\s*\\n\\s*\\*?\\s*", " ").replaceAll("\\s+", " ").trim();
+    
+    // Look for period followed by space and capital letter - strong indicator of multiple sentences
+    if (normalized.matches(".*\\. +[A-Z].*")) {
+      return true;
+    }
+    
+    // Look for other sentence ending patterns followed by capital letters
+    if (normalized.matches(".*[.!?] +[A-Z].*")) {
+      return true;
+    }
+    
+    return false;
   }
 
   String getType() {
