@@ -79,16 +79,17 @@ public final class DocFix {
    * The file is modified in place.
    *
    * @param path the directory to scan for Java source files
+   * @param dryrun if true only prints what would be changed without actually changning any files
    * @param encoding the character encoding to use, or null to auto-detect
    * @throws IOException if an I/O error occurs
    */
-  public static void fixDirectory(Path path, boolean finalDryrun, Charset encoding) throws IOException {
+  public static void fixDirectory(Path path, boolean dryrun, Charset encoding) throws IOException {
     Files.walk(path, 63)
         .filter(p -> !Files.isSymbolicLink(p))
         .filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".java"))
         .forEach(p -> {
           try {
-            if (finalDryrun) {
+            if (dryrun) {
               Charset charset = encoding != null ? encoding : EncodingDetector.detectEncoding(p);
               String original = Files.readString(p, charset);
               String fixed = fix(original);
@@ -111,7 +112,7 @@ public final class DocFix {
    * Main method that applies Javadoc fixes to the file specified as the first
    * command line argument.
    *
-   * @param args command line arguments; supported flags: [--dryrun] [-encoding charset] <file-or-directory>
+   * @param args command line arguments; supported flags: [--dryrun] [-encoding charset] &lt;file-or-directory&gt;
    */
   public static void main(String[] args) {
     int argIndex = 0;
