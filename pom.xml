@@ -124,7 +124,7 @@
           </plugin>
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
-            <artifactId>n</artifactId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
             <version>1.7.0</version>
             <extensions>true</extensions>
             <configuration>
