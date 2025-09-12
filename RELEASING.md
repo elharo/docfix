@@ -10,196 +10,71 @@ DocFix is a multi-module Maven project with two artifacts:
 
 Before releasing, ensure you have completed the one-time setup requirements:
 
-- Sonatype OSSRH account with access to `com.elharo.docfix` groupId
+- Sonatype Central account with access to `com.elharo.docfix` groupId
 - GPG key for artifact signing
 - Maven settings.xml configured with credentials
 
-For detailed setup instructions, see the [Sonatype OSSRH Guide](https://central.sonatype.org/publish/publish-guide/).
+For detailed setup instructions, see the [Sonatype Central Publishing Guide](https://central.sonatype.org/publish/publish-guide/).
 
 ## Release Process
 
 ### 1. Prepare the Release
 
-Before releasing, ensure all tests pass and the project is ready:
+Before releasing, ensure the project is ready:
 
 ```bash
-# Clean build and test
-mvn clean test
-
 # Verify everything compiles and plugins work
 mvn clean package
-
-# Test the CLI tool
-java -cp core/target/classes com.elharo.docfix.DocFix --dryrun core/src/test/resources/
-
-# Test the Maven plugin
-mvn com.elharo.docfix:docfix-maven-plugin:fix -Ddocfix.dryrun=true
 ```
 
 ### 2. Update Version Numbers
 
-Update the version in the parent POM from `1.0-SNAPSHOT` to the release version:
+Update the version in the parent POM from SNAPSHOT to the release version:
 
 ```bash
 # Use Maven versions plugin to update all modules consistently
-mvn versions:set -DnewVersion=1.0
+mvn versions:set -DnewVersion=<VERSION>
 
 # Commit the version change
 git add .
-git commit -m "Release version 1.0"
-git tag v1.0
+git commit -m "Release version <VERSION>"
+git tag v<VERSION>
 ```
 
-### 3. Configure POM for Release
-
-Add the following configuration to the parent `pom.xml` for Maven Central deployment:
-
-```xml
-<distributionManagement>
-  <snapshotRepository>
-    <id>ossrh</id>
-    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-  </snapshotRepository>
-  <repository>
-    <id>ossrh</id>
-    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-  </repository>
-</distributionManagement>
-
-<build>
-  <plugins>
-    <!-- Source plugin -->
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-source-plugin</artifactId>
-      <version>3.3.0</version>
-      <executions>
-        <execution>
-          <id>attach-sources</id>
-          <goals>
-            <goal>jar-no-fork</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-    
-    <!-- Javadoc plugin -->
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-javadoc-plugin</artifactId>
-      <version>3.6.3</version>
-      <executions>
-        <execution>
-          <id>attach-javadocs</id>
-          <goals>
-            <goal>jar</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-    
-    <!-- GPG plugin -->
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-gpg-plugin</artifactId>
-      <version>3.1.0</version>
-      <executions>
-        <execution>
-          <id>sign-artifacts</id>
-          <phase>verify</phase>
-          <goals>
-            <goal>sign</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-    
-    <!-- Nexus staging plugin -->
-    <plugin>
-      <groupId>org.sonatype.plugins</groupId>
-      <artifactId>nexus-staging-maven-plugin</artifactId>
-      <version>1.6.13</version>
-      <extensions>true</extensions>
-      <configuration>
-        <serverId>ossrh</serverId>
-        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-        <autoReleaseAfterClose>true</autoReleaseAfterClose>
-      </configuration>
-    </plugin>
-  </plugins>
-</build>
-```
-
-### 4. Deploy to Maven Central
+### 3. Deploy to Maven Central
 
 Deploy the artifacts to the staging repository:
 
 ```bash
 # Deploy to staging repository
-mvn clean deploy
-
-# If you want to manually control the release, use:
-# mvn clean deploy -P release -Dautorelease=false
+mvn deploy -Prelease -DskipRemoteStaging -DaltStagingDirectory=/tmp/docfix-deploy -Dmaven.install.skip
 ```
 
-### 5. Release from Staging
+### 4. Release from Staging
 
-If you disabled auto-release, manually release from Sonatype Nexus:
+If you disabled auto-release, manually release from Maven Central:
 
-1. Go to [Sonatype Nexus](https://oss.sonatype.org/)
+1. Go to [Maven Central](https://central.sonatype.com/)
 2. Log in with your Sonatype credentials
-3. Click "Staging Repositories" in the left sidebar
+3. Navigate to the staging repository management
 4. Find your staging repository (usually `comelharodocfix-XXXX`)
 5. Select it and click "Close"
 6. Wait for validation to complete
 7. Select it again and click "Release"
 
-### 6. Prepare for Next Development Iteration
+### 5. Prepare for Next Development Iteration
 
 Update to the next SNAPSHOT version:
 
 ```bash
 # Update to next development version
-mvn versions:set -DnewVersion=1.1-SNAPSHOT
+mvn versions:set -DnewVersion=<NEXT-VERSION>-SNAPSHOT
 
 # Commit the version change
 git add .
-git commit -m "Prepare for next development iteration: 1.1-SNAPSHOT"
+git commit -m "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
 git push origin main
-git push origin v1.0
-```
-
-## Alternative: Using Maven Release Plugin
-
-For a more automated approach, you can use the Maven Release Plugin:
-
-### Configure Release Plugin
-
-Add to parent `pom.xml`:
-
-```xml
-<plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-release-plugin</artifactId>
-  <version>3.0.1</version>
-  <configuration>
-    <autoVersionSubmodules>true</autoVersionSubmodules>
-    <useReleaseProfile>false</useReleaseProfile>
-    <releaseProfiles>release</releaseProfiles>
-    <goals>deploy</goals>
-    <tagNameFormat>v@{project.version}</tagNameFormat>
-  </configuration>
-</plugin>
-```
-
-### Perform Release
-
-```bash
-# Prepare the release (updates versions, creates tag)
-mvn release:prepare
-
-# Perform the release (builds and deploys)
-mvn release:perform
+git push origin v<VERSION>
 ```
 
 ## Verification
@@ -221,7 +96,7 @@ Once released, users can use the library and plugin:
 <dependency>
   <groupId>com.elharo.docfix</groupId>
   <artifactId>docfix</artifactId>
-  <version>1.0</version>
+  <version>VERSION</version>
 </dependency>
 ```
 
@@ -231,7 +106,7 @@ Once released, users can use the library and plugin:
 <plugin>
   <groupId>com.elharo.docfix</groupId>
   <artifactId>docfix-maven-plugin</artifactId>
-  <version>1.0</version>
+  <version>VERSION</version>
   <executions>
     <execution>
       <goals>
@@ -266,6 +141,6 @@ mvn help:effective-pom
 
 ### Support
 
-- [Sonatype OSSRH Guide](https://central.sonatype.org/publish/publish-guide/)
+- [Sonatype Central Documentation](https://central.sonatype.org/publish/publish-guide/)
 - [Maven Central Documentation](https://maven.apache.org/repository/guide-central-repository-upload.html)
 - [Sonatype Support](https://issues.sonatype.org/)
