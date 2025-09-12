@@ -43,24 +43,22 @@ git tag v<VERSION>
 
 ### 3. Deploy to Maven Central
 
-Deploy the artifacts to the staging repository:
+Deploy the artifacts to Maven Central:
 
 ```bash
-# Deploy to staging repository
+# Deploy to Maven Central
 mvn deploy -Prelease -DskipRemoteStaging -DaltStagingDirectory=/tmp/docfix-deploy -Dmaven.install.skip
 ```
 
-### 4. Release from Staging
+### 4. Monitor and Verify Deployment
 
-If you disabled auto-release, manually release from Maven Central:
+Monitor the deployment through the Central Portal:
 
-1. Go to [Maven Central](https://central.sonatype.com/)
+1. Go to [Central Portal](https://central.sonatype.com/)
 2. Log in with your Sonatype credentials
-3. Navigate to the staging repository management
-4. Find your staging repository (usually `comelharodocfix-XXXX`)
-5. Select it and click "Close"
-6. Wait for validation to complete
-7. Select it again and click "Release"
+3. Navigate to "Deployments" to view deployment status
+4. Artifacts are automatically validated and published to Maven Central
+5. Publication typically takes 10-30 minutes after successful deployment
 
 ### 5. Prepare for Next Development Iteration
 
