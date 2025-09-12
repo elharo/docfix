@@ -44,11 +44,21 @@ mvn clean compile
 
 ### Command Line
 
-Run DocFix using Java with the compiled classes:
+If you have Maven installed, in the directory containing the files you want to fix, run: 
+
+```bash
+mvn com.elharo.docfix:docfix-maven-plugin:1.0:fix
+```
+
+This should fix all the .java files in src/main/java. It won't touch files in src/test or non-Java files.
+
+You can also run DocFix using Java 11 or later with the compiled classes:
 
 ```bash
 java -cp target/classes com.elharo.docfix.DocFix [--dryrun] <file-or-directory>
 ```
+
+This enables you to process any particular file or directory regardless of location. 
 
 ### Options
 
@@ -66,6 +76,7 @@ java -cp target/classes com.elharo.docfix.DocFix src/main/java/MyClass.java
 ```bash
 java -cp target/classes com.elharo.docfix.DocFix src/main/java
 ```
+
 
 **Preview changes without modifying files:**
 ```bash
