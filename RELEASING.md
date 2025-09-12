@@ -78,12 +78,24 @@ git push origin v<VERSION>
 
 ## Verification
 
-After release, verify the artifacts are available:
+After release, verify the artifacts are available for download:
 
-1. Check [Maven Central Search](https://search.maven.org/search?q=g:com.elharo.docfix)
-2. Verify both artifacts are available:
-   - `com.elharo.docfix:docfix`
-   - `com.elharo.docfix:docfix-maven-plugin`
+1. **Direct repository check** (available immediately):
+   ```bash
+   # Test downloading the core library
+   mvn dependency:get -Dartifact=com.elharo.docfix:docfix:<VERSION>
+   
+   # Test downloading the Maven plugin
+   mvn dependency:get -Dartifact=com.elharo.docfix:docfix-maven-plugin:<VERSION>
+   ```
+
+2. **Direct URL check** (available immediately):
+   - Core library: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix/<VERSION>/`
+   - Maven plugin: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix-maven-plugin/<VERSION>/`
+
+3. **Maven Central Search** (may take several hours to update):
+   - [Search results](https://search.maven.org/search?q=g:com.elharo.docfix)
+   - Note: Search indexing can lag behind artifact availability by many hours
 
 ## Usage After Release
 
