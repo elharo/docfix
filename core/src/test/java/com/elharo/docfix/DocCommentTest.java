@@ -77,6 +77,16 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testInlineReturn() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * {@return the name of the object}\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue(java, java.contains(" * {@return the name of the object}\n"));
+  }
+
+  @Test
   public void testRemovePeriod() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "  /**\n"
