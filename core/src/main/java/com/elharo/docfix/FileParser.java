@@ -77,65 +77,54 @@ final class FileParser {
    */
   public static List<String> extractChunks(Reader reader) throws IOException, JavaParseException {
     try (BufferedReader bufferedReader = new BufferedReader(reader)) {
-      List<String> lines = new ArrayList<>();
+      StringBuilder content = new StringBuilder();
       String line;
       while ((line = bufferedReader.readLine()) != null) {
-        lines.add(line);
+        content.append(line).append("\n");
       }
       
-      if (lines.isEmpty()) {
+      if (content.length() == 0) {
         return new ArrayList<>();
       }
       
-      List<String> chunks = new ArrayList<>();
-      int i = 0;
+      // Remove the last newline that we added
+      if (content.length() > 0 && content.charAt(content.length() - 1) == '\n') {
+        content.setLength(content.length() - 1);
+      }
       
-      while (i < lines.size()) {
-        String currentLine = lines.get(i);
-        String trimmed = currentLine.stripLeading();
+      String sourceText = content.toString();
+      List<String> chunks = new ArrayList<>();
+      
+      int index = 0;
+      while (index < sourceText.length()) {
+        int javadocStart = sourceText.indexOf("/**", index);
         
-        if (trimmed.startsWith("/**")) {
-          // Found start of Javadoc comment
-          StringBuilder javadocBuilder = new StringBuilder();
-          javadocBuilder.append(currentLine);
-          
-          if (trimmed.endsWith("*/")) {
-            // Single line Javadoc
-            chunks.add(javadocBuilder.toString());
-            i++;
-          } else {
-            // Multi-line Javadoc
-            i++;
-            while (i < lines.size()) {
-              String javadocLine = lines.get(i);
-              javadocBuilder.append("\n").append(javadocLine);
-              
-              if (javadocLine.trim().endsWith("*/")) {
-                chunks.add(javadocBuilder.toString());
-                i++;
-                break;
-              }
-              i++;
-            }
+        if (javadocStart == -1) {
+          // No more Javadoc comments - add rest as one chunk
+          String remaining = sourceText.substring(index);
+          if (!remaining.isEmpty()) {
+            addNonJavadocChunk(remaining, chunks);
           }
-        } else {
-          // Non-Javadoc content
-          StringBuilder contentBuilder = new StringBuilder();
-          
-          // Keep collecting lines until we hit a Javadoc or end of file
-          while (i < lines.size() && !lines.get(i).stripLeading().startsWith("/**")) {
-            if (contentBuilder.length() > 0) {
-              contentBuilder.append("\n");
-            }
-            contentBuilder.append(lines.get(i));
-            i++;
-          }
-          
-          if (contentBuilder.length() > 0) {
-            String content = removeOneLeadingTrailingNewline(contentBuilder.toString());
-            chunks.add(content);
-          }
+          break;
         }
+        
+        // Add any content before the Javadoc as chunk(s)
+        if (javadocStart > index) {
+          String beforeJavadoc = sourceText.substring(index, javadocStart);
+          addNonJavadocChunk(beforeJavadoc, chunks);
+        }
+        
+        // Find end of Javadoc comment
+        int javadocEnd = sourceText.indexOf("*/", javadocStart);
+        if (javadocEnd == -1) {
+          throw new JavaParseException("Unclosed Javadoc comment starting at position " + javadocStart);
+        }
+        
+        // Add Javadoc as chunk
+        String javadoc = sourceText.substring(javadocStart, javadocEnd + 2);
+        chunks.add(javadoc);
+        
+        index = javadocEnd + 2;
       }
       
       return chunks;
@@ -147,6 +136,44 @@ final class FileParser {
         throw e;
       }
       throw new JavaParseException("Error parsing Java source", e);
+    }
+  }
+  
+  /**
+   * Adds a non-Javadoc chunk, applying line terminator rules and splitting if needed.
+   */
+  private static void addNonJavadocChunk(String chunk, List<String> chunks) {
+    String processed = removeOneLeadingTrailingNewline(chunk);
+    
+    if (processed.isEmpty()) {
+      return; // Don't add empty chunks
+    }
+    
+    // Special case: if the processed chunk contains "\n\n", split on it
+    int doubleNewline = processed.indexOf("\n\n");
+    if (doubleNewline >= 0) {
+      String before = processed.substring(0, doubleNewline);
+      String after = processed.substring(doubleNewline + 2);
+      
+      if (!before.isEmpty()) {
+        chunks.add(before);
+      }
+      chunks.add(""); // The empty line becomes an empty chunk
+      
+      if (!after.isEmpty()) {
+        addNonJavadocChunk(after, chunks); // Recursively process the rest
+      }
+    }
+    // If the processed chunk ends with "\n", split it
+    else if (processed.endsWith("\n")) {
+      String content = processed.substring(0, processed.length() - 1);
+      if (!content.isEmpty()) {
+        chunks.add(content);
+      }
+      chunks.add("");
+    }
+    else {
+      chunks.add(processed);
     }
   }
   
