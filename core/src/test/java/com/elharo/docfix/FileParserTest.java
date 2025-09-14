@@ -369,4 +369,17 @@ public class FileParserTest {
     assertEquals("Should have 1 chunk", 1, chunks.size());
     assertEquals("package test;\nclass Test {}", chunks.get(0));
   }
+
+  @Test
+  public void testExtractChunksMultipleDocCommentsNoLineBreaks() throws IOException, JavaParseException {
+    String source = "/**First*/class A{}/**Second*/class B{}";
+    
+    List<String> chunks = FileParser.extractChunks(new StringReader(source));
+    
+    assertEquals("Should have 4 chunks", 4, chunks.size());
+    assertEquals("/**First*/", chunks.get(0));
+    assertEquals("class A{}", chunks.get(1));
+    assertEquals("/**Second*/", chunks.get(2));
+    assertEquals("class B{}", chunks.get(3));
+  }
 }

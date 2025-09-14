@@ -76,67 +76,81 @@ final class FileParser {
    * @throws JavaParseException if there is an error parsing the Java source
    */
   public static List<String> extractChunks(Reader reader) throws IOException, JavaParseException {
-    try (BufferedReader bufferedReader = new BufferedReader(reader)) {
-      StringBuilder content = new StringBuilder();
-      String line;
-      while ((line = bufferedReader.readLine()) != null) {
-        content.append(line).append("\n");
-      }
-      
-      if (content.length() == 0) {
-        return new ArrayList<>();
-      }
-      
-      // Remove the last newline that we added
-      if (content.length() > 0 && content.charAt(content.length() - 1) == '\n') {
-        content.setLength(content.length() - 1);
-      }
-      
-      String sourceText = content.toString();
-      List<String> chunks = new ArrayList<>();
-      
-      int index = 0;
-      while (index < sourceText.length()) {
-        int javadocStart = sourceText.indexOf("/**", index);
-        
-        if (javadocStart == -1) {
-          // No more Javadoc comments - add rest as one chunk
-          String remaining = sourceText.substring(index);
-          if (!remaining.isEmpty()) {
-            addNonJavadocChunk(remaining, chunks);
-          }
-          break;
-        }
-        
-        // Add any content before the Javadoc as chunk(s)
-        if (javadocStart > index) {
-          String beforeJavadoc = sourceText.substring(index, javadocStart);
-          addNonJavadocChunk(beforeJavadoc, chunks);
-        }
-        
-        // Find end of Javadoc comment
-        int javadocEnd = sourceText.indexOf("*/", javadocStart);
-        if (javadocEnd == -1) {
-          throw new JavaParseException("Unclosed Javadoc comment starting at position " + javadocStart);
-        }
-        
-        // Add Javadoc as chunk
-        String javadoc = sourceText.substring(javadocStart, javadocEnd + 2);
-        chunks.add(javadoc);
-        
-        index = javadocEnd + 2;
-      }
-      
-      return chunks;
-    } catch (Exception e) {
-      if (e instanceof IOException) {
-        throw e;
-      }
-      if (e instanceof JavaParseException) {
-        throw e;
-      }
-      throw new JavaParseException("Error parsing Java source", e);
+    StringBuilder content = new StringBuilder();
+    int ch;
+    while ((ch = reader.read()) != -1) {
+      content.append((char) ch);
     }
+    
+    if (content.length() == 0) {
+      return new ArrayList<>();
+    }
+    
+    String sourceText = content.toString();
+    List<String> chunks = new ArrayList<>();
+    
+    int index = 0;
+    while (index < sourceText.length()) {
+      int javadocStart = findNextJavadocStart(sourceText, index);
+      
+      if (javadocStart == -1) {
+        // No more Javadoc comments - add rest as one chunk
+        String remaining = sourceText.substring(index);
+        if (!remaining.isEmpty()) {
+          addNonJavadocChunk(remaining, chunks);
+        }
+        break;
+      }
+      
+      // Add any content before the Javadoc as chunk(s)
+      if (javadocStart > index) {
+        String beforeJavadoc = sourceText.substring(index, javadocStart);
+        addNonJavadocChunk(beforeJavadoc, chunks);
+      }
+      
+      // Find end of Javadoc comment
+      int javadocEnd = sourceText.indexOf("*/", javadocStart);
+      if (javadocEnd == -1) {
+        throw new JavaParseException("Unclosed Javadoc comment starting at position " + javadocStart);
+      }
+      
+      // Add Javadoc as chunk
+      String javadoc = sourceText.substring(javadocStart, javadocEnd + 2);
+      chunks.add(javadoc);
+      
+      index = javadocEnd + 2;
+    }
+    
+    return chunks;
+  }
+  
+  /**
+   * Find the next Javadoc start (/**) that is not preceded by // on the same line.
+   */
+  private static int findNextJavadocStart(String sourceText, int startIndex) {
+    int index = startIndex;
+    while (index < sourceText.length()) {
+      int javadocStart = sourceText.indexOf("/**", index);
+      if (javadocStart == -1) {
+        return -1; // No more /** found
+      }
+      
+      // Check if there's a // before this /** on the same line
+      int lineStart = javadocStart;
+      while (lineStart > 0 && sourceText.charAt(lineStart - 1) != '\n') {
+        lineStart--;
+      }
+      
+      String linePrefix = sourceText.substring(lineStart, javadocStart);
+      if (linePrefix.contains("//")) {
+        // This /** is commented out, skip it
+        index = javadocStart + 3;
+        continue;
+      }
+      
+      return javadocStart;
+    }
+    return -1;
   }
   
   /**
