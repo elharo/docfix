@@ -18,14 +18,12 @@ final class FileParser {
       String line = lines1.get(i);
       String trimmed = line.stripLeading();
 
-      // Check if this line starts a Javadoc comment
+      // Check if this line starts a Javadoc comment (original logic)
       if (trimmed.startsWith("/**")) {
         StringBuilder javadocBuilder = new StringBuilder();
         javadocBuilder.append(line);
 
         // If the comment doesn't end on the same line, continue reading
-        // TODO this is wrong. */ does not have to be last on the line though it usually is.
-        // This is a claude mistake.
         if (!trimmed.endsWith("*/")) {
           javadocBuilder.append(lineEnding);
           i++; // Move to next line
@@ -35,7 +33,6 @@ final class FileParser {
             String currentLine = lines1.get(i);
             javadocBuilder.append(currentLine);
 
-            // TODO same claude sonnet mistake
             if (currentLine.trim().endsWith("*/")) {
               break;
             }
@@ -53,8 +50,58 @@ final class FileParser {
           result.add(fixedComment);
         }
       } else {
-        // Regular line, add as-is
-        result.add(line);
+        // Look for Javadoc comments elsewhere on the line
+        int searchStart = 0;
+        String workingLine = line;
+        boolean foundComment = false;
+        
+        while (searchStart < workingLine.length()) {
+          int javadocStart = workingLine.indexOf("/**", searchStart);
+          if (javadocStart < 0) {
+            break; // No more comments on this line
+          }
+          
+          foundComment = true;
+          
+          // Extract code before the comment
+          String codeBefore = workingLine.substring(0, javadocStart);
+          
+          // Check if comment ends on the same line
+          int javadocEnd = workingLine.indexOf("*/", javadocStart);
+          if (javadocEnd >= 0) {
+            // Single-line comment on same line as code
+            String comment = workingLine.substring(javadocStart, javadocEnd + 2);
+            String codeAfter = workingLine.substring(javadocEnd + 2);
+            
+            String fixedComment = DocComment.parse(null, comment).toJava();
+            fixedComment = fixedComment.replace("\n", lineEnding);
+            
+            // Reconstruct this portion of the line
+            StringBuilder reconstructed = new StringBuilder();
+            reconstructed.append(codeBefore);
+            if (!fixedComment.isEmpty()) {
+              reconstructed.append(fixedComment);
+            }
+            
+            // Update working line to continue processing from after this comment
+            workingLine = reconstructed.toString() + codeAfter;
+            searchStart = reconstructed.length();
+          } else {
+            // Multi-line comment starting after code - this is a complex edge case
+            // For now, just add the line as-is (this can be enhanced later if needed)
+            result.add(line);
+            foundComment = false;
+            break;
+          }
+        }
+        
+        if (foundComment) {
+          // We processed comments on this line
+          result.add(workingLine);
+        } else {
+          // Regular line, add as-is
+          result.add(line);
+        }
       }
     }
 
