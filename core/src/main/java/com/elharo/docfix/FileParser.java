@@ -76,6 +76,7 @@ final class FileParser {
    * @throws JavaParseException if there is an error parsing the Java source
    */
   public static List<String> extractChunks(Reader reader) throws IOException, JavaParseException {
+    // Read character by character to preserve exact line break characters
     StringBuilder content = new StringBuilder();
     int ch;
     while ((ch = reader.read()) != -1) {
@@ -152,6 +153,7 @@ final class FileParser {
     }
     return -1;
   }
+
   
   /**
    * Adds a non-Javadoc chunk, applying line terminator rules and splitting if needed.
