@@ -5,49 +5,70 @@ import java.util.List;
 
 public class DebugExtractChunks {
   public static void main(String[] args) throws Exception {
-    // Test case 1 - PASSES
-    testCase("Simple class", 
-        "package test;\n\n/**\n * A simple class.\n */\npublic class Test {\n}\n",
-        new String[]{"package test;", "", "/**\n * A simple class.\n */", "public class Test {\n}"});
+    // Debug the multiple Javadocs case specifically
+    String source = "/**\n * Class comment.\n */\nclass Test {\n  /**\n   * Method comment.\n   */\n  void method() {\n  }\n}\n";
     
-    // Test case 2 - FAILS (expects 5, probably getting 4)
-    testCase("Multiple Javadocs",
-        "/**\n * Class comment.\n */\nclass Test {\n  /**\n   * Method comment.\n   */\n  void method() {\n  }\n}\n",
-        new String[]{"/**\n * Class comment.\n */", "class Test {", "/**\n   * Method comment.\n   */", "void method() {\n  }", ""});
+    System.out.println("=== Multiple Javadocs Debug ===");
+    System.out.println("Full source: '" + source.replace("\n", "\\n") + "'");
+    System.out.println();
     
-    // Test case 3 - FAILS (expects 4, probably getting 7) 
-    testCase("Leading/trailing terminators",
-        "\npackage test;\n\n/**\n * Comment.\n */\n\nclass Test {\n}\n\n",
-        new String[]{"package test;\n", "/**\n * Comment.\n */", "class Test {\n}", ""});
-  }
-  
-  private static void testCase(String name, String source, String[] expected) throws Exception {
-    System.out.println("=== " + name + " ===");
-    System.out.println("Source: '" + source.replace("\n", "\\n") + "'");
+    // Find Javadoc boundaries
+    int firstJavadocStart = source.indexOf("/**");
+    int firstJavadocEnd = source.indexOf("*/") + 2;
+    int secondJavadocStart = source.indexOf("/**", firstJavadocEnd);
+    int secondJavadocEnd = source.indexOf("*/", secondJavadocStart) + 2;
+    
+    System.out.println("First Javadoc: " + firstJavadocStart + " to " + firstJavadocEnd);
+    System.out.println("Second Javadoc: " + secondJavadocStart + " to " + secondJavadocEnd);
+    
+    String firstJavadoc = source.substring(firstJavadocStart, firstJavadocEnd);
+    String betweenJavadocs = source.substring(firstJavadocEnd, secondJavadocStart);
+    String secondJavadoc = source.substring(secondJavadocStart, secondJavadocEnd);
+    String afterSecondJavadoc = source.substring(secondJavadocEnd);
+    
+    System.out.println("First Javadoc: '" + firstJavadoc.replace("\n", "\\n") + "'");
+    System.out.println("Between: '" + betweenJavadocs.replace("\n", "\\n") + "'");
+    System.out.println("Second Javadoc: '" + secondJavadoc.replace("\n", "\\n") + "'");
+    System.out.println("After: '" + afterSecondJavadoc.replace("\n", "\\n") + "'");
+    
+    // Apply line terminator removal
+    System.out.println();
+    System.out.println("After removeOneLeadingTrailingNewline:");
+    String processedBetween = removeOneLeadingTrailingNewline(betweenJavadocs);
+    String processedAfter = removeOneLeadingTrailingNewline(afterSecondJavadoc);
+    System.out.println("Between: '" + processedBetween.replace("\n", "\\n") + "'");
+    System.out.println("After: '" + processedAfter.replace("\n", "\\n") + "'");
+    
+    System.out.println();
+    System.out.println("Expected:");
+    System.out.println("Between: 'class Test {'");
+    System.out.println("After: 'void method() {\\n  }' + ''");
     
     List<String> chunks = FileParser.extractChunks(new StringReader(source));
-    
-    System.out.println("Expected " + expected.length + " chunks:");
-    for (int i = 0; i < expected.length; i++) {
-      System.out.println("  " + i + ": '" + expected[i].replace("\n", "\\n") + "'");
-    }
-    
-    System.out.println("Got " + chunks.size() + " chunks:");
-    for (int i = 0; i < chunks.size(); i++) {
-      System.out.println("  " + i + ": '" + chunks.get(i).replace("\n", "\\n") + "'");
-    }
-    
-    boolean match = chunks.size() == expected.length;
-    if (match) {
-      for (int i = 0; i < expected.length; i++) {
-        if (!expected[i].equals(chunks.get(i))) {
-          match = false;
-          break;
-        }
-      }
-    }
-    
-    System.out.println("Result: " + (match ? "PASS" : "FAIL"));
     System.out.println();
+    System.out.println("Actual result:");
+    for (int i = 0; i < chunks.size(); i++) {
+      System.out.println(i + ": '" + chunks.get(i).replace("\n", "\\n") + "'");
+    }
+  }
+  
+  private static String removeOneLeadingTrailingNewline(String text) {
+    if (text.isEmpty()) {
+      return text;
+    }
+    
+    String result = text;
+    
+    // Remove one leading newline
+    if (result.startsWith("\n")) {
+      result = result.substring(1);
+    }
+    
+    // Remove one trailing newline  
+    if (result.endsWith("\n")) {
+      result = result.substring(0, result.length() - 1);
+    }
+    
+    return result;
   }
 }
