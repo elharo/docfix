@@ -59,50 +59,14 @@ final class Strings {
       }
     }
     
-    // Check for common web domain patterns
-    if (lastWord.startsWith("www.") || lastWord.startsWith("ftp.")) {
-      return true;
-    }
-    
-    // Check if it looks like a domain name (contains dots and common TLDs)
-    if (lastWord.contains(".") && isLikelyDomain(lastWord)) {
+    // Check for www URLs which are typically clickable
+    if (lastWord.startsWith("www.")) {
       return true;
     }
     
     return false;
   }
   
-  /**
-   * Checks if a string looks like a domain name by checking for common TLD patterns.
-   *
-   * @param word the word to check
-   * @return true if it looks like a domain name
-   */
-  private static boolean isLikelyDomain(String word) {
-    if (word == null || !word.contains(".")) {
-      return false;
-    }
-    
-    // Common top-level domains
-    String[] commonTlds = {
-      ".com", ".org", ".net", ".edu", ".gov", ".mil", ".info", ".biz",
-      ".co", ".io", ".ly", ".me", ".tv", ".cc", ".ws", ".in", ".uk",
-      ".de", ".fr", ".jp", ".cn", ".au", ".ca", ".ru", ".br", ".it",
-      ".nl", ".es", ".se", ".no", ".dk", ".fi", ".pl", ".ch", ".be",
-      ".cz", ".at", ".hu", ".sk", ".si", ".hr", ".bg", ".ro", ".gr",
-      ".pt", ".ie", ".lv", ".lt", ".ee", ".is", ".mt", ".cy", ".lu"
-    };
-    
-    String lowerWord = word.toLowerCase();
-    for (String tld : commonTlds) {
-      if (lowerWord.endsWith(tld) || lowerWord.endsWith(tld + "/")) {
-        return true;
-      }
-    }
-    
-    return false;
-  }
-
   /**
    * Detects the line ending used in the provided code.
    * It checks for Windows (\r\n), Mac (\r), and Unix (\n) line endings.

@@ -28,7 +28,8 @@ public class StringsTest {
   @Test
   public void testEndsWithURL_wwwUrl() {
     assertTrue("Should detect www URL", Strings.endsWithURL("Visit www.example.com"));
-    assertTrue("Should detect www URL with subdomain", Strings.endsWithURL("Check docs.example.com"));
+    // Subdomains without www. should not be detected as URLs
+    assertFalse("Should not detect subdomain without www", Strings.endsWithURL("Check docs.example.com"));
   }
 
   @Test
@@ -47,6 +48,10 @@ public class StringsTest {
     assertFalse("Should not detect text ending with period", Strings.endsWithURL("This ends with period."));
     assertFalse("Should not detect text with URL in middle", 
         Strings.endsWithURL("Visit https://example.com and then do something else"));
+    assertFalse("Should not detect domain names without explicit schemes", 
+        Strings.endsWithURL("Visit example.com"));
+    assertFalse("Should not detect subdomains", 
+        Strings.endsWithURL("Check docs.example.com"));
   }
 
   @Test
