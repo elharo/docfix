@@ -27,8 +27,9 @@ class SingleLineComment extends DocComment {
     sb.append(indent).append("/** ");
     if (description != null && !description.isEmpty()) {
       String desc = description;
-      // Add period if description doesn't end with punctuation
-      if (!desc.endsWith(".") && !desc.endsWith("!") && !desc.endsWith("?")) {
+      // Add period if description doesn't end with punctuation and doesn't end with URL
+      if (!desc.endsWith(".") && !desc.endsWith("!") && !desc.endsWith("?") 
+          && !Strings.endsWithURL(desc)) {
         desc += ".";
       }
       sb.append(desc);

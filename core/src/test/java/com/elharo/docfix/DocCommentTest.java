@@ -811,4 +811,90 @@ public class DocCommentTest {
     assertTrue("Period after 'serialized' should be preserved", 
         javaCode.contains("automatically escaped when the attribute is serialized."));
   }
+
+  @Test
+  public void testDontAddPeriodAfterHttpsURL() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * File origin:\n"
+            + " * https://github.com/gradle/gradle/blob/v5.6.2/subprojects/launcher/src/main/java/org/gradle/launcher/daemon/client/DaemonClientConnection.java\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should not add period after HTTPS URL", 
+        java.contains("DaemonClientConnection.java\n"));
+    assertFalse("Should not add period after URL", 
+        java.contains("DaemonClientConnection.java.\n"));
+  }
+
+  @Test
+  public void testDontAddPeriodAfterHttpURL() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * See documentation at http://example.com/docs\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should not add period after HTTP URL", 
+        java.contains("http://example.com/docs\n"));
+    assertFalse("Should not add period after URL", 
+        java.contains("http://example.com/docs.\n"));
+  }
+
+  @Test
+  public void testDontAddPeriodAfterFtpURL() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Download from ftp://ftp.example.com/files/\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should not add period after FTP URL", 
+        java.contains("ftp://ftp.example.com/files/\n"));
+    assertFalse("Should not add period after URL", 
+        java.contains("ftp://ftp.example.com/files/.\n"));
+  }
+
+  @Test
+  public void testAddPeriodAfterWwwURL() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Visit www.example.com\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should add period after www URL", 
+        java.contains("www.example.com.\n"));
+    assertFalse("Should not leave www URL without period", 
+        java.contains("www.example.com\n"));
+  }
+
+  @Test
+  public void testAddPeriodAfterURLInMiddle() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Visit https://example.com and then do something else\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should add period when URL is not at end", 
+        java.contains("do something else.\n"));
+  }
+
+  @Test
+  public void testAddPeriodWhenURLInMiddleOfText() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Visit www.example.com for more info\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should add period when text continues after URL", 
+        java.contains("for more info.\n"));
+  }
+
+  @Test
+  public void testAddPeriodForNormalText() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * This is a normal comment without URLs\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should add period for normal text", 
+        java.contains("without URLs.\n"));
+  }
 }

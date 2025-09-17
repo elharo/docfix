@@ -28,8 +28,9 @@ class DocComment {
       char first = description.charAt(0);
       description = (Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1)).trim();
       // add a period to the end of the description if it doesn't end with a
-      // punctuation mark
-      if ((Character.isLetterOrDigit(description.charAt(description.length() - 1)))) {
+      // punctuation mark and doesn't end with a URL
+      if ((Character.isLetterOrDigit(description.charAt(description.length() - 1))) 
+          && !Strings.endsWithURL(description)) {
         description = description + ".";
       }
     }
