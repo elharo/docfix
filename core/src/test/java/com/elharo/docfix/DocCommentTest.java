@@ -853,16 +853,16 @@ public class DocCommentTest {
   }
 
   @Test
-  public void testDontAddPeriodAfterWwwURL() {
+  public void testAddPeriodAfterWwwURL() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "/**\n"
             + " * Visit www.example.com\n"
             + " */");
     String java = docComment.toJava();
-    assertTrue("Should not add period after www URL", 
-        java.contains("www.example.com\n"));
-    assertFalse("Should not add period after URL", 
+    assertTrue("Should add period after www URL", 
         java.contains("www.example.com.\n"));
+    assertFalse("Should not leave www URL without period", 
+        java.contains("www.example.com\n"));
   }
 
   @Test

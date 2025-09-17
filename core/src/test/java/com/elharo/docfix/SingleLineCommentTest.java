@@ -101,12 +101,12 @@ public class SingleLineCommentTest {
   }
 
   @Test
-  public void testDontAddPeriodAfterWwwURL() {
+  public void testAddPeriodAfterWwwURL() {
     String raw = "/** Check www.example.com */";
     DocComment comment = DocComment.parse(DocComment.Kind.METHOD, raw);
 
     assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
-    assertEquals("/** Check www.example.com */", comment.toJava());
+    assertEquals("/** Check www.example.com. */", comment.toJava());
   }
 
   @Test

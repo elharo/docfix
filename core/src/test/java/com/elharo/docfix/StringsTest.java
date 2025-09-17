@@ -27,8 +27,8 @@ public class StringsTest {
 
   @Test
   public void testEndsWithURL_wwwUrl() {
-    assertTrue("Should detect www URL", Strings.endsWithURL("Visit www.example.com"));
-    // Subdomains without www. should not be detected as URLs
+    // www URLs should not be detected as URLs (they get periods added)
+    assertFalse("Should not detect www URL", Strings.endsWithURL("Visit www.example.com"));
     assertFalse("Should not detect subdomain without www", Strings.endsWithURL("Check docs.example.com"));
   }
 
@@ -52,6 +52,8 @@ public class StringsTest {
         Strings.endsWithURL("Visit example.com"));
     assertFalse("Should not detect subdomains", 
         Strings.endsWithURL("Check docs.example.com"));
+    assertFalse("Should not detect www URLs", 
+        Strings.endsWithURL("Visit www.example.com"));
   }
 
   @Test

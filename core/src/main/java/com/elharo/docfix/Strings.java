@@ -34,11 +34,14 @@ final class Strings {
    * @return true if the text appears to end with a URL
    */
   static boolean endsWithURL(String text) {
-    if (text == null || text.trim().isEmpty()) {
+    if (text == null) {
       return false;
     }
     
     String trimmed = text.trim();
+    if (trimmed.isEmpty()) {
+      return false;
+    }
     
     // Find the last word/token that might be a URL
     String[] words = trimmed.split("\\s+");
@@ -57,11 +60,6 @@ final class Strings {
       if (lastWord.contains(scheme)) {
         return true;
       }
-    }
-    
-    // Check for www URLs which are typically clickable
-    if (lastWord.startsWith("www.")) {
-      return true;
     }
     
     return false;
