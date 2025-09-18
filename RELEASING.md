@@ -18,10 +18,10 @@ For detailed setup instructions, see the [Sonatype Central Publishing Guide](htt
 
 ## Release Process
 
-### 0. Make a release branch
+### 0. Create a release branch
 
 ```bash
-git checkout -v <VERSION>
+git checkout -b release/<VERSION>
 ```
 
 ### 1. Prepare the Release
@@ -44,19 +44,48 @@ mvn versions:set -DnewVersion=<VERSION>
 # Commit the version change
 git add .
 git commit -m "Release version <VERSION>"
-git tag v<VERSION>
 ```
 
-### 3. Deploy to Maven Central
+### 3. Create Pull Request for Release
 
-Deploy the artifacts to Maven Central:
+Create a pull request for the release version changes:
+
+```bash
+# Push the release branch
+git push origin release/<VERSION>
+```
+
+Then create a pull request from `release/<VERSION>` to `main` with:
+- Title: "Release version <VERSION>"
+- Description: Include changelog and release notes
+- Request review from project maintainers
+
+Once the pull request is approved and merged, the release tag will be on main.
+
+### 4. Tag the Release
+
+After the release PR is merged to main, create the release tag:
+
+```bash
+# Switch to main and pull the merged changes
+git checkout main
+git pull origin main
+
+# Create and push the release tag
+git tag v<VERSION>
+git push origin v<VERSION>
+```
+
+### 5. Deploy to Maven Central
+
+Deploy the artifacts to Maven Central from the tagged release:
 
 ```bash
 # Deploy to Maven Central
 mvn deploy -Prelease -DskipRemoteStaging -DaltStagingDirectory=/tmp/docfix-deploy -Dmaven.install.skip
 ```
 
-### 4. Monitor and Publish Deployment
+### 6. Monitor and Publish Deployment
 
 Monitor and publish the deployment through the Central Portal:
 
@@ -67,20 +96,31 @@ Monitor and publish the deployment through the Central Portal:
 5. Once validation is complete, click the "Publish" button to release artifacts to Maven Central
 6. Publication typically takes 10-30 minutes after clicking publish
 
-### 5. Prepare for Next Development Iteration
+### 7. Prepare for Next Development Iteration
 
-Update to the next SNAPSHOT version:
+Create another pull request for the next development version:
 
 ```bash
+# Create a new branch for the next development iteration
+git checkout -b prepare-next-development-<NEXT-VERSION>
+
 # Update to next development version
 mvn versions:set -DnewVersion=<NEXT-VERSION>-SNAPSHOT
 
 # Commit the version change
 git add .
 git commit -m "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
-git push origin main
-git push origin v<VERSION>
+
+# Push the branch and create a pull request
+git push origin prepare-next-development-<NEXT-VERSION>
 ```
+
+Then create a pull request from `prepare-next-development-<NEXT-VERSION>` to `main` with:
+- Title: "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
+- Description: Updates version numbers for continued development
+- Request review from project maintainers
+
+**Important**: Never push directly to the main branch. All changes must go through pull requests.
 
 ## Verification
 
