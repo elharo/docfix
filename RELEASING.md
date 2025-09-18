@@ -120,8 +120,6 @@ Then create a pull request from `prepare-next-development-<NEXT-VERSION>` to `ma
 - Description: Updates version numbers for continued development
 - Request review from project maintainers
 
-**Important**: Never push directly to the main branch. All changes must go through pull requests.
-
 ## Verification
 
 After release, verify the artifacts are available for download:
