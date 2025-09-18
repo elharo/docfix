@@ -18,6 +18,12 @@ For detailed setup instructions, see the [Sonatype Central Publishing Guide](htt
 
 ## Release Process
 
+### 0. Make a release branch
+
+```bash
+git checkout -v <VERSION>
+```
+
 ### 1. Prepare the Release
 
 Before releasing, ensure the project is ready:
