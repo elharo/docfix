@@ -47,7 +47,7 @@ mvn clean compile
 If you have Maven installed, in the directory containing the files you want to fix, run: 
 
 ```bash
-mvn com.elharo.docfix:docfix-maven-plugin:1.0:fix
+mvn com.elharo.docfix:docfix-maven-plugin:1.0.1:fix
 ```
 
 This should fix all the .java files in src/main/java. It won't touch files in src/test or non-Java files.
@@ -115,7 +115,7 @@ To include the plugin in your project's build process, add it to your `pom.xml`:
     <plugin>
       <groupId>com.elharo.docfix</groupId>
       <artifactId>docfix</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0.1</version>
       <executions>
         <execution>
           <goals>
