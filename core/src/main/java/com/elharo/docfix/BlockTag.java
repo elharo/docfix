@@ -82,7 +82,7 @@ class BlockTag {
 
   // Known proper nouns that should remain capitalized
   private static final Set<String> PROPER_NOUNS = Set.of(
-      "Java", "JDK", "API", "URL", "I/O", "IO", "JSON", "XML", "HTML"
+      "Java"
   );
 
   // TODO handle title case ligatures
