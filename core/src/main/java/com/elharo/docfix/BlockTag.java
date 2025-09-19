@@ -82,7 +82,7 @@ class BlockTag {
 
   // Known proper nouns that should remain capitalized
   private static final Set<String> PROPER_NOUNS = Set.of(
-      "Java", "JDK", "API", "URL", "I/O", "IO", "JSON", "XML", "HTML", "HTTP", "HTTPS"
+      "Java", "JDK", "API", "URL", "I/O", "IO", "JSON", "XML", "HTML"
   );
 
   // TODO handle title case ligatures
@@ -133,6 +133,7 @@ class BlockTag {
    * @return the first word
    */
   private String extractFirstWord(String text) {
+    text = text.trim();
     int endIndex = 0;
     while (endIndex < text.length() && !Character.isWhitespace(text.charAt(endIndex))) {
       endIndex++;
@@ -152,7 +153,7 @@ class BlockTag {
     }
     
     for (char c : word.toCharArray()) {
-      if (!Character.isUpperCase(c)) {
+      if (Character.isLowerCase(c)) {
         return false;
       }
     }
