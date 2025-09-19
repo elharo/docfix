@@ -80,6 +80,11 @@ class BlockTag {
     return blockTag;
   }
 
+  // Known proper nouns that should remain capitalized
+  private static final Set<String> PROPER_NOUNS = Set.of(
+      "Java", "JDK", "API", "URL", "I/O", "IO", "JSON", "XML", "HTML", "HTTP", "HTTPS"
+  );
+
   // TODO handle title case ligatures
   /**
    * @return true iff the first word in the text is capitalized. That is,
@@ -94,6 +99,19 @@ class BlockTag {
       return false;
     }
 
+    // Extract the first word
+    String firstWord = extractFirstWord(text);
+    
+    // Check if it's a known proper noun
+    if (PROPER_NOUNS.contains(firstWord)) {
+      return false;
+    }
+
+    // Check if it's an acronym (3+ letters, all uppercase)
+    if (isAcronym(firstWord)) {
+      return false;
+    }
+
     // Now we know first character is uppercase.
     char[] characters = text.toCharArray();
     for (int i = 1; i < characters.length; i++) {
@@ -102,6 +120,39 @@ class BlockTag {
         return true;
       }
       if (Character.isUpperCase(c)) { // There's more than one uppercase letter in the first word
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Extracts the first word from the given text.
+   *
+   * @param text the text to extract the first word from
+   * @return the first word
+   */
+  private String extractFirstWord(String text) {
+    int endIndex = 0;
+    while (endIndex < text.length() && !Character.isWhitespace(text.charAt(endIndex))) {
+      endIndex++;
+    }
+    return text.substring(0, endIndex);
+  }
+
+  /**
+   * Checks if a word is an acronym (3+ letters, all uppercase).
+   *
+   * @param word the word to check
+   * @return true if the word is an acronym
+   */
+  private boolean isAcronym(String word) {
+    if (word.length() < 3) {
+      return false;
+    }
+    
+    for (char c : word.toCharArray()) {
+      if (!Character.isUpperCase(c)) {
         return false;
       }
     }
