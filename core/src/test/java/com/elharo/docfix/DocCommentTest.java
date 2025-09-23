@@ -978,4 +978,62 @@ public class DocCommentTest {
     assertTrue("Should add period for normal text", 
         java.contains("without URLs.\n"));
   }
+
+  @Test
+  public void testDeprecatedTagCapitalizationNotAdjusted() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A deprecated method.\n"
+            + "     *\n"
+            + "     * @param name the name parameter\n"
+            + "     * @deprecated This method is deprecated. Use the newer version instead.\n"
+            + "     * @return something useful\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(3, tags.size());
+    
+    // Check that @param is lowercased as expected (order: param=2)
+    assertEquals("param", tags.get(0).getType());
+    assertEquals("the name parameter", tags.get(0).getText());
+    
+    // Check that @return is lowercased as expected (order: return=3)
+    assertEquals("return", tags.get(1).getType());
+    assertEquals("something useful", tags.get(1).getText());
+    
+    // Check that @deprecated maintains its capitalization (order: deprecated=8)
+    assertEquals("deprecated", tags.get(2).getType());
+    assertEquals("This method is deprecated. Use the newer version instead.", tags.get(2).getText());
+  }
+
+  @Test
+  public void testDeprecatedTagVariousCapitalizations() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A deprecated class.\n"
+            + "     *\n"
+            + "     * @deprecated This class is obsolete\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(1, tags.size());
+    assertEquals("deprecated", tags.get(0).getType());
+    assertEquals("This class is obsolete", tags.get(0).getText());
+  }
+
+  @Test
+  public void testDeprecatedTagLowercaseStart() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method with lowercase deprecated tag.\n"
+            + "     *\n"
+            + "     * @deprecated this method should not be used anymore\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(1, tags.size());
+    assertEquals("deprecated", tags.get(0).getType());
+    // Should preserve the original lowercase start
+    assertEquals("this method should not be used anymore", tags.get(0).getText());
+  }
 }
