@@ -54,6 +54,10 @@ class BlockTag {
   );
 
   static BlockTag parse(String trimmed) {
+    return parse(trimmed, false);
+  }
+
+  static BlockTag parse(String trimmed, boolean preserveAlignment) {
     // Parse block tag: e.g. @param real The real part
     String[] parts = trimmed.split(" ", 3);
     String type = parts[0].substring(1); // remove '@'
@@ -72,8 +76,12 @@ class BlockTag {
        arg = parts.length > 1 ? parts[1] : null;
        text = parts.length > 2 ? parts[2].trim() : "";
        if (parts.length > 2) {
-         int x = Strings.findIndent(parts[2]);
-         spaces = " ".repeat(x + 1);
+         if (preserveAlignment) {
+           int x = Strings.findIndent(parts[2]);
+           spaces = " ".repeat(x + 1);
+         } else {
+           spaces = " "; // Single space when alignment is not needed
+         }
        }
     }
     BlockTag blockTag = new BlockTag(type, arg, text, spaces);
