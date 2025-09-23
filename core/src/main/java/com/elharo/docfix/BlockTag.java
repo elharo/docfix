@@ -70,7 +70,25 @@ class BlockTag {
         text += parts[1];
       }
       if (parts.length > 2) {
-        text += " " + parts[2].trim();
+        if (preserveAlignment) {
+          // For noArgumentTags, we need to preserve the original spacing
+          // Find the original spacing by looking at the raw trimmed input
+          int atIndex = trimmed.indexOf('@');
+          int typeEndIndex = trimmed.indexOf(' ', atIndex);
+          if (typeEndIndex > 0 && typeEndIndex < trimmed.length() - 1) {
+            String remainder = trimmed.substring(typeEndIndex + 1);
+            int firstNonSpaceIndex = 0;
+            while (firstNonSpaceIndex < remainder.length() && remainder.charAt(firstNonSpaceIndex) == ' ') {
+              firstNonSpaceIndex++;
+            }
+            spaces = " ".repeat(firstNonSpaceIndex + 1);
+            text = remainder.substring(firstNonSpaceIndex);
+          } else {
+            text = parts[2].trim();
+          }
+        } else {
+          text += " " + parts[2].trim();
+        }
       }
     } else {
        arg = parts.length > 1 ? parts[1] : null;

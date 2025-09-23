@@ -1011,4 +1011,21 @@ public class DocCommentTest {
     assertTrue("Should preserve alignment for multiple tags", 
         java.contains("@param something another parameter"));
   }
+
+  @Test
+  public void testMultipleDifferentTagsPreserveAlignment() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Creates a new forked compiler.\n"
+            + "     *\n"
+            + "     * @param mojo  the MOJO from which to get the configuration\n"
+            + "     * @return      the new compiler instance\n"
+            + "     */");
+    String java = docComment.toJava();
+    // When there are multiple tags of different types, alignment spaces should be preserved
+    assertTrue("Should preserve alignment for multiple different tags", 
+        java.contains("@param mojo  the MOJO"));
+    assertTrue("Should preserve alignment for multiple different tags", 
+        java.contains("@return      the new compiler"));
+  }
 }

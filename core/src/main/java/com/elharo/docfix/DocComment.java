@@ -182,21 +182,14 @@ class DocComment {
     }
 
     // Second pass: analyze tag types for alignment needs and parse
-    Map<String, Integer> tagTypeCounts = new HashMap<>();
     Set<String> standardTags = Set.of("author", "version", "param", "return", "throws", "see", "since", "serial", "serialField", "serialData", "deprecated");
-    
-    for (String rawTag : rawBlockTags) {
-      String[] parts = rawTag.split(" ", 2);
-      String type = parts[0].substring(1); // remove '@'
-      tagTypeCounts.put(type, tagTypeCounts.getOrDefault(type, 0) + 1);
-    }
     
     List<BlockTag> blockTags = new java.util.ArrayList<>();
     for (String rawTag : rawBlockTags) {
       String[] parts = rawTag.split(" ", 2);
       String type = parts[0].substring(1); // remove '@'
-      // Only optimize spacing for standard tags when there's a single tag of that type
-      boolean preserveAlignment = !standardTags.contains(type) || tagTypeCounts.get(type) > 1;
+      // Only optimize spacing for standard tags when there's a single tag total
+      boolean preserveAlignment = !standardTags.contains(type) || rawBlockTags.size() > 1;
       BlockTag blockTag = BlockTag.parse(rawTag, preserveAlignment);
       blockTags.add(blockTag);
     }
