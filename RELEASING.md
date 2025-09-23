@@ -91,8 +91,8 @@ Monitor and publish the deployment through the Central Portal:
 
 1. Go to [Central Portal](https://central.sonatype.com/)
 2. Log in with your Sonatype credentials
-3. Navigate to "Deployments" to view deployment status
-4. Wait for artifacts to be validated (typically takes a few minutes)
+3. Click the Publish link at the top right of the page. 
+4. If necessary, wait for artifacts to be validated.
 5. Once validation is complete, click the "Publish" button to release artifacts to Maven Central
 6. Publication typically takes 10-30 minutes after clicking publish
 
