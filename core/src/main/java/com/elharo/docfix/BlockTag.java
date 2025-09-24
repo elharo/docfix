@@ -54,6 +54,10 @@ class BlockTag {
   );
 
   static BlockTag parse(String trimmed) {
+    return parse(trimmed, false);
+  }
+
+  static BlockTag parse(String trimmed, boolean preserveAlignment) {
     // Parse block tag: e.g. @param real The real part
     String[] parts = trimmed.split(" ", 3);
     String type = parts[0].substring(1); // remove '@'
@@ -66,14 +70,36 @@ class BlockTag {
         text += parts[1];
       }
       if (parts.length > 2) {
-        text += " " + parts[2].trim();
+        if (preserveAlignment) {
+          // For noArgumentTags, we need to preserve the original spacing
+          // Find the original spacing by looking at the raw trimmed input
+          int atIndex = trimmed.indexOf('@');
+          int typeEndIndex = trimmed.indexOf(' ', atIndex);
+          if (typeEndIndex > 0 && typeEndIndex < trimmed.length() - 1) {
+            String remainder = trimmed.substring(typeEndIndex + 1);
+            int firstNonSpaceIndex = 0;
+            while (firstNonSpaceIndex < remainder.length() && remainder.charAt(firstNonSpaceIndex) == ' ') {
+              firstNonSpaceIndex++;
+            }
+            spaces = " ".repeat(firstNonSpaceIndex + 1);
+            text = remainder.substring(firstNonSpaceIndex);
+          } else {
+            text = parts[2].trim();
+          }
+        } else {
+          text += " " + parts[2].trim();
+        }
       }
     } else {
        arg = parts.length > 1 ? parts[1] : null;
        text = parts.length > 2 ? parts[2].trim() : "";
        if (parts.length > 2) {
-         int x = Strings.findIndent(parts[2]);
-         spaces = " ".repeat(x + 1);
+         if (preserveAlignment) {
+           int x = Strings.findIndent(parts[2]);
+           spaces = " ".repeat(x + 1);
+         } else {
+           spaces = " "; // Single space when alignment is not needed
+         }
        }
     }
     BlockTag blockTag = new BlockTag(type, arg, text, spaces);

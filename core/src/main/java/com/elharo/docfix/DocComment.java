@@ -142,8 +142,10 @@ class DocComment {
     }
     String[] lines = body.split("\n");
     StringBuilder description = new StringBuilder();
-    List<BlockTag> blockTags = new java.util.ArrayList<>();
+    List<String> rawBlockTags = new java.util.ArrayList<>();
     boolean inBlockTags = false;
+    
+    // First pass: collect description and raw block tag strings
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
       String trimmed = line.stripLeading();
@@ -168,8 +170,7 @@ class DocComment {
             trimmed += "\n" + lines[i];
           }
         }
-        BlockTag blockTag = BlockTag.parse(trimmed);
-        blockTags.add(blockTag);
+        rawBlockTags.add(trimmed);
       } else if (!inBlockTags) {
         // Description lines before first block tag
         if (description.length() > 0) {
@@ -177,6 +178,17 @@ class DocComment {
         }
         description.append(trimmed);
       }
+    }
+
+    // Second pass: analyze tag types for alignment needs and parse
+    List<BlockTag> blockTags = new java.util.ArrayList<>();
+    for (String rawTag : rawBlockTags) {
+      String[] parts = rawTag.split(" ", 2);
+      String type = parts[0].substring(1); // remove '@'
+      // Preserve alignment when there are multiple tags, collapse to single space for lone tags
+      boolean preserveAlignment = rawBlockTags.size() > 1;
+      BlockTag blockTag = BlockTag.parse(rawTag, preserveAlignment);
+      blockTags.add(blockTag);
     }
 
     return new DocComment(kind, description.toString(), blockTags, tagIndent);
