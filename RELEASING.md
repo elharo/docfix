@@ -95,8 +95,9 @@ Monitor and publish the deployment through the Central Portal:
 Update main branch for the next development version:
 
 ```bash
-# Switch to main branch
+# Switch to main branch and create a new branch for the version bump
 git checkout main
+git checkout -b prepare-next-development-<NEXT-VERSION>
 
 # Update to next development version
 mvn versions:set -DnewVersion=<NEXT-VERSION>-SNAPSHOT
@@ -105,11 +106,36 @@ mvn versions:set -DnewVersion=<NEXT-VERSION>-SNAPSHOT
 git add .
 git commit -m "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
 
-# Push directly to main
-git push origin main
+# Push the branch and create a pull request
+git push origin prepare-next-development-<NEXT-VERSION>
 ```
 
+Then create a pull request from `prepare-next-development-<NEXT-VERSION>` to `main` with:
+- Title: "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
+- Description: Updates version numbers for continued development
+
+Once the pull request is approved and merged, main will be updated with the next SNAPSHOT version.
+
 Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
+
+### 7. Abandoning a Release
+
+If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
+
+```bash
+# Delete the local tag
+git tag -d v<VERSION>
+
+# Delete the remote tag
+git push origin :refs/tags/v<VERSION>
+```
+
+After removing the tag:
+1. Fix any issues on the release branch or main branch as appropriate
+2. If needed, restart the release process from step 0 with the same or different version number
+3. The release branch can be deleted if no longer needed: `git branch -D release/<VERSION>`
+
+Note: Only remove tags for releases that have not been published to Maven Central. Once published, versions are immutable and a new version must be released instead.
 
 ## Verification
 
