@@ -18,6 +18,14 @@ For detailed setup instructions, see the [Sonatype Central Publishing Guide](htt
 
 ## Release Process
 
+The release process follows a tag-based approach where:
+
+- **Main branch always contains SNAPSHOT versions only**
+- **Releases are cut from tags on release branches, never from main**
+- **Release branches are not merged back to main**
+
+This ensures main branch remains in active development with snapshot versions while releases are immutable tags.
+
 ### 0. Create a release branch
 
 ```bash
@@ -46,46 +54,32 @@ git add .
 git commit -m "Release version <VERSION>"
 ```
 
-### 3. Create Pull Request for Release
+### 3. Tag the Release
 
-Create a pull request for the release version changes:
-
-```bash
-# Push the release branch
-git push origin release/<VERSION>
-```
-
-Then create a pull request from `release/<VERSION>` to `main` with:
-- Title: "Release version <VERSION>"
-- Description: Include changelog and release notes
-- Request review from project maintainers
-
-Once the pull request is approved and merged, the release tag will be on main.
-
-### 4. Tag the Release
-
-After the release PR is merged to main, create the release tag:
+Create the release tag directly on the release branch:
 
 ```bash
-# Switch to main and pull the merged changes
-git checkout main
-git pull origin main
+# Ensure you're on the release branch
+git checkout release/<VERSION>
 
 # Create and push the release tag
 git tag v<VERSION>
 git push origin v<VERSION>
 ```
 
-### 5. Deploy to Maven Central
+### 4. Deploy to Maven Central
 
-Deploy the artifacts to Maven Central from the tagged release:
+Deploy the artifacts to Maven Central from the tagged release branch:
 
 ```bash
+# Ensure you're on the correct tag
+git checkout v<VERSION>
+
 # Deploy to Maven Central
 mvn deploy -Prelease -DskipRemoteStaging -DaltStagingDirectory=/tmp/docfix-deploy -Dmaven.install.skip
 ```
 
-### 6. Monitor and Publish Deployment
+### 5. Monitor and Publish Deployment
 
 Monitor and publish the deployment through the Central Portal:
 
@@ -96,12 +90,13 @@ Monitor and publish the deployment through the Central Portal:
 5. Once validation is complete, click the "Publish" button to release artifacts to Maven Central
 6. Publication typically takes 10-30 minutes after clicking publish
 
-### 7. Prepare for Next Development Iteration
+### 6. Prepare for Next Development Iteration
 
-Create another pull request for the next development version:
+Update main branch for the next development version:
 
 ```bash
-# Create a new branch for the next development iteration
+# Switch to main branch and create a new branch for the version bump
+git checkout main
 git checkout -b prepare-next-development-<NEXT-VERSION>
 
 # Update to next development version
@@ -118,7 +113,29 @@ git push origin prepare-next-development-<NEXT-VERSION>
 Then create a pull request from `prepare-next-development-<NEXT-VERSION>` to `main` with:
 - Title: "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
 - Description: Updates version numbers for continued development
-- Request review from project maintainers
+
+Once the pull request is approved and merged, main will be updated with the next SNAPSHOT version.
+
+Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
+
+### 7. Abandoning a Release
+
+If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
+
+```bash
+# Delete the local tag
+git tag -d v<VERSION>
+
+# Delete the remote tag
+git push origin :refs/tags/v<VERSION>
+```
+
+After removing the tag:
+1. Fix any issues on the release branch or main branch as appropriate
+2. If needed, restart the release process from step 0 with the same or different version number
+3. The release branch can be deleted if no longer needed: `git branch -D release/<VERSION>`
+
+Note: Only remove tags for releases that have not been published to Maven Central. Once published, versions are immutable and a new version must be released instead.
 
 ## Verification
 
