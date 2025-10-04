@@ -1,5 +1,6 @@
 package com.elharo.docfix;
 
+import com.elharo.propernouns.Names;
 import java.util.Set;
 
 /**
@@ -81,6 +82,7 @@ class BlockTag {
   }
 
   // Known proper nouns that should remain capitalized
+  // This is kept for specific technical terms that may not be in the Names database
   private static final Set<String> PROPER_NOUNS = Set.of(
       "Java"
   );
@@ -102,8 +104,13 @@ class BlockTag {
     // Extract the first word
     String firstWord = extractFirstWord(text);
     
-    // Check if it's a known proper noun
+    // Check if it's a known proper noun from our static set
     if (PROPER_NOUNS.contains(firstWord)) {
+      return false;
+    }
+
+    // Check if it's a name using the propernouns library
+    if (Names.isName(firstWord)) {
       return false;
     }
 

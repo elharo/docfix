@@ -745,6 +745,29 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testParse_recognizesCommonProperNames() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * processes data.\n"
+            + "     *\n"
+            + "     * @param name the person's name\n"
+            + "     * @return John Smith if found\n"
+            + "     * @throws Exception if Michael cannot be located\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(3, tags.size());
+    
+    // Check @return preserves "John"
+    assertEquals("return", tags.get(1).getType());
+    assertEquals("John Smith if found", tags.get(1).getText());
+    
+    // Check @throws preserves "Michael"
+    assertEquals("throws", tags.get(2).getType());
+    assertEquals("if Michael cannot be located", tags.get(2).getText());
+  }
+
+  @Test
   public void testParse_comprehensiveProperNounAndAcronymHandling() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
