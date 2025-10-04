@@ -1,5 +1,6 @@
 package com.elharo.docfix;
 
+import com.elharo.propernouns.Names;
 import java.util.Set;
 
 /**
@@ -35,7 +36,8 @@ class BlockTag {
 
     // Remove trailing period if not a sentence
     // Check for periods followed by space or newline to detect multiple sentences
-    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".")) {
+    // Don't remove periods from @deprecated tags since they typically contain complete sentences
+    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".") && !"deprecated".equals(type)) {
       text = text.trim().substring(0, text.trim().length() - 1);
     }
     this.text = text;
@@ -107,6 +109,7 @@ class BlockTag {
   }
 
   // Known proper nouns that should remain capitalized
+  // This is kept for specific technical terms that may not be in the Names database
   private static final Set<String> PROPER_NOUNS = Set.of(
       "Java"
   );
@@ -117,8 +120,8 @@ class BlockTag {
    *     it contains an initial capital letter followed only by non-capital letters.
    */
   private boolean shouldLowerCase(String type, String text) {
-    if ("author".equals(type) || "see".equals(type)) {
-      return false; // author is usually a proper name
+    if ("author".equals(type) || "see".equals(type) || "deprecated".equals(type)) {
+      return false; // author is usually a proper name, deprecated tags use complete sentences
     }
 
     if (!Character.isUpperCase(text.charAt(0))) {
@@ -128,8 +131,13 @@ class BlockTag {
     // Extract the first word
     String firstWord = extractFirstWord(text);
     
-    // Check if it's a known proper noun
+    // Check if it's a known proper noun from our static set
     if (PROPER_NOUNS.contains(firstWord)) {
+      return false;
+    }
+
+    // Check if it's a name using the propernouns library
+    if (Names.isName(firstWord)) {
       return false;
     }
 
