@@ -768,29 +768,6 @@ public class DocCommentTest {
   }
 
   @Test
-  public void testParse_recognizesProperNamesWithPossessives() {
-    DocComment docComment = DocComment.parse(Kind.METHOD,
-        "    /**\n"
-            + "     * retrieves user information.\n"
-            + "     *\n"
-            + "     * @param userId the user identifier\n"
-            + "     * @return Sarah's profile data\n"
-            + "     * @throws Exception if William's record is not found\n"
-            + "     */");
-
-    List<BlockTag> tags = docComment.getBlockTags();
-    assertEquals(3, tags.size());
-    
-    // Check @return preserves "Sarah's"
-    assertEquals("return", tags.get(1).getType());
-    assertEquals("Sarah's profile data", tags.get(1).getText());
-    
-    // Check @throws preserves "William's"
-    assertEquals("throws", tags.get(2).getType());
-    assertEquals("if William's record is not found", tags.get(2).getText());
-  }
-
-  @Test
   public void testParse_comprehensiveProperNounAndAcronymHandling() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"

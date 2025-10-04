@@ -109,7 +109,7 @@ class BlockTag {
       return false;
     }
 
-    // Check if it's a proper name using the propernouns library
+    // Check if it's a name using the propernouns library
     if (Names.isName(firstWord)) {
       return false;
     }
@@ -135,10 +135,9 @@ class BlockTag {
 
   /**
    * Extracts the first word from the given text.
-   * Strips possessive suffixes ('s, 's) to check the base form.
    *
    * @param text the text to extract the first word from
-   * @return the first word without possessive suffix
+   * @return the first word
    */
   private String extractFirstWord(String text) {
     text = text.trim();
@@ -146,14 +145,7 @@ class BlockTag {
     while (endIndex < text.length() && !Character.isWhitespace(text.charAt(endIndex))) {
       endIndex++;
     }
-    String word = text.substring(0, endIndex);
-    
-    // Strip possessive suffixes to check the base name
-    if (word.endsWith("'s") || word.endsWith("'s")) {
-      word = word.substring(0, word.length() - 2);
-    }
-    
-    return word;
+    return text.substring(0, endIndex);
   }
 
   /**
