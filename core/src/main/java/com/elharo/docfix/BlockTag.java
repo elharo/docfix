@@ -1,5 +1,6 @@
 package com.elharo.docfix;
 
+import com.elharo.propernouns.Names;
 import java.util.Set;
 
 /**
@@ -81,6 +82,7 @@ class BlockTag {
   }
 
   // Known proper nouns that should remain capitalized
+  // This is kept for specific technical terms that may not be in the Names database
   private static final Set<String> PROPER_NOUNS = Set.of(
       "Java"
   );
@@ -102,8 +104,13 @@ class BlockTag {
     // Extract the first word
     String firstWord = extractFirstWord(text);
     
-    // Check if it's a known proper noun
+    // Check if it's a known proper noun from our static set
     if (PROPER_NOUNS.contains(firstWord)) {
+      return false;
+    }
+
+    // Check if it's a proper name using the propernouns library
+    if (Names.isName(firstWord)) {
       return false;
     }
 
@@ -128,9 +135,10 @@ class BlockTag {
 
   /**
    * Extracts the first word from the given text.
+   * Strips possessive suffixes ('s, 's) to check the base form.
    *
    * @param text the text to extract the first word from
-   * @return the first word
+   * @return the first word without possessive suffix
    */
   private String extractFirstWord(String text) {
     text = text.trim();
@@ -138,7 +146,14 @@ class BlockTag {
     while (endIndex < text.length() && !Character.isWhitespace(text.charAt(endIndex))) {
       endIndex++;
     }
-    return text.substring(0, endIndex);
+    String word = text.substring(0, endIndex);
+    
+    // Strip possessive suffixes to check the base name
+    if (word.endsWith("'s") || word.endsWith("'s")) {
+      word = word.substring(0, word.length() - 2);
+    }
+    
+    return word;
   }
 
   /**

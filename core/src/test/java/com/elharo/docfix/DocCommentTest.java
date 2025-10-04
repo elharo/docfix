@@ -745,6 +745,52 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testParse_recognizesCommonProperNames() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * processes data.\n"
+            + "     *\n"
+            + "     * @param name the person's name\n"
+            + "     * @return John Smith if found\n"
+            + "     * @throws Exception if Michael cannot be located\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(3, tags.size());
+    
+    // Check @return preserves "John"
+    assertEquals("return", tags.get(1).getType());
+    assertEquals("John Smith if found", tags.get(1).getText());
+    
+    // Check @throws preserves "Michael"
+    assertEquals("throws", tags.get(2).getType());
+    assertEquals("if Michael cannot be located", tags.get(2).getText());
+  }
+
+  @Test
+  public void testParse_recognizesProperNamesWithPossessives() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * retrieves user information.\n"
+            + "     *\n"
+            + "     * @param userId the user identifier\n"
+            + "     * @return Sarah's profile data\n"
+            + "     * @throws Exception if William's record is not found\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(3, tags.size());
+    
+    // Check @return preserves "Sarah's"
+    assertEquals("return", tags.get(1).getType());
+    assertEquals("Sarah's profile data", tags.get(1).getText());
+    
+    // Check @throws preserves "William's"
+    assertEquals("throws", tags.get(2).getType());
+    assertEquals("if William's record is not found", tags.get(2).getText());
+  }
+
+  @Test
   public void testParse_comprehensiveProperNounAndAcronymHandling() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
