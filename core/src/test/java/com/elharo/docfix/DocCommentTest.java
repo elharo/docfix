@@ -857,7 +857,7 @@ public class DocCommentTest {
     List<BlockTag> tags = docComment.getBlockTags();
     assertEquals(1, tags.size());
     assertEquals("throws", tags.get(0).getType());
-    String java = tags.get(0).toJava();
+    String java = tags.get(0).toJava(true);
     assertEquals(java, " * @throws IllegalArgumentException some exception\n"
         + "     *     if something goes wrong\n", java);
   }
