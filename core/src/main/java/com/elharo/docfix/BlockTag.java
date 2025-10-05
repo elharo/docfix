@@ -203,7 +203,4 @@ class BlockTag {
     return toJava(false);
   }
 
-  public String getSpaces() {
-    return this.spaces;
-  }
 }

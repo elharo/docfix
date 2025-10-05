@@ -1059,4 +1059,37 @@ public class DocCommentTest {
     // Should preserve the original lowercase start
     assertEquals("this method should not be used anymore", tags.get(0).getText());
   }
+
+  @Test
+  public void testSingleTagCollapseExtraSpaces() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Creates a new forked compiler.\n"
+            + "     *\n"
+            + "     * @param mojo  the MOJO from which to get the configuration\n"
+            + "     */");
+    String java = docComment.toJava();
+    // When there's only one tag, extra spaces should collapse to single space
+    assertTrue("Should collapse extra spaces for single tag",
+        java.contains("@param mojo the MOJO"));
+    assertFalse("Should not preserve extra spaces for single tag",
+        java.contains("@param mojo  the MOJO"));
+  }
+
+  @Test
+  public void testMultipleTagsPreserveAlignment() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Creates a new forked compiler.\n"
+            + "     *\n"
+            + "     * @param mojo      the MOJO from which to get the configuration\n"
+            + "     * @param something another parameter\n"
+            + "     */");
+    String java = docComment.toJava();
+    // When there are multiple tags, alignment spaces should be preserved
+    assertTrue("Should preserve alignment for multiple tags",
+        java.contains("@param mojo      the MOJO"));
+    assertTrue("Should preserve alignment for multiple tags",
+        java.contains("@param something another parameter"));
+  }
 }
