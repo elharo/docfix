@@ -245,8 +245,9 @@ class DocComment {
       if (description != null && !description.isBlank()) {
         sb.append(indent).append(" *\n"); // Blank line between description and block tags
       }
+      boolean indentDescription = blockTags.size() > 1;
       for (BlockTag tag : blockTags) {
-        sb.append(indent).append(tag.toJava());
+        sb.append(indent).append(tag.toJava(indentDescription));
       }
     }
     sb.append(indent).append(" */");

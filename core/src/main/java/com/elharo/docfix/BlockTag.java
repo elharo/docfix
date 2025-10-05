@@ -34,9 +34,9 @@ class BlockTag {
       text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
     }
 
-    // Remove trailing period if not a sentence
-    // Check for periods followed by space or newline to detect multiple sentences
-    // Don't remove periods from @deprecated tags since they typically contain complete sentences
+    // Remove trailing period if not a sentence.
+    // Check for periods followed by space or newline to detect multiple sentences.
+    // Don't remove periods from @deprecated tags since they typically contain complete sentences.
     if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".") && !"deprecated".equals(type)) {
       text = text.trim().substring(0, text.trim().length() - 1);
     }
@@ -180,14 +180,19 @@ class BlockTag {
     return argument;
   }
 
-  String toJava() {
+  String toJava(boolean indent) {
     StringBuilder sb = new StringBuilder();
     sb.append(" * @").append(type);
     if (argument != null && !argument.isEmpty()) {
       sb.append(" ").append(argument);
     }
     if (text != null && !text.isEmpty()) {
-      sb.append(spaces).append(text);
+      if (indent) {
+        sb.append(spaces);
+      } else {
+        sb.append(" ");
+      }
+      sb.append(text);
     }
     sb.append("\n");
     return sb.toString();
@@ -195,10 +200,7 @@ class BlockTag {
   
   @Override
   public String toString() {
-    return toJava();
+    return toJava(false);
   }
 
-  public String getSpaces() {
-    return this.spaces;
-  }
 }
