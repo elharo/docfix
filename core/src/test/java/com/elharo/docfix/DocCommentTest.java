@@ -1092,4 +1092,11 @@ public class DocCommentTest {
     assertTrue("Should preserve alignment for multiple tags",
         java.contains("@param something another parameter"));
   }
+
+  @Test
+  public void testI212() {
+    DocComment docComment = DocComment.parse(null, "/**/");
+    String java = docComment.toJava();
+    assertEquals("", java);
+  }
 }

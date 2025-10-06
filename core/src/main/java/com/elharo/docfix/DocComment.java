@@ -2,6 +2,7 @@ package com.elharo.docfix;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,6 +126,11 @@ class DocComment {
 
     // Remove leading/trailing comment markers and split into lines
     String body = raw.trim();
+    
+    if (body.matches("/\\*+/")) {
+      return new SingleLineComment(null, "", tagIndent);
+    }
+    
     boolean singleLine = !body.contains("\n");
     if (body.startsWith("/**")) {
       body = body.substring(3);

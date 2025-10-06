@@ -208,6 +208,62 @@ public class FileParserTest {
   }
 
   @Test
+  public void testBlankCommentTwoAsterisksIsRemoved() {
+    // Test that empty single-line Javadoc comments are completely removed
+    String[] input = {
+        "package test;",
+        "",
+        "/**/",
+        "class TestClass {",
+        "    public void method() {}",
+        "}"
+    };
+
+    String[] expected = {
+        "package test;",
+        "",
+        "class TestClass {",
+        "    public void method() {}",
+        "}"
+    };
+
+    List<String> result = FileParser.parseLines(input, "\n");
+
+    assertEquals("Result should have " + expected.length + " lines", expected.length, result.size());
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals("Line " + i + " should match", expected[i], result.get(i));
+    }
+  }
+
+  @Test
+  public void testBlankCommentSeveralAsterisksIsRemoved() {
+    // Test that empty single-line Javadoc comments are completely removed
+    String[] input = {
+        "package test;",
+        "",
+        "/******/",
+        "class TestClass {",
+        "    public void method() {}",
+        "}"
+    };
+
+    String[] expected = {
+        "package test;",
+        "",
+        "class TestClass {",
+        "    public void method() {}",
+        "}"
+    };
+
+    List<String> result = FileParser.parseLines(input, "\n");
+
+    assertEquals("Result should have " + expected.length + " lines", expected.length, result.size());
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals("Line " + i + " should match", expected[i], result.get(i));
+    }
+  }
+
+  @Test
   public void testBlankCommentWithIndentationIsRemoved() {
     // Test that empty indented Javadoc comments are completely removed
     String[] input = {
