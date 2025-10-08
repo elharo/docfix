@@ -38,7 +38,7 @@ export VERSION=<your-version-number>
 export NEXT_VERSION=<next-version-number>
 ```
 
-Replace `<your-version-number>` and `<next-version-number>` with actual version numbers. For example:
+For example:
 ```bash
 export VERSION=1.2.3
 export NEXT_VERSION=1.3.0
@@ -171,8 +171,8 @@ After release, verify the artifacts are available for download:
    ```
 
 2. **Direct URL check** (available immediately):
-   - Core library: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix/$VERSION/`
-   - Maven plugin: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix-maven-plugin/$VERSION/`
+   - Core library: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix/<VERSION>/`
+   - Maven plugin: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix-maven-plugin/<VERSION>/`
 
 3. **Maven Central Search** (may take several hours to update):
    - [Search results](https://search.maven.org/search?q=g:com.elharo.docfix)
