@@ -90,7 +90,30 @@ Monitor and publish the deployment through the Central Portal:
 5. Once validation is complete, click the "Publish" button to release artifacts to Maven Central
 6. Publication typically takes 10-30 minutes after clicking publish
 
-### 6. Prepare for Next Development Iteration
+### 6. Publish GitHub Release
+
+After the Maven Central release is published, create a GitHub release:
+
+1. Navigate to the [Releases page](https://github.com/elharo/docfix/releases) on GitHub
+2. Click "Draft a new release"
+3. Choose the tag created in step 3 (e.g., `v<VERSION>`)
+4. Set the release title to the version number (e.g., `<VERSION>`)
+5. In the release description, include:
+   - A brief summary of what's new in this release
+   - Major features or bug fixes
+   - Link to Maven Central artifacts:
+     ```
+     Available on Maven Central:
+     - [Core Library](https://repo1.maven.org/maven2/com/elharo/docfix/docfix/<VERSION>/)
+     - [Maven Plugin](https://repo1.maven.org/maven2/com/elharo/docfix/docfix-maven-plugin/<VERSION>/)
+     ```
+   - Any breaking changes or upgrade notes
+   - Installation/usage instructions referencing the README.md
+6. Click "Publish release"
+
+The GitHub release will be associated with the tag and will be visible on the repository's releases page.
+
+### 7. Prepare for Next Development Iteration
 
 Update main branch for the next development version:
 
@@ -118,7 +141,7 @@ Once the pull request is approved and merged, main will be updated with the next
 
 Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
 
-### 7. Abandoning a Release
+### 8. Abandoning a Release
 
 If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
 
@@ -131,9 +154,10 @@ git push origin :refs/tags/v<VERSION>
 ```
 
 After removing the tag:
-1. Fix any issues on the release branch or main branch as appropriate
-2. If needed, restart the release process from step 0 with the same or different version number
-3. The release branch can be deleted if no longer needed: `git branch -D release/<VERSION>`
+1. If a GitHub release was created, delete it from the [Releases page](https://github.com/elharo/docfix/releases)
+2. Fix any issues on the release branch or main branch as appropriate
+3. If needed, restart the release process from step 0 with the same or different version number
+4. The release branch can be deleted if no longer needed: `git branch -D release/<VERSION>`
 
 Note: Only remove tags for releases that have not been published to Maven Central. Once published, versions are immutable and a new version must be released instead.
 
