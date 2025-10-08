@@ -26,13 +26,33 @@ The release process follows a tag-based approach where:
 
 This ensures main branch remains in active development with snapshot versions while releases are immutable tags.
 
-### 0. Create a release branch
+### 0. Set Version Environment Variables
+
+Set environment variables for the release and next development versions:
 
 ```bash
-git checkout -b release/<VERSION>
+# Set the version number for this release (e.g., 1.2.3)
+export VERSION=<your-version-number>
+
+# Set the next development version (e.g., 1.3.0)
+export NEXT_VERSION=<next-version-number>
 ```
 
-### 1. Prepare the Release
+Replace `<your-version-number>` and `<next-version-number>` with actual version numbers. For example:
+```bash
+export VERSION=1.2.3
+export NEXT_VERSION=1.3.0
+```
+
+After setting these variables, all subsequent commands can be copy-pasted without editing.
+
+### 1. Create a release branch
+
+```bash
+git checkout -b release/$VERSION
+```
+
+### 2. Prepare the Release
 
 Before releasing, ensure the project is ready:
 
@@ -41,45 +61,45 @@ Before releasing, ensure the project is ready:
 mvn clean package
 ```
 
-### 2. Update Version Numbers
+### 3. Update Version Numbers
 
 Update the version in the parent POM from SNAPSHOT to the release version:
 
 ```bash
 # Use Maven versions plugin to update all modules consistently
-mvn versions:set -DnewVersion=<VERSION>
+mvn versions:set -DnewVersion=$VERSION
 
 # Commit the version change
 git add .
-git commit -m "Release version <VERSION>"
+git commit -m "Release version $VERSION"
 ```
 
-### 3. Tag the Release
+### 4. Tag the Release
 
 Create the release tag directly on the release branch:
 
 ```bash
 # Ensure you're on the release branch
-git checkout release/<VERSION>
+git checkout release/$VERSION
 
 # Create and push the release tag
-git tag v<VERSION>
-git push origin v<VERSION>
+git tag v$VERSION
+git push origin v$VERSION
 ```
 
-### 4. Deploy to Maven Central
+### 5. Deploy to Maven Central
 
 Deploy the artifacts to Maven Central from the tagged release branch:
 
 ```bash
 # Ensure you're on the correct tag
-git checkout v<VERSION>
+git checkout v$VERSION
 
 # Deploy to Maven Central
 mvn deploy -Prelease -DskipRemoteStaging -DaltStagingDirectory=/tmp/docfix-deploy -Dmaven.install.skip
 ```
 
-### 5. Monitor and Publish Deployment
+### 6. Monitor and Publish Deployment
 
 Monitor and publish the deployment through the Central Portal:
 
@@ -90,50 +110,50 @@ Monitor and publish the deployment through the Central Portal:
 5. Once validation is complete, click the "Publish" button to release artifacts to Maven Central
 6. Publication typically takes 10-30 minutes after clicking publish
 
-### 6. Prepare for Next Development Iteration
+### 7. Prepare for Next Development Iteration
 
 Update main branch for the next development version:
 
 ```bash
 # Switch to main branch and create a new branch for the version bump
 git checkout main
-git checkout -b prepare-next-development-<NEXT-VERSION>
+git checkout -b prepare-next-development-$NEXT_VERSION
 
 # Update to next development version
-mvn versions:set -DnewVersion=<NEXT-VERSION>-SNAPSHOT
+mvn versions:set -DnewVersion=$NEXT_VERSION-SNAPSHOT
 
 # Commit the version change
 git add .
-git commit -m "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
+git commit -m "Prepare for next development iteration: $NEXT_VERSION-SNAPSHOT"
 
 # Push the branch and create a pull request
-git push origin prepare-next-development-<NEXT-VERSION>
+git push origin prepare-next-development-$NEXT_VERSION
 ```
 
-Then create a pull request from `prepare-next-development-<NEXT-VERSION>` to `main` with:
-- Title: "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
+Then create a pull request from `prepare-next-development-$NEXT_VERSION` to `main` with:
+- Title: "Prepare for next development iteration: $NEXT_VERSION-SNAPSHOT"
 - Description: Updates version numbers for continued development
 
 Once the pull request is approved and merged, main will be updated with the next SNAPSHOT version.
 
 Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
 
-### 7. Abandoning a Release
+### 8. Abandoning a Release
 
 If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
 
 ```bash
 # Delete the local tag
-git tag -d v<VERSION>
+git tag -d v$VERSION
 
 # Delete the remote tag
-git push origin :refs/tags/v<VERSION>
+git push origin :refs/tags/v$VERSION
 ```
 
 After removing the tag:
 1. Fix any issues on the release branch or main branch as appropriate
 2. If needed, restart the release process from step 0 with the same or different version number
-3. The release branch can be deleted if no longer needed: `git branch -D release/<VERSION>`
+3. The release branch can be deleted if no longer needed: `git branch -D release/$VERSION`
 
 Note: Only remove tags for releases that have not been published to Maven Central. Once published, versions are immutable and a new version must be released instead.
 
@@ -144,15 +164,15 @@ After release, verify the artifacts are available for download:
 1. **Direct repository check** (available immediately):
    ```bash
    # Test downloading the core library
-   mvn dependency:get -Dartifact=com.elharo.docfix:docfix:<VERSION>
+   mvn dependency:get -Dartifact=com.elharo.docfix:docfix:$VERSION
    
    # Test downloading the Maven plugin
-   mvn dependency:get -Dartifact=com.elharo.docfix:docfix-maven-plugin:<VERSION>
+   mvn dependency:get -Dartifact=com.elharo.docfix:docfix-maven-plugin:$VERSION
    ```
 
 2. **Direct URL check** (available immediately):
-   - Core library: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix/<VERSION>/`
-   - Maven plugin: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix-maven-plugin/<VERSION>/`
+   - Core library: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix/$VERSION/`
+   - Maven plugin: `https://repo1.maven.org/maven2/com/elharo/docfix/docfix-maven-plugin/$VERSION/`
 
 3. **Maven Central Search** (may take several hours to update):
    - [Search results](https://search.maven.org/search?q=g:com.elharo.docfix)
