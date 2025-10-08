@@ -3,7 +3,10 @@ Fix Common Javadoc Problems
 
 DocFix is a Java utility that automatically fixes common Javadoc
 formatting issues to conform to [Oracle Javadoc
-conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html).
+conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html)
+and the [JavaDoc Documentation Comment Specification for the Standard Doclet](https://docs.oracle.com/en/java/javase/25/docs/specs/javadoc/doc-comment-spec.html).
+It only edits traditional documentation comments (the ones that begin `/**`).
+It does not make any edits to the newer markdown comments introduced in Java 23.
 
 The goal is to correctly format most real world Javadoc. 
 It maintains proper formatting while applying fixes
@@ -47,7 +50,7 @@ mvn clean compile
 If you have Maven installed, in the directory containing the files you want to fix, run: 
 
 ```bash
-mvn com.elharo.docfix:docfix-maven-plugin:1.0.1:fix
+mvn com.elharo.docfix:docfix-maven-plugin:1.0.3:fix
 ```
 
 This should fix all the .java files in src/main/java. It won't touch files in src/test or non-Java files.
