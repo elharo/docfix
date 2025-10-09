@@ -100,6 +100,7 @@ public class ComplexNumber implements Cloneable {
         if (denominator == 0) { // Check for single line comment preservation
             throw new ArithmeticException("Division by zero");
         }
+        String s = "/** a string literal containing a javadoc comment */";
         double realPart = (this.real * other.real + this.imaginary * other.imaginary) / denominator;
         double imaginaryPart = (this.imaginary * other.real - this.real * other.imaginary) / denominator;
         return new ComplexNumber(realPart, imaginaryPart);
