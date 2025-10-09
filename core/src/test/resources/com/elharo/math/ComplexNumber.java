@@ -86,6 +86,8 @@ public class ComplexNumber implements Cloneable {
         return new ComplexNumber(realPart, imaginaryPart);
     }
 
+    // /** this comment is commented out and should be ignored */
+
     /**
      * Divides this complex number by the specified complex number.
      *
