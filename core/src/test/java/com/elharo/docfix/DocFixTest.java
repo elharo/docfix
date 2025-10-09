@@ -70,6 +70,12 @@ public class DocFixTest {
     }
 
     @Test
+    public void testCommentedOutComment() {
+        String fixed = DocFix.fix(code);
+        assertTrue(fixed, fixed.contains("    // /** this comment is commented out and should be ignored */"));
+    }
+
+    @Test
     public void testPreserveLineEndings() {
         code = code.replace('\n', '\r');
         String fixed = DocFix.fix(code);
