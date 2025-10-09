@@ -126,7 +126,6 @@ After the Maven Central release is published, create a GitHub release:
 
 The GitHub release will be associated with the tag and will be visible on the repository's releases page.
 
-
 ### 8. Prepare for Next Development Iteration
 
 Update main branch for the next development version:
