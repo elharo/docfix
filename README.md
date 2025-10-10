@@ -43,6 +43,8 @@ so malformed that it cannot be handled by the javadoc tool.
 mvn clean compile
 ```
 
+This project uses [Maven reproducible builds](https://maven.apache.org/guides/mini/guide-reproducible-builds.html) with a fixed timestamp. This ensures that building the same source code produces identical artifacts regardless of when or where the build is executed.
+
 ## Usage
 
 ### Command Line

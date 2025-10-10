@@ -52,7 +52,20 @@ After setting these variables, all subsequent commands can be copy-pasted withou
 git checkout -b release/$VERSION
 ```
 
-### 2. Prepare the Release
+### 2. Update the Reproducible Build Timestamp
+
+The project uses [Maven reproducible builds](https://maven.apache.org/guides/mini/guide-reproducible-builds.html) to ensure that identical source code produces identical artifacts. Before each release, update the `project.build.outputTimestamp` property in the root `pom.xml` to the current date:
+
+1. Open `pom.xml` in the root directory
+2. Locate the `<project.build.outputTimestamp>` property in the `<properties>` section
+3. Update it to the current date in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`
+   - Example: `2025-10-13T00:00:00Z`
+   - Use `00:00:00` for the time component
+   - Always use UTC timezone (indicated by the `Z` suffix)
+
+This timestamp will be embedded in all build artifacts (JARs, etc.) for this release, ensuring reproducibility.
+
+### 3. Prepare the Release
 
 Before releasing, ensure the project is ready:
 
@@ -61,7 +74,7 @@ Before releasing, ensure the project is ready:
 mvn clean package
 ```
 
-### 3. Update Version Numbers
+### 4. Update Version Numbers
 
 Update the version in the parent POM from SNAPSHOT to the release version:
 
@@ -74,7 +87,7 @@ git add .
 git commit -m "Release version $VERSION"
 ```
 
-### 4. Tag the Release
+### 5. Tag the Release
 
 Create the release tag directly on the release branch:
 
@@ -87,7 +100,7 @@ git tag v$VERSION
 git push origin v$VERSION
 ```
 
-### 5. Deploy to Maven Central
+### 6. Deploy to Maven Central
 
 Deploy the artifacts to Maven Central from the tagged release branch:
 
@@ -99,7 +112,7 @@ git checkout v$VERSION
 mvn deploy -Prelease -DskipRemoteStaging -DaltStagingDirectory=/tmp/docfix-deploy -Dmaven.install.skip
 ```
 
-### 6. Monitor and Publish Deployment
+### 7. Monitor and Publish Deployment
 
 Monitor and publish the deployment through the Central Portal:
 
@@ -110,13 +123,13 @@ Monitor and publish the deployment through the Central Portal:
 5. Once validation is complete, click the "Publish" button to release artifacts to Maven Central
 6. Publication typically takes 10-30 minutes after clicking publish
 
-### 7. Publish GitHub Release
+### 8. Publish GitHub Release
 
 After the Maven Central release is published, create a GitHub release:
 
 1. Navigate to the [Releases page](https://github.com/elharo/docfix/releases) on GitHub
 2. Click "Draft a new release"
-3. Choose the tag created in step 4 (e.g., `v$VERSION`)
+3. Choose the tag created in step 5 (e.g., `v$VERSION`)
 4. Set the release title to the version number (e.g., `$VERSION`)
 5. In the release description, include:
    - A brief summary of what's new in this release
@@ -126,7 +139,7 @@ After the Maven Central release is published, create a GitHub release:
 
 The GitHub release will be associated with the tag and will be visible on the repository's releases page.
 
-### 8. Prepare for Next Development Iteration
+### 9. Prepare for Next Development Iteration
 
 Update main branch for the next development version:
 
@@ -154,7 +167,7 @@ Once the pull request is approved and merged, main will be updated with the next
 
 Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
 
-### 9. Abandoning a Release
+### 10. Abandoning a Release
 
 If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
 
