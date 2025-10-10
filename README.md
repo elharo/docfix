@@ -3,7 +3,10 @@ Fix Common Javadoc Problems
 
 DocFix is a Java utility that automatically fixes common Javadoc
 formatting issues to conform to [Oracle Javadoc
-conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html).
+conventions](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html)
+and the [JavaDoc Documentation Comment Specification for the Standard Doclet](https://docs.oracle.com/en/java/javase/25/docs/specs/javadoc/doc-comment-spec.html).
+It only edits traditional documentation comments (the ones that begin `/**`).
+It does not make any edits to the newer markdown comments introduced in Java 23.
 
 The goal is to correctly format most real world Javadoc. 
 It maintains proper formatting while applying fixes
@@ -18,7 +21,7 @@ so malformed that it cannot be handled by the javadoc tool.
 ## What it fixes
 
 - Converts the first letter of Javadoc class, method, and field comments to uppercase
-- Fixes @param, @return, @throws, and other block tag descriptions to start with lowercase
+- Fixes @param, @return, and @throws tag comment descriptions to start with lowercase
 - Adds missing periods to the end of comment descriptions
 - Removes extraneous periods from the end of block tag descriptions
 - Removes extraneous hyphens from the start of block tag descriptions
@@ -46,11 +49,21 @@ This project uses [Maven reproducible builds](https://maven.apache.org/guides/mi
 
 ### Command Line
 
-Run DocFix using Java with the compiled classes:
+If you have Maven installed, in the directory containing the files you want to fix, run: 
+
+```bash
+mvn com.elharo.docfix:docfix-maven-plugin:1.0.3:fix
+```
+
+This should fix all the .java files in src/main/java. It won't touch files in src/test or non-Java files.
+
+You can also run DocFix using Java 11 or later with the compiled classes:
 
 ```bash
 java -cp target/classes com.elharo.docfix.DocFix [--dryrun] <file-or-directory>
 ```
+
+This enables you to process any particular file or directory regardless of location. 
 
 ### Options
 
@@ -68,6 +81,7 @@ java -cp target/classes com.elharo.docfix.DocFix src/main/java/MyClass.java
 ```bash
 java -cp target/classes com.elharo.docfix.DocFix src/main/java
 ```
+
 
 **Preview changes without modifying files:**
 ```bash
@@ -106,7 +120,7 @@ To include the plugin in your project's build process, add it to your `pom.xml`:
     <plugin>
       <groupId>com.elharo.docfix</groupId>
       <artifactId>docfix</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0.1</version>
       <executions>
         <execution>
           <goals>

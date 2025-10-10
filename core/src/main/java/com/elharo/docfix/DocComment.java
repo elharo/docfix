@@ -28,8 +28,9 @@ class DocComment {
       char first = description.charAt(0);
       description = (Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1)).trim();
       // add a period to the end of the description if it doesn't end with a
-      // punctuation mark
-      if ((Character.isLetterOrDigit(description.charAt(description.length() - 1)))) {
+      // punctuation mark and doesn't end with a URL
+      if ((Character.isLetterOrDigit(description.charAt(description.length() - 1))) 
+          && !Strings.endsWithURL(description)) {
         description = description + ".";
       }
     }
@@ -124,6 +125,11 @@ class DocComment {
 
     // Remove leading/trailing comment markers and split into lines
     String body = raw.trim();
+    
+    if (body.matches("/\\*+/")) {
+      return new SingleLineComment(null, "", tagIndent);
+    }
+    
     boolean singleLine = !body.contains("\n");
     if (body.startsWith("/**")) {
       body = body.substring(3);
@@ -244,8 +250,9 @@ class DocComment {
       if (description != null && !description.isBlank()) {
         sb.append(indent).append(" *\n"); // Blank line between description and block tags
       }
+      boolean indentDescription = blockTags.size() > 1;
       for (BlockTag tag : blockTags) {
-        sb.append(indent).append(tag.toJava());
+        sb.append(indent).append(tag.toJava(indentDescription));
       }
     }
     sb.append(indent).append(" */");

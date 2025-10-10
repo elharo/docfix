@@ -2,6 +2,12 @@
 target/
 .idea/
 
+# VS Code settings
+.vscode/settings.json
+
+# Maven versions plugin backup files
+*.versionsBackup
+
 # Compiled class file
 *.class
 

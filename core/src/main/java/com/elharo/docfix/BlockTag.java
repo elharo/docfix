@@ -1,5 +1,6 @@
 package com.elharo.docfix;
 
+import com.elharo.propernouns.Names;
 import java.util.Set;
 
 /**
@@ -33,9 +34,10 @@ class BlockTag {
       text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
     }
 
-    // Remove trailing period if not a sentence
-    // Check for periods followed by space or newline to detect multiple sentences
-    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".")) {
+    // Remove trailing period if not a sentence.
+    // Check for periods followed by space or newline to detect multiple sentences.
+    // Don't remove periods from @deprecated tags since they typically contain complete sentences.
+    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".") && !"deprecated".equals(type)) {
       text = text.trim().substring(0, text.trim().length() - 1);
     }
     this.text = text;
@@ -80,17 +82,41 @@ class BlockTag {
     return blockTag;
   }
 
+  // Known proper nouns that should remain capitalized
+  // This is kept for specific technical terms that may not be in the Names database
+  private static final Set<String> PROPER_NOUNS = Set.of(
+      "Java"
+  );
+
   // TODO handle title case ligatures
   /**
    * @return true iff the first word in the text is capitalized. That is,
    *     it contains an initial capital letter followed only by non-capital letters.
    */
   private boolean shouldLowerCase(String type, String text) {
-    if ("author".equals(type) || "see".equals(type)) {
-      return false; // author is usually a proper name
+    if ("author".equals(type) || "see".equals(type) || "deprecated".equals(type)) {
+      return false; // author is usually a proper name, deprecated tags use complete sentences
     }
 
     if (!Character.isUpperCase(text.charAt(0))) {
+      return false;
+    }
+
+    // Extract the first word
+    String firstWord = extractFirstWord(text);
+    
+    // Check if it's a known proper noun from our static set
+    if (PROPER_NOUNS.contains(firstWord)) {
+      return false;
+    }
+
+    // Check if it's a name using the propernouns library
+    if (Names.isName(firstWord)) {
+      return false;
+    }
+
+    // Check if it's an acronym (3+ letters, all uppercase)
+    if (isAcronym(firstWord)) {
       return false;
     }
 
@@ -102,6 +128,40 @@ class BlockTag {
         return true;
       }
       if (Character.isUpperCase(c)) { // There's more than one uppercase letter in the first word
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Extracts the first word from the given text.
+   *
+   * @param text the text to extract the first word from
+   * @return the first word
+   */
+  private String extractFirstWord(String text) {
+    text = text.trim();
+    int endIndex = 0;
+    while (endIndex < text.length() && !Character.isWhitespace(text.charAt(endIndex))) {
+      endIndex++;
+    }
+    return text.substring(0, endIndex);
+  }
+
+  /**
+   * Checks if a word is an acronym (3+ letters, all uppercase).
+   *
+   * @param word the word to check
+   * @return true if the word is an acronym
+   */
+  private boolean isAcronym(String word) {
+    if (word.length() < 3) {
+      return false;
+    }
+    
+    for (char c : word.toCharArray()) {
+      if (Character.isLowerCase(c)) {
         return false;
       }
     }
@@ -120,14 +180,19 @@ class BlockTag {
     return argument;
   }
 
-  String toJava() {
+  String toJava(boolean indent) {
     StringBuilder sb = new StringBuilder();
     sb.append(" * @").append(type);
     if (argument != null && !argument.isEmpty()) {
       sb.append(" ").append(argument);
     }
     if (text != null && !text.isEmpty()) {
-      sb.append(spaces).append(text);
+      if (indent) {
+        sb.append(spaces);
+      } else {
+        sb.append(" ");
+      }
+      sb.append(text);
     }
     sb.append("\n");
     return sb.toString();
@@ -135,10 +200,7 @@ class BlockTag {
   
   @Override
   public String toString() {
-    return toJava();
+    return toJava(false);
   }
 
-  public String getSpaces() {
-    return this.spaces;
-  }
 }

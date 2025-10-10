@@ -48,6 +48,7 @@ final class FileParser {
         String originalComment = javadocBuilder.toString();
         String fixedComment = DocComment.parse(null, originalComment).toJava();
         fixedComment = fixedComment.replace("\n", lineEnding);
+        // TODO probably don't really need to do this if check
         // Only add the fixed comment if it's not empty (empty comments should be completely removed)
         if (!fixedComment.isEmpty()) {
           result.add(fixedComment);

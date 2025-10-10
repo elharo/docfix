@@ -27,6 +27,45 @@ final class Strings {
   }
 
   /**
+   * Checks if a string ends with a URL.
+   * This method identifies common URL patterns to avoid adding periods after URLs.
+   *
+   * @param text the text to check
+   * @return true if the text appears to end with a URL
+   */
+  static boolean endsWithURL(String text) {
+    if (text == null) {
+      return false;
+    }
+    
+    String trimmed = text.trim();
+    if (trimmed.isEmpty()) {
+      return false;
+    }
+    
+    // Find the last word/token that might be a URL
+    String[] words = trimmed.split("\\s+");
+    if (words.length == 0) {
+      return false;
+    }
+    
+    String lastWord = words[words.length - 1];
+    
+    // Check if the last word contains explicit URL schemes
+    String[] urlSchemes = {
+      "http://", "https://", "ftp://", "ftps://", "file://", "mailto:"
+    };
+    
+    for (String scheme : urlSchemes) {
+      if (lastWord.contains(scheme)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  /**
    * Detects the line ending used in the provided code.
    * It checks for Windows (\r\n), Mac (\r), and Unix (\n) line endings.
    *
