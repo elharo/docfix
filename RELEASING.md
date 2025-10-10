@@ -110,7 +110,23 @@ Monitor and publish the deployment through the Central Portal:
 5. Once validation is complete, click the "Publish" button to release artifacts to Maven Central
 6. Publication typically takes 10-30 minutes after clicking publish
 
-### 7. Prepare for Next Development Iteration
+### 7. Publish GitHub Release
+
+After the Maven Central release is published, create a GitHub release:
+
+1. Navigate to the [Releases page](https://github.com/elharo/docfix/releases) on GitHub
+2. Click "Draft a new release"
+3. Choose the tag created in step 4 (e.g., `v$VERSION`)
+4. Set the release title to the version number (e.g., `$VERSION`)
+5. In the release description, include:
+   - A brief summary of what's new in this release
+   - Major features or bug fixes
+   - Any breaking changes or upgrade notes
+6. Click "Publish release"
+
+The GitHub release will be associated with the tag and will be visible on the repository's releases page.
+
+### 8. Prepare for Next Development Iteration
 
 Update main branch for the next development version:
 
@@ -138,7 +154,7 @@ Once the pull request is approved and merged, main will be updated with the next
 
 Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
 
-### 8. Abandoning a Release
+### 9. Abandoning a Release
 
 If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
 
