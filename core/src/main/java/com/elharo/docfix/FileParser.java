@@ -20,11 +20,15 @@ final class FileParser {
 
       // Check if this line starts a Javadoc comment (original logic)
       if (trimmed.startsWith("/**")) {
-        StringBuilder javadocBuilder = new StringBuilder();
-        javadocBuilder.append(line);
-
-        // If the comment doesn't end on the same line, continue reading
-        if (!trimmed.endsWith("*/")) {
+        // Check if this is a single-line comment with potential code after it
+        int commentEnd = trimmed.indexOf("*/");
+        if (commentEnd >= 0 && commentEnd + 2 < trimmed.length()) {
+          // Single-line comment with code after it - use the more general handler below
+          // Fall through to the else block by not entering this if
+        } else if (!trimmed.endsWith("*/")) {
+          // Multi-line comment starting at the beginning of a line
+          StringBuilder javadocBuilder = new StringBuilder();
+          javadocBuilder.append(line);
           javadocBuilder.append(lineEnding);
           i++; // Move to next line
 
@@ -40,16 +44,30 @@ final class FileParser {
             javadocBuilder.append(lineEnding);
             i++;
           }
-        }
 
-        String originalComment = javadocBuilder.toString();
-        String fixedComment = DocComment.parse(null, originalComment).toJava();
-        fixedComment = fixedComment.replace("\n", lineEnding);
-        // Only add the fixed comment if it's not empty (empty comments should be completely removed)
-        if (!fixedComment.isEmpty()) {
-          result.add(fixedComment);
+          String originalComment = javadocBuilder.toString();
+          String fixedComment = DocComment.parse(null, originalComment).toJava();
+          fixedComment = fixedComment.replace("\n", lineEnding);
+          // Only add the fixed comment if it's not empty (empty comments should be completely removed)
+          if (!fixedComment.isEmpty()) {
+            result.add(fixedComment);
+          }
+          continue; // Skip to next line
+        } else {
+          // Single-line comment at the beginning of line with nothing after
+          String originalComment = line;
+          String fixedComment = DocComment.parse(null, originalComment).toJava();
+          fixedComment = fixedComment.replace("\n", lineEnding);
+          // Only add the fixed comment if it's not empty (empty comments should be completely removed)
+          if (!fixedComment.isEmpty()) {
+            result.add(fixedComment);
+          }
+          continue; // Skip to next line
         }
-      } else {
+      }
+      
+      // Handle lines with comments not at the beginning, or lines starting with single-line comments followed by code
+      {
         // Look for Javadoc comments elsewhere on the line
         int searchStart = 0;
         String workingLine = line;
