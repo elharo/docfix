@@ -66,15 +66,17 @@ public class EdgeCaseTest {
   @Test
   public void testNoLineBreaks() {
     // Test when an entire Java file is on one line with lowercase comments
-    // Comments should be moved to their own lines, capitalized, and have periods added
+    // Each comment should be on its own line immediately before the element it documents
     String[] input = {
         "public class Test { /** first comment */ public void method() {} /** second comment */ private int x; }"
     };
     
     String[] expected = {
+        "public class Test {",
         "/** First comment. */",
+        "public void method() {}",
         "/** Second comment. */",
-        "public class Test { public void method() {} private int x; }"
+        "private int x; }"
     };
     
     List<String> result = FileParser.parseLines(input, "\n");
@@ -88,15 +90,16 @@ public class EdgeCaseTest {
   @Test
   public void testMultipleCommentsOnSameLine() {
     // Test multiple Javadoc comments on the same line with lowercase starts
-    // Comments should be moved to their own lines, capitalized, and have periods added
+    // Each comment should be on its own line immediately before the element it documents
     String[] input = {
         "/** first comment */ public void method() { } /** second comment */ private int field;"
     };
     
     String[] expected = {
         "/** First comment. */",
+        "public void method() { }",
         "/** Second comment. */",
-        "public void method() { } private int field;"
+        "private int field;"
     };
     
     List<String> result = FileParser.parseLines(input, "\n");

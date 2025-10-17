@@ -142,44 +142,95 @@ final class FileParser {
           hasCodeOnLine = !nonCommentContent.toString().trim().isEmpty();
         }
         
-        // Second pass: extract and fix comments
-        while (searchStart < workingLine.length()) {
-          int javadocStart = workingLine.indexOf("/**", searchStart);
-          if (javadocStart < 0) {
-            break; // No more comments on this line
-          }
+        // If there's code mixed with comments, we need to intelligently separate them
+        if (hasCodeOnLine && !commentRanges.isEmpty()) {
+          // Process the line by extracting comments and associating them with following code
+          int pos = 0;
           
-          // Skip if inside a string literal or single-line comment
-          if (isInsideStringLiteral(workingLine, javadocStart) || isInsideSingleLineComment(workingLine, javadocStart)) {
-            searchStart = javadocStart + 1;
-            continue;
-          }
-          
-          foundComment = true;
-          
-          // Extract code before the comment
-          String codeBefore = workingLine.substring(0, javadocStart);
-          
-          // Check if comment ends on the same line
-          int javadocEnd = workingLine.indexOf("*/", javadocStart);
-          if (javadocEnd >= 0) {
-            // Single-line comment on same line as code
-            String comment = workingLine.substring(javadocStart, javadocEnd + 2);
-            String codeAfter = workingLine.substring(javadocEnd + 2);
+          for (int j = 0; j < commentRanges.size(); j++) {
+            int[] range = commentRanges.get(j);
+            int commentStart = range[0];
+            int commentEnd = range[1];
             
+            // Get code before this comment (if any) - this code doesn't have a javadoc comment
+            String codeBefore = workingLine.substring(pos, commentStart).trim();
+            
+            // Get the comment and fix it
+            String comment = workingLine.substring(commentStart, commentEnd);
             String fixedComment = DocComment.parse(null, comment).toJava();
             fixedComment = fixedComment.replace("\n", lineEnding);
             
-            // Extract comment to its own line if there's code mixed with comments on this line
-            if (!fixedComment.isEmpty() && hasCodeOnLine) {
-              // Move comment to its own line before the code
-              extractedComments.add(leadingWhitespace + fixedComment);
-              // Remove the comment from the working line, keeping the code
-              String trimmedBefore = codeBefore.stripTrailing();
-              String trimmedAfter = trimmedBefore.isEmpty() ? codeAfter.stripLeading() : codeAfter;
-              workingLine = trimmedBefore + trimmedAfter;
-              searchStart = trimmedBefore.length();
+            // Get code after this comment (up to the next comment or end of line)
+            String codeAfter;
+            if (j < commentRanges.size() - 1) {
+              // There's another comment after this one
+              int nextCommentStart = commentRanges.get(j + 1)[0];
+              codeAfter = workingLine.substring(commentEnd, nextCommentStart).trim();
             } else {
+              // This is the last comment
+              codeAfter = workingLine.substring(commentEnd).trim();
+            }
+            
+            // If there's code before and no code after, the comment likely documents the code before it
+            // Move comment to before that code
+            if (!codeBefore.isEmpty() && codeAfter.isEmpty() && j == commentRanges.size() - 1) {
+              // Special case: comment at end of line with code before it
+              // Comment should go before the code
+              if (!fixedComment.isEmpty()) {
+                result.add(leadingWhitespace + fixedComment);
+              }
+              result.add(leadingWhitespace + codeBefore);
+            } else {
+              // Normal case: output any code before, then comment, then code after
+              if (!codeBefore.isEmpty() && j == 0) {
+                // Code at start with no comment doesn't get output here - it will be handled later
+                // Actually, we should output it if it's truly standalone
+                result.add(leadingWhitespace + codeBefore);
+              }
+              
+              // Output comment before its associated code
+              if (!fixedComment.isEmpty()) {
+                result.add(leadingWhitespace + fixedComment);
+              }
+              if (!codeAfter.isEmpty()) {
+                result.add(leadingWhitespace + codeAfter);
+              }
+            }
+            
+            pos = commentEnd;
+          }
+          
+          foundComment = true;
+        } else {
+          // No code mixed with comments, or no comments at all - use simpler logic
+          // Second pass: extract and fix comments
+          while (searchStart < workingLine.length()) {
+            int javadocStart = workingLine.indexOf("/**", searchStart);
+            if (javadocStart < 0) {
+              break; // No more comments on this line
+            }
+            
+            // Skip if inside a string literal or single-line comment
+            if (isInsideStringLiteral(workingLine, javadocStart) || isInsideSingleLineComment(workingLine, javadocStart)) {
+              searchStart = javadocStart + 1;
+              continue;
+            }
+            
+            foundComment = true;
+            
+            // Extract code before the comment
+            String codeBefore = workingLine.substring(0, javadocStart);
+            
+            // Check if comment ends on the same line
+            int javadocEnd = workingLine.indexOf("*/", javadocStart);
+            if (javadocEnd >= 0) {
+              // Single-line comment on same line as code
+              String comment = workingLine.substring(javadocStart, javadocEnd + 2);
+              String codeAfter = workingLine.substring(javadocEnd + 2);
+              
+              String fixedComment = DocComment.parse(null, comment).toJava();
+              fixedComment = fixedComment.replace("\n", lineEnding);
+              
               // No code on line, or comment is empty - keep it inline
               // Reconstruct this portion of the line
               StringBuilder reconstructed = new StringBuilder();
@@ -191,28 +242,24 @@ final class FileParser {
               // Update working line to continue processing from after this comment
               workingLine = reconstructed.toString() + codeAfter;
               searchStart = reconstructed.length();
+            } else {
+              // Multi-line comment starting after code - this is a complex edge case
+              // For now, just add the line as-is (this can be enhanced later if needed)
+              result.add(line);
+              foundComment = false;
+              break;
+            }
+          }
+          
+          if (foundComment) {
+            // Add the processed line
+            if (!workingLine.trim().isEmpty()) {
+              result.add(workingLine);
             }
           } else {
-            // Multi-line comment starting after code - this is a complex edge case
-            // For now, just add the line as-is (this can be enhanced later if needed)
+            // Regular line, add as-is
             result.add(line);
-            foundComment = false;
-            break;
           }
-        }
-        
-        if (foundComment) {
-          // Add extracted comments first (on their own lines)
-          for (String comment : extractedComments) {
-            result.add(comment);
-          }
-          // Then add the line with code (if any code remains)
-          if (!workingLine.trim().isEmpty()) {
-            result.add(workingLine);
-          }
-        } else {
-          // Regular line, add as-is
-          result.add(line);
         }
       }
     }
