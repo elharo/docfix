@@ -15,7 +15,8 @@ public class EdgeCaseTest {
   @Test
   public void testSingleLineWithCodeBefore() {
     // Test when code appears before /** on the same line
-    // The comment should be fixed (capitalized and period added)
+    // The comment should be moved to its own line before the code,
+    // fixed (capitalized and period added), with proper indentation
     String[] input = {
         "public class Test {",
         "    private int field; /** field comment */",
@@ -24,7 +25,8 @@ public class EdgeCaseTest {
     
     String[] expected = {
         "public class Test {",
-        "    private int field; /** Field comment. */",
+        "    /** Field comment. */",
+        "    private int field;",
         "}"
     };
     
@@ -64,13 +66,15 @@ public class EdgeCaseTest {
   @Test
   public void testNoLineBreaks() {
     // Test when an entire Java file is on one line with lowercase comments
-    // Both capitalization and period should be fixed
+    // Comments should be moved to their own lines, capitalized, and have periods added
     String[] input = {
         "public class Test { /** first comment */ public void method() {} /** second comment */ private int x; }"
     };
     
     String[] expected = {
-        "public class Test { /** First comment. */ public void method() {} /** Second comment. */ private int x; }"
+        "/** First comment. */",
+        "/** Second comment. */",
+        "public class Test { public void method() {} private int x; }"
     };
     
     List<String> result = FileParser.parseLines(input, "\n");
@@ -84,13 +88,15 @@ public class EdgeCaseTest {
   @Test
   public void testMultipleCommentsOnSameLine() {
     // Test multiple Javadoc comments on the same line with lowercase starts
-    // Both comments should be capitalized and have periods added
+    // Comments should be moved to their own lines, capitalized, and have periods added
     String[] input = {
         "/** first comment */ public void method() { } /** second comment */ private int field;"
     };
     
     String[] expected = {
-        "/** First comment. */ public void method() { } /** Second comment. */ private int field;"
+        "/** First comment. */",
+        "/** Second comment. */",
+        "public void method() { } private int field;"
     };
     
     List<String> result = FileParser.parseLines(input, "\n");
@@ -103,13 +109,15 @@ public class EdgeCaseTest {
 
   @Test
   public void testCommentWithPunctuation() {
-    // Test comment that already has proper punctuation
+    // Test comment that already has proper punctuation and capitalization
+    // Should still be moved to its own line before the code
     String[] input = {
         "private int x; /** This comment already has a period. */"
     };
     
     String[] expected = {
-        "private int x; /** This comment already has a period. */"
+        "/** This comment already has a period. */",
+        "private int x;"
     };
     
     List<String> result = FileParser.parseLines(input, "\n");
