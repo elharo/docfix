@@ -10,6 +10,40 @@ final class FileParser {
   
   private FileParser() {}
 
+  /**
+   * Checks if the position in the line is inside a string literal.
+   * This is a simple heuristic that counts quotes before the position.
+   */
+  private static boolean isInsideStringLiteral(String line, int position) {
+    int quoteCount = 0;
+    boolean escaped = false;
+    for (int i = 0; i < position && i < line.length(); i++) {
+      char c = line.charAt(i);
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (c == '\\') {
+        escaped = true;
+        continue;
+      }
+      if (c == '"') {
+        quoteCount++;
+      }
+    }
+    // If odd number of quotes, we're inside a string
+    return quoteCount % 2 == 1;
+  }
+
+  /**
+   * Checks if the position in the line is inside a single-line comment (// ...).
+   */
+  private static boolean isInsideSingleLineComment(String line, int position) {
+    // Look for "//" before the position
+    int slashSlashIndex = line.indexOf("//");
+    return slashSlashIndex >= 0 && slashSlashIndex < position;
+  }
+
   static List<String> parseLines(String[] lines, String lineEnding) {
     List<String> lines1 = List.of(lines);
     List<String> result = new ArrayList<>();
@@ -85,6 +119,11 @@ final class FileParser {
         while (tempSearch < workingLine.length()) {
           int javadocStart = workingLine.indexOf("/**", tempSearch);
           if (javadocStart < 0) break;
+          // Skip if inside a string literal or single-line comment
+          if (isInsideStringLiteral(workingLine, javadocStart) || isInsideSingleLineComment(workingLine, javadocStart)) {
+            tempSearch = javadocStart + 1;
+            continue;
+          }
           int javadocEnd = workingLine.indexOf("*/", javadocStart);
           if (javadocEnd < 0) break; // Incomplete comment
           commentRanges.add(new int[]{javadocStart, javadocEnd + 2});
@@ -108,6 +147,12 @@ final class FileParser {
           int javadocStart = workingLine.indexOf("/**", searchStart);
           if (javadocStart < 0) {
             break; // No more comments on this line
+          }
+          
+          // Skip if inside a string literal or single-line comment
+          if (isInsideStringLiteral(workingLine, javadocStart) || isInsideSingleLineComment(workingLine, javadocStart)) {
+            searchStart = javadocStart + 1;
+            continue;
           }
           
           foundComment = true;
