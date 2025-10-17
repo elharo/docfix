@@ -1,0 +1,38 @@
+version: 2
+updates:
+  # Maven dependencies for parent POM
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      maven-plugins:
+        patterns:
+          - "org.apache.maven.plugins:*"
+      production-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "org.apache.maven.plugins:*"
+
+  # Maven dependencies for core module
+  - package-ecosystem: "maven"
+    directory: "/core"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Maven dependencies for maven-plugin module
+  - package-ecosystem: "maven"
+    directory: "/maven-plugin"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

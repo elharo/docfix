@@ -707,6 +707,110 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testParse_doesntLowerCaseProperNouns() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * constructs a complex number with the specified real and imaginary parts.\n"
+            + "     *\n"
+            + "     * @param real the real part\n"
+            + "     * @return Java representation of the number\n"
+            + "     * @throws IOException if URL cannot be accessed\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(3, tags.size());
+    assertEquals("return", tags.get(1).getType());
+    assertEquals("Java representation of the number", tags.get(1).getText());
+    assertEquals("throws", tags.get(2).getType());
+    assertEquals("if URL cannot be accessed", tags.get(2).getText());
+  }
+
+  @Test
+  public void testParse_doesntLowerCaseMoreAcronyms() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * constructs a complex number with the specified real and imaginary parts.\n"
+            + "     *\n"
+            + "     * @param real the real part\n"
+            + "     * @return API response as JSON\n"
+            + "     * @throws Exception if JDK version is incompatible\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(3, tags.size());
+    assertEquals("return", tags.get(1).getType());
+    assertEquals("API response as JSON", tags.get(1).getText());
+    assertEquals("throws", tags.get(2).getType());
+    assertEquals("if JDK version is incompatible", tags.get(2).getText());
+  }
+
+  @Test
+  public void testParse_recognizesCommonProperNames() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * processes data.\n"
+            + "     *\n"
+            + "     * @param name the person's name\n"
+            + "     * @return John Smith if found\n"
+            + "     * @throws Exception if Michael cannot be located\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(3, tags.size());
+    
+    // Check @return preserves "John"
+    assertEquals("return", tags.get(1).getType());
+    assertEquals("John Smith if found", tags.get(1).getText());
+    
+    // Check @throws preserves "Michael"
+    assertEquals("throws", tags.get(2).getType());
+    assertEquals("if Michael cannot be located", tags.get(2).getText());
+  }
+
+  @Test
+  public void testParse_comprehensiveProperNounAndAcronymHandling() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * processes HTTP requests using Java APIs.\n"
+            + "     *\n"
+            + "     * @param url the URL to connect to\n"
+            + "     * @param config XML configuration for the API\n"
+            + "     * @return HTML response or JSON data\n"
+            + "     * @throws IOException if I/O operation fails\n"
+            + "     * @throws Exception if JDK or HTTP protocol has issues\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(5, tags.size()); // 2 @param + 1 @return + 2 @throws
+    
+    // Tags are sorted: @param first, then @return, then @throws
+    
+    // Check @param url preservation of URL
+    assertEquals("param", tags.get(0).getType());
+    assertEquals("the URL to connect to", tags.get(0).getText());
+    assertEquals("url", tags.get(0).getArgument());
+    
+    // Check @param config preservation of XML and API
+    assertEquals("param", tags.get(1).getType());
+    assertEquals("XML configuration for the API", tags.get(1).getText());
+    assertEquals("config", tags.get(1).getArgument());
+    
+    // Check @return preservation of HTML and JSON
+    assertEquals("return", tags.get(2).getType());
+    assertEquals("HTML response or JSON data", tags.get(2).getText());
+    
+    // Check first @throws (Exception comes before IOException alphabetically)
+    assertEquals("throws", tags.get(3).getType());
+    assertEquals("if JDK or HTTP protocol has issues", tags.get(3).getText());
+    assertEquals("Exception", tags.get(3).getArgument());
+    
+    // Check second @throws preservation of I/O
+    assertEquals("throws", tags.get(4).getType());
+    assertEquals("if I/O operation fails", tags.get(4).getText());
+    assertEquals("IOException", tags.get(4).getArgument());
+  }
+
+  @Test
   public void testConvertExceptionToThrows() {
     DocComment docComment = DocComment.parse(Kind.METHOD,
         "    /**\n"
@@ -753,7 +857,7 @@ public class DocCommentTest {
     List<BlockTag> tags = docComment.getBlockTags();
     assertEquals(1, tags.size());
     assertEquals("throws", tags.get(0).getType());
-    String java = tags.get(0).toJava();
+    String java = tags.get(0).toJava(true);
     assertEquals(java, " * @throws IllegalArgumentException some exception\n"
         + "     *     if something goes wrong\n", java);
   }
@@ -810,5 +914,189 @@ public class DocCommentTest {
     // contains multiple sentences (indicated by ". " after "null")
     assertTrue("Period after 'serialized' should be preserved", 
         javaCode.contains("automatically escaped when the attribute is serialized."));
+  }
+
+  @Test
+  public void testDontAddPeriodAfterHttpsURL() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * File origin:\n"
+            + " * https://github.com/gradle/gradle/blob/v5.6.2/subprojects/launcher/src/main/java/org/gradle/launcher/daemon/client/DaemonClientConnection.java\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should not add period after HTTPS URL", 
+        java.contains("DaemonClientConnection.java\n"));
+    assertFalse("Should not add period after URL", 
+        java.contains("DaemonClientConnection.java.\n"));
+  }
+
+  @Test
+  public void testDontAddPeriodAfterHttpURL() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * See documentation at http://example.com/docs\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should not add period after HTTP URL", 
+        java.contains("http://example.com/docs\n"));
+    assertFalse("Should not add period after URL", 
+        java.contains("http://example.com/docs.\n"));
+  }
+
+  @Test
+  public void testDontAddPeriodAfterFtpURL() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Download from ftp://ftp.example.com/files/\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should not add period after FTP URL", 
+        java.contains("ftp://ftp.example.com/files/\n"));
+    assertFalse("Should not add period after URL", 
+        java.contains("ftp://ftp.example.com/files/.\n"));
+  }
+
+  @Test
+  public void testAddPeriodAfterWwwURL() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Visit www.example.com\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should add period after www URL", 
+        java.contains("www.example.com.\n"));
+    assertFalse("Should not leave www URL without period", 
+        java.contains("www.example.com\n"));
+  }
+
+  @Test
+  public void testAddPeriodAfterURLInMiddle() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Visit https://example.com and then do something else\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should add period when URL is not at end", 
+        java.contains("do something else.\n"));
+  }
+
+  @Test
+  public void testAddPeriodWhenURLInMiddleOfText() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * Visit www.example.com for more info\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should add period when text continues after URL", 
+        java.contains("for more info.\n"));
+  }
+
+  @Test
+  public void testAddPeriodForNormalText() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "/**\n"
+            + " * This is a normal comment without URLs\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Should add period for normal text", 
+        java.contains("without URLs.\n"));
+  }
+
+  @Test
+  public void testDeprecatedTagCapitalizationNotAdjusted() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A deprecated method.\n"
+            + "     *\n"
+            + "     * @param name the name parameter\n"
+            + "     * @deprecated This method is deprecated. Use the newer version instead.\n"
+            + "     * @return something useful\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(3, tags.size());
+    
+    // Check that @param is lowercased as expected (order: param=2)
+    assertEquals("param", tags.get(0).getType());
+    assertEquals("the name parameter", tags.get(0).getText());
+    
+    // Check that @return is lowercased as expected (order: return=3)
+    assertEquals("return", tags.get(1).getType());
+    assertEquals("something useful", tags.get(1).getText());
+    
+    // Check that @deprecated maintains its capitalization (order: deprecated=8)
+    assertEquals("deprecated", tags.get(2).getType());
+    assertEquals("This method is deprecated. Use the newer version instead.", tags.get(2).getText());
+  }
+
+  @Test
+  public void testDeprecatedTagVariousCapitalizations() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A deprecated class.\n"
+            + "     *\n"
+            + "     * @deprecated This class is obsolete\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(1, tags.size());
+    assertEquals("deprecated", tags.get(0).getType());
+    assertEquals("This class is obsolete", tags.get(0).getText());
+  }
+
+  @Test
+  public void testDeprecatedTagLowercaseStart() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method with lowercase deprecated tag.\n"
+            + "     *\n"
+            + "     * @deprecated this method should not be used anymore\n"
+            + "     */");
+
+    List<BlockTag> tags = docComment.getBlockTags();
+    assertEquals(1, tags.size());
+    assertEquals("deprecated", tags.get(0).getType());
+    // Should preserve the original lowercase start
+    assertEquals("this method should not be used anymore", tags.get(0).getText());
+  }
+
+  @Test
+  public void testSingleTagCollapseExtraSpaces() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Creates a new forked compiler.\n"
+            + "     *\n"
+            + "     * @param mojo  the MOJO from which to get the configuration\n"
+            + "     */");
+    String java = docComment.toJava();
+    // When there's only one tag, extra spaces should collapse to single space
+    assertTrue("Should collapse extra spaces for single tag",
+        java.contains("@param mojo the MOJO"));
+    assertFalse("Should not preserve extra spaces for single tag",
+        java.contains("@param mojo  the MOJO"));
+  }
+
+  @Test
+  public void testMultipleTagsPreserveAlignment() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Creates a new forked compiler.\n"
+            + "     *\n"
+            + "     * @param mojo      the MOJO from which to get the configuration\n"
+            + "     * @param something another parameter\n"
+            + "     */");
+    String java = docComment.toJava();
+    // When there are multiple tags, alignment spaces should be preserved
+    assertTrue("Should preserve alignment for multiple tags",
+        java.contains("@param mojo      the MOJO"));
+    assertTrue("Should preserve alignment for multiple tags",
+        java.contains("@param something another parameter"));
+  }
+
+  @Test
+  public void testI212() {
+    DocComment docComment = DocComment.parse(null, "/**/");
+    String java = docComment.toJava();
+    assertEquals("", java);
   }
 }

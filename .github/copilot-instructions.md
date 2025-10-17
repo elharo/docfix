@@ -14,6 +14,8 @@ Always reference these instructions first and fallback to search or bash command
   - From JAR (after `mvn package`): `java -cp target/docfix-1.0-SNAPSHOT.jar com.elharo.docfix.DocFix [--dryrun] <file-or-directory>`
   - Use `--dryrun` to preview changes without modifying files
   - Tool processes single Java files or entire directories recursively
+- Pull requests
+  - Always merge main into the branch and resolve all conflicts. 
 
 ## Validation
 - Always run the complete test suite after making changes: `mvn test`

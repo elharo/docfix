@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,6 +67,18 @@ public class DocFixTest {
     public void testDocFix_asterisks() {
         String fixed = DocFix.fix(code);
         assertTrue(fixed, fixed.contains("/**\n * Represents a complex number with real and imaginary parts.\n"));
+    }
+
+    @Test
+    public void testCommentedOutComment() {
+        String fixed = DocFix.fix(code);
+        assertTrue(fixed, fixed.contains("    // /** this comment is commented out and should be ignored */"));
+    }
+
+    @Test
+    public void testDocCommentInString() {
+        String fixed = DocFix.fix(code);
+        assertTrue(fixed, fixed.contains("\"/** a string literal containing a javadoc comment */\""));
     }
 
     @Test

@@ -81,4 +81,49 @@ public class SingleLineCommentTest {
     assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
     assertEquals("/** Is this a question? */", comment.toJava());
   }
+
+  @Test
+  public void testDontAddPeriodAfterHttpsURL() {
+    String raw = "/** See https://example.com/docs */";
+    DocComment comment = DocComment.parse(DocComment.Kind.METHOD, raw);
+
+    assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
+    assertEquals("/** See https://example.com/docs */", comment.toJava());
+  }
+
+  @Test
+  public void testDontAddPeriodAfterHttpURL() {
+    String raw = "/** Visit http://www.example.com */";
+    DocComment comment = DocComment.parse(DocComment.Kind.METHOD, raw);
+
+    assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
+    assertEquals("/** Visit http://www.example.com */", comment.toJava());
+  }
+
+  @Test
+  public void testAddPeriodAfterWwwURL() {
+    String raw = "/** Check www.example.com */";
+    DocComment comment = DocComment.parse(DocComment.Kind.METHOD, raw);
+
+    assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
+    assertEquals("/** Check www.example.com. */", comment.toJava());
+  }
+
+  @Test
+  public void testDontAddPeriodAfterFtpURL() {
+    String raw = "/** Download from ftp://ftp.example.com/files/ */";
+    DocComment comment = DocComment.parse(DocComment.Kind.METHOD, raw);
+
+    assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
+    assertEquals("/** Download from ftp://ftp.example.com/files/ */", comment.toJava());
+  }
+
+  @Test
+  public void testAddPeriodForNormalText() {
+    String raw = "/** This is normal text */";
+    DocComment comment = DocComment.parse(DocComment.Kind.METHOD, raw);
+
+    assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
+    assertEquals("/** This is normal text. */", comment.toJava());
+  }
 }

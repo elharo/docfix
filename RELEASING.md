@@ -18,7 +18,54 @@ For detailed setup instructions, see the [Sonatype Central Publishing Guide](htt
 
 ## Release Process
 
-### 1. Prepare the Release
+The release process follows a tag-based approach where:
+
+- **Main branch always contains SNAPSHOT versions only**
+- **Releases are cut from tags on release branches, never from main**
+- **Release branches are not merged back to main**
+
+This ensures main branch remains in active development with snapshot versions while releases are immutable tags.
+
+### 0. Set Version Environment Variables
+
+Set environment variables for the release and next development versions:
+
+```bash
+# Set the version number for this release (e.g., 1.2.3)
+export VERSION=<your-version-number>
+
+# Set the next development version (e.g., 1.3.0)
+export NEXT_VERSION=<next-version-number>
+```
+
+For example:
+```bash
+export VERSION=1.2.3
+export NEXT_VERSION=1.3.0
+```
+
+After setting these variables, all subsequent commands can be copy-pasted without editing.
+
+### 1. Create a release branch
+
+```bash
+git checkout -b release/$VERSION
+```
+
+### 2. Update the Reproducible Build Timestamp
+
+The project uses [Maven reproducible builds](https://maven.apache.org/guides/mini/guide-reproducible-builds.html) to ensure that identical source code produces identical artifacts. Before each release, update the `project.build.outputTimestamp` property in the root `pom.xml` to the current date:
+
+1. Open `pom.xml` in the root directory
+2. Locate the `<project.build.outputTimestamp>` property in the `<properties>` section
+3. Update it to the current date in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`
+   - Example: `2025-10-13T00:00:00Z`
+   - Use `00:00:00` for the time component
+   - Always use UTC timezone (indicated by the `Z` suffix)
+
+This timestamp will be embedded in all build artifacts (JARs, etc.) for this release, ensuring reproducibility.
+
+### 3. Prepare the Release
 
 Before releasing, ensure the project is ready:
 
@@ -27,54 +74,117 @@ Before releasing, ensure the project is ready:
 mvn clean package
 ```
 
-### 2. Update Version Numbers
+### 4. Update Version Numbers
 
 Update the version in the parent POM from SNAPSHOT to the release version:
 
 ```bash
 # Use Maven versions plugin to update all modules consistently
-mvn versions:set -DnewVersion=<VERSION>
+mvn versions:set -DnewVersion=$VERSION
 
 # Commit the version change
 git add .
-git commit -m "Release version <VERSION>"
-git tag v<VERSION>
+git commit -m "Release version $VERSION"
 ```
 
-### 3. Deploy to Maven Central
+### 5. Tag the Release
 
-Deploy the artifacts to Maven Central:
+Create the release tag directly on the release branch:
 
 ```bash
+# Ensure you're on the release branch
+git checkout release/$VERSION
+
+# Create and push the release tag
+git tag v$VERSION
+git push origin v$VERSION
+```
+
+### 6. Deploy to Maven Central
+
+Deploy the artifacts to Maven Central from the tagged release branch:
+
+```bash
+# Ensure you're on the correct tag
+git checkout v$VERSION
+
 # Deploy to Maven Central
 mvn deploy -Prelease -DskipRemoteStaging -DaltStagingDirectory=/tmp/docfix-deploy -Dmaven.install.skip
 ```
 
-### 4. Monitor and Publish Deployment
+### 7. Monitor and Publish Deployment
 
 Monitor and publish the deployment through the Central Portal:
 
 1. Go to [Central Portal](https://central.sonatype.com/)
 2. Log in with your Sonatype credentials
-3. Navigate to "Deployments" to view deployment status
-4. Wait for artifacts to be validated (typically takes a few minutes)
+3. Click the Publish link at the top right of the page. 
+4. If necessary, wait for artifacts to be validated.
 5. Once validation is complete, click the "Publish" button to release artifacts to Maven Central
 6. Publication typically takes 10-30 minutes after clicking publish
 
-### 5. Prepare for Next Development Iteration
+### 8. Publish GitHub Release
 
-Update to the next SNAPSHOT version:
+After the Maven Central release is published, create a GitHub release:
+
+1. Navigate to the [Releases page](https://github.com/elharo/docfix/releases) on GitHub
+2. Click "Draft a new release"
+3. Choose the tag created in step 5 (e.g., `v$VERSION`)
+4. Set the release title to the version number (e.g., `$VERSION`)
+5. In the release description, include:
+   - A brief summary of what's new in this release
+   - Major features or bug fixes
+   - Any breaking changes or upgrade notes
+6. Click "Publish release"
+
+The GitHub release will be associated with the tag and will be visible on the repository's releases page.
+
+### 9. Prepare for Next Development Iteration
+
+Update main branch for the next development version:
 
 ```bash
+# Switch to main branch and create a new branch for the version bump
+git checkout main
+git checkout -b prepare-next-development-$NEXT_VERSION
+
 # Update to next development version
-mvn versions:set -DnewVersion=<NEXT-VERSION>-SNAPSHOT
+mvn versions:set -DnewVersion=$NEXT_VERSION-SNAPSHOT
 
 # Commit the version change
 git add .
-git commit -m "Prepare for next development iteration: <NEXT-VERSION>-SNAPSHOT"
-git push origin main
-git push origin v<VERSION>
+git commit -m "Prepare for next development iteration: $NEXT_VERSION-SNAPSHOT"
+
+# Push the branch and create a pull request
+git push origin prepare-next-development-$NEXT_VERSION
 ```
+
+Then create a pull request from `prepare-next-development-$NEXT_VERSION` to `main` with:
+- Title: "Prepare for next development iteration: $NEXT_VERSION-SNAPSHOT"
+- Description: Updates version numbers for continued development
+
+Once the pull request is approved and merged, main will be updated with the next SNAPSHOT version.
+
+Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
+
+### 10. Abandoning a Release
+
+If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
+
+```bash
+# Delete the local tag
+git tag -d v$VERSION
+
+# Delete the remote tag
+git push origin :refs/tags/v$VERSION
+```
+
+After removing the tag:
+1. Fix any issues on the release branch or main branch as appropriate
+2. If needed, restart the release process from step 0 with the same or different version number
+3. The release branch can be deleted if no longer needed: `git branch -D release/$VERSION`
+
+Note: Only remove tags for releases that have not been published to Maven Central. Once published, versions are immutable and a new version must be released instead.
 
 ## Verification
 
@@ -83,10 +193,10 @@ After release, verify the artifacts are available for download:
 1. **Direct repository check** (available immediately):
    ```bash
    # Test downloading the core library
-   mvn dependency:get -Dartifact=com.elharo.docfix:docfix:<VERSION>
+   mvn dependency:get -Dartifact=com.elharo.docfix:docfix:$VERSION
    
    # Test downloading the Maven plugin
-   mvn dependency:get -Dartifact=com.elharo.docfix:docfix-maven-plugin:<VERSION>
+   mvn dependency:get -Dartifact=com.elharo.docfix:docfix-maven-plugin:$VERSION
    ```
 
 2. **Direct URL check** (available immediately):
