@@ -171,31 +171,21 @@ final class FileParser {
               codeAfter = workingLine.substring(commentEnd).trim();
             }
             
-            // If there's code before and no code after, the comment likely documents the code before it
-            // Move comment to before that code
-            if (!codeBefore.isEmpty() && codeAfter.isEmpty() && j == commentRanges.size() - 1) {
-              // Special case: comment at end of line with code before it
-              // Comment should go before the code
-              if (!fixedComment.isEmpty()) {
-                result.add(leadingWhitespace + fixedComment);
-              }
+            // Javadoc comments document the element that follows them
+            // If there's code before this comment, output it first (it has no comment)
+            if (!codeBefore.isEmpty() && j == 0) {
               result.add(leadingWhitespace + codeBefore);
-            } else {
-              // Normal case: output any code before, then comment, then code after
-              if (!codeBefore.isEmpty() && j == 0) {
-                // Code at start with no comment doesn't get output here - it will be handled later
-                // Actually, we should output it if it's truly standalone
-                result.add(leadingWhitespace + codeBefore);
-              }
-              
-              // Output comment before its associated code
+            }
+            
+            // Output comment only if there's code after it (the element it documents)
+            if (!codeAfter.isEmpty()) {
               if (!fixedComment.isEmpty()) {
                 result.add(leadingWhitespace + fixedComment);
               }
-              if (!codeAfter.isEmpty()) {
-                result.add(leadingWhitespace + codeAfter);
-              }
+              result.add(leadingWhitespace + codeAfter);
             }
+            // If there's no code after the comment, we don't output the comment
+            // as it doesn't document anything
             
             pos = commentEnd;
           }

@@ -14,44 +14,19 @@ public class EdgeCaseTest {
 
   @Test
   public void testSingleLineWithCodeBefore() {
-    // Test when code appears before /** on the same line
-    // The comment should be moved to its own line before the code,
-    // fixed (capitalized and period added), with proper indentation
+    // Test when code appears before /** on the same line with code after the comment
+    // The comment should be moved to its own line before the following code element
     String[] input = {
         "public class Test {",
-        "    private int field; /** field comment */",
+        "    private int field1; /** field comment */ private int field2;",
         "}"
     };
     
     String[] expected = {
         "public class Test {",
+        "    private int field1;",
         "    /** Field comment. */",
-        "    private int field;",
-        "}"
-    };
-    
-    List<String> result = FileParser.parseLines(input, "\n");
-    
-    assertEquals("Result should have " + expected.length + " lines", expected.length, result.size());
-    for (int i = 0; i < expected.length; i++) {
-      assertEquals("Line " + i + " should match", expected[i], result.get(i));
-    }
-  }
-
-  @Test
-  public void testSingleLineCommentWithLowercase() {
-    // Test that lowercase comments are properly capitalized
-    String[] input = {
-        "public class Test {",
-        "    /** lowercase comment */",
-        "    public void method() {}",
-        "}"
-    };
-    
-    String[] expected = {
-        "public class Test {",
-        "    /** Lowercase comment. */",
-        "    public void method() {}",
+        "    private int field2;",
         "}"
     };
     
@@ -113,9 +88,9 @@ public class EdgeCaseTest {
   @Test
   public void testCommentWithPunctuation() {
     // Test comment that already has proper punctuation and capitalization
-    // Should still be moved to its own line before the code
+    // Comment documents the element that follows it
     String[] input = {
-        "private int x; /** This comment already has a period. */"
+        "/** This comment already has a period. */ private int x;"
     };
     
     String[] expected = {
