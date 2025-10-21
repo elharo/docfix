@@ -182,17 +182,28 @@ class BlockTag {
 
   /**
    * Determines if this block tag should be removed because it's blank.
-   * Only @param, @return, and @throws tags with no description text are considered blank
-   * and should be removed. Other tags (like custom tags) are kept even if they have no text.
+   * A blank tag is one with no argument and no description text.
+   * For @return tags (which have no argument), only the text is checked.
+   * For @param and @throws tags, both argument and text must be null/empty.
+   * Other tags (like custom tags) are kept even if they have no text.
    *
    * @return true if the tag is blank and should be removed, false otherwise
    */
   boolean isBlank() {
-    // Only remove blank @param, @return, and @throws tags
+    // Only check @param, @return, and @throws tags
     if (!("param".equals(type) || "return".equals(type) || "throws".equals(type))) {
       return false;
     }
-    return text == null || text.trim().isEmpty();
+    
+    // For @return (no argument tag), check only text
+    if ("return".equals(type)) {
+      return text == null || text.trim().isEmpty();
+    }
+    
+    // For @param and @throws, both argument and text must be blank
+    boolean argBlank = argument == null || argument.trim().isEmpty();
+    boolean textBlank = text == null || text.trim().isEmpty();
+    return argBlank && textBlank;
   }
 
   String toJava(boolean indent) {

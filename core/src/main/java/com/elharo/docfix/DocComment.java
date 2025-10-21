@@ -174,7 +174,10 @@ class DocComment {
           }
         }
         BlockTag blockTag = BlockTag.parse(trimmed);
-        blockTags.add(blockTag);
+        // Only add non-blank tags
+        if (!blockTag.isBlank()) {
+          blockTags.add(blockTag);
+        }
       } else if (!inBlockTags) {
         // Description lines before first block tag
         if (description.length() > 0) {
@@ -184,15 +187,7 @@ class DocComment {
       }
     }
 
-    // Filter out blank tags (tags with no description text)
-    List<BlockTag> nonBlankTags = new java.util.ArrayList<>();
-    for (BlockTag tag : blockTags) {
-      if (!tag.isBlank()) {
-        nonBlankTags.add(tag);
-      }
-    }
-
-    return new DocComment(kind, description.toString(), nonBlankTags, tagIndent);
+    return new DocComment(kind, description.toString(), blockTags, tagIndent);
   }
 
   // visible for testing
