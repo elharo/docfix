@@ -180,6 +180,21 @@ class BlockTag {
     return argument;
   }
 
+  /**
+   * Determines if this block tag should be removed because it's blank.
+   * Only @param, @return, and @throws tags with no description text are considered blank
+   * and should be removed. Other tags (like custom tags) are kept even if they have no text.
+   *
+   * @return true if the tag is blank and should be removed, false otherwise
+   */
+  boolean isBlank() {
+    // Only remove blank @param, @return, and @throws tags
+    if (!("param".equals(type) || "return".equals(type) || "throws".equals(type))) {
+      return false;
+    }
+    return text == null || text.trim().isEmpty();
+  }
+
   String toJava(boolean indent) {
     StringBuilder sb = new StringBuilder();
     sb.append(" * @").append(type);

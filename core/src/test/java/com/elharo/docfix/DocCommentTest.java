@@ -1099,4 +1099,89 @@ public class DocCommentTest {
     String java = docComment.toJava();
     assertEquals("", java);
   }
+
+  @Test
+  public void testRemoveBlankReturn() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Test method with blank return tag.\n"
+            + "     *\n"
+            + "     * @return\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertFalse("Should remove blank @return tag", java.contains("@return"));
+    assertTrue("Should keep description", java.contains("Test method with blank return tag."));
+  }
+
+  @Test
+  public void testRemoveBlankParam() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Test method with blank param tag.\n"
+            + "     *\n"
+            + "     * @param name\n"
+            + "     * @param value the value\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertFalse("Should remove blank @param tag", java.contains("@param name\n"));
+    assertTrue("Should keep valid @param tag", java.contains("@param value the value"));
+    assertTrue("Should keep description", java.contains("Test method with blank param tag."));
+  }
+
+  @Test
+  public void testRemoveBlankThrows() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Test method with blank throws tag.\n"
+            + "     *\n"
+            + "     * @throws\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertFalse("Should remove blank @throws tag", java.contains("@throws"));
+    assertTrue("Should keep description", java.contains("Test method with blank throws tag."));
+  }
+
+  @Test
+  public void testRemoveBlankParamWithArgument() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Test method with blank param that has argument name but no description.\n"
+            + "     *\n"
+            + "     * @param name\n"
+            + "     * @param value the value\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertFalse("Should remove blank @param with only argument", java.contains("@param name"));
+    assertTrue("Should keep valid @param tag", java.contains("@param value"));
+  }
+
+  @Test
+  public void testRemoveBlankThrowsWithArgument() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Test method.\n"
+            + "     *\n"
+            + "     * @throws IllegalArgumentException\n"
+            + "     * @throws NullPointerException if null\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertFalse("Should remove blank @throws with only exception type", java.contains("@throws IllegalArgumentException\n"));
+    assertTrue("Should keep valid @throws tag", java.contains("@throws NullPointerException if null"));
+  }
+
+  @Test
+  public void testKeepValidTags() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Test method with valid tags.\n"
+            + "     *\n"
+            + "     * @param name the name\n"
+            + "     * @return the result\n"
+            + "     * @throws IllegalArgumentException if invalid\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should keep valid @param", java.contains("@param name the name"));
+    assertTrue("Should keep valid @return", java.contains("@return the result"));
+    assertTrue("Should keep valid @throws", java.contains("@throws IllegalArgumentException if invalid"));
+  }
 }

@@ -184,7 +184,15 @@ class DocComment {
       }
     }
 
-    return new DocComment(kind, description.toString(), blockTags, tagIndent);
+    // Filter out blank tags (tags with no description text)
+    List<BlockTag> nonBlankTags = new java.util.ArrayList<>();
+    for (BlockTag tag : blockTags) {
+      if (!tag.isBlank()) {
+        nonBlankTags.add(tag);
+      }
+    }
+
+    return new DocComment(kind, description.toString(), nonBlankTags, tagIndent);
   }
 
   // visible for testing
