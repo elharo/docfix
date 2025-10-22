@@ -25,6 +25,7 @@ so malformed that it cannot be handled by the javadoc tool.
 - Adds missing periods to the end of comment descriptions
 - Removes extraneous periods from the end of block tag descriptions
 - Removes extraneous hyphens from the start of block tag descriptions
+- Removes blank @param, @return, and @throws tags (tags with no argument and no description)
 - Removes blank lines in and after the block tag sections
 - Removes excess white space after the asterisks
 - Removes trailing white space from Javadoc comments

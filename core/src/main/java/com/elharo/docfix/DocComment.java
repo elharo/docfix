@@ -174,7 +174,10 @@ class DocComment {
           }
         }
         BlockTag blockTag = BlockTag.parse(trimmed);
-        blockTags.add(blockTag);
+        // Only add non-blank tags
+        if (!blockTag.isBlank()) {
+          blockTags.add(blockTag);
+        }
       } else if (!inBlockTags) {
         // Description lines before first block tag
         if (description.length() > 0) {
