@@ -53,7 +53,7 @@ This project uses [Maven reproducible builds](https://maven.apache.org/guides/mi
 If you have Maven installed, in the directory containing the files you want to fix, run: 
 
 ```bash
-mvn com.elharo.docfix:docfix-maven-plugin:1.0.3:fix
+mvn com.elharo.docfix:docfix-maven-plugin:1.0.4:fix
 ```
 
 This should fix all the .java files in src/main/java. It won't touch files in src/test or non-Java files.
