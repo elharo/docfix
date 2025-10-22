@@ -181,8 +181,7 @@ class BlockTag {
   }
 
   /**
-   * Determines if this block tag should be removed because it's blank.
-   * A blank tag is one with no argument and no description text.
+   * Determines if this block tag has no argument and no description text.
    * For @return tags (which have no argument), only the text is checked.
    * For @param and @throws tags, both argument and text must be null/empty.
    * Other tags (like custom tags) are kept even if they have no text.
