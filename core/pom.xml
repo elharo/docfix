@@ -36,9 +36,9 @@
       <version>3.4.2</version>
       <configuration>
         <archive>
-            <manifest>
-              <mainClass>com.elharo.docfix.DocFix</mainClass>
-            </manifest>
+          <manifest>
+            <mainClass>com.elharo.docfix.DocFix</mainClass>
+          </manifest>
         </archive>
       </configuration>
     </plugin>
