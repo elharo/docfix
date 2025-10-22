@@ -58,10 +58,23 @@ mvn com.elharo.docfix:docfix-maven-plugin:1.0.4:fix
 
 This should fix all the .java files in src/main/java. It won't touch files in src/test or non-Java files.
 
-You can also run DocFix using Java 11 or later with the compiled classes:
+You can also run DocFix directly using Java 11 or later. First, build the project and generate a classpath file containing all dependencies:
 
 ```bash
-java -cp target/classes com.elharo.docfix.DocFix [--dryrun] <file-or-directory>
+mvn clean package
+cd core && mvn dependency:build-classpath -Dmdep.outputFile=cp.txt
+```
+
+Then run DocFix with the full classpath:
+
+```bash
+java -cp "core/target/classes:$(cat core/cp.txt)" com.elharo.docfix.DocFix [--dryrun] <file-or-directory>
+```
+
+Alternatively, you can use the JAR file:
+
+```bash
+java -cp "core/target/docfix-1.0.5-SNAPSHOT.jar:$(cat core/cp.txt)" com.elharo.docfix.DocFix [--dryrun] <file-or-directory>
 ```
 
 This enables you to process any particular file or directory regardless of location. 
@@ -75,18 +88,18 @@ This enables you to process any particular file or directory regardless of locat
 
 **Fix a single Java file:**
 ```bash
-java -cp target/classes com.elharo.docfix.DocFix src/main/java/MyClass.java
+java -cp "core/target/classes:$(cat core/cp.txt)" com.elharo.docfix.DocFix src/main/java/MyClass.java
 ```
 
 **Fix all Java files in a directory (recursively):**
 ```bash
-java -cp target/classes com.elharo.docfix.DocFix src/main/java
+java -cp "core/target/classes:$(cat core/cp.txt)" com.elharo.docfix.DocFix src/main/java
 ```
 
 
 **Preview changes without modifying files:**
 ```bash
-java -cp target/classes com.elharo.docfix.DocFix --dryrun src/main/java
+java -cp "core/target/classes:$(cat core/cp.txt)" com.elharo.docfix.DocFix --dryrun src/main/java
 ```
 
 ### Maven Plugin

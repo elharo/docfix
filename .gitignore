@@ -8,6 +8,9 @@ target/
 # Maven versions plugin backup files
 *.versionsBackup
 
+# Classpath file
+cp.txt
+
 # Compiled class file
 *.class
 
