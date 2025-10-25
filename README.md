@@ -50,7 +50,7 @@ This project uses [Maven reproducible builds](https://maven.apache.org/guides/mi
 
 ### Command Line
 
-If you have Maven installed, in the directory containing the files you want to fix, run: 
+If the project you want to fix is built with Maven, in the directory containing the files you want to fix, run: 
 
 ```bash
 mvn com.elharo.docfix:docfix-maven-plugin:1.0.4:fix
@@ -58,13 +58,14 @@ mvn com.elharo.docfix:docfix-maven-plugin:1.0.4:fix
 
 This should fix all the .java files in src/main/java. It won't touch files in src/test or non-Java files.
 
-You can also run DocFix using Java 11 or later with the compiled classes:
+You can run DocFix on non-Maven projects using Java 11 or later with the compiled cli jar:
 
 ```bash
-java -cp target/classes com.elharo.docfix.DocFix [--dryrun] <file-or-directory>
+mvn clean package
+java -jar core/target/docfix-1.0.5-SNAPSHOT-cli.jar [--dryrun] <file-or-directory>
 ```
 
-This enables you to process any particular file or directory regardless of location. 
+This enables you to process any particular file or directory regardless of location or build system. 
 
 ### Options
 
@@ -75,18 +76,18 @@ This enables you to process any particular file or directory regardless of locat
 
 **Fix a single Java file:**
 ```bash
-java -cp target/classes com.elharo.docfix.DocFix src/main/java/MyClass.java
+java -jar core/target/docfix-1.0.5-SNAPSHOT-cli.jar src/main/java/MyClass.java
 ```
 
 **Fix all Java files in a directory (recursively):**
 ```bash
-java -cp target/classes com.elharo.docfix.DocFix src/main/java
+java -jar core/target/docfix-1.0.5-SNAPSHOT-cli.jar src/main/java
 ```
 
 
 **Preview changes without modifying files:**
 ```bash
-java -cp target/classes com.elharo.docfix.DocFix --dryrun src/main/java
+java -jar core/target/docfix-1.0.5-SNAPSHOT-cli.jar --dryrun src/main/java
 ```
 
 ### Maven Plugin
@@ -187,7 +188,8 @@ public double getReal(double real) {
 
 ## Reporting Bugs
 
-Use the [GitHub Issue Tracker](https://github.com/elharo/docfix/issues). Please include a sample Javadoc comment
+Use the [GitHub Issue Tracker](https://github.com/elharo/docfix/issues).
+Please include a sample Javadoc comment
 that this tool can't handle or handles incorrectly.
 
 ## How it works
