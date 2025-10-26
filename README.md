@@ -22,6 +22,7 @@ so malformed that it cannot be handled by the javadoc tool.
 
 - Converts the first letter of Javadoc class, method, and field comments to uppercase
 - Fixes @param, @return, and @throws tag comment descriptions to start with lowercase
+- Removes redundant "return" or "returns" at the start of @return tag descriptions
 - Adds missing periods to the end of comment descriptions
 - Removes extraneous periods from the end of block tag descriptions
 - Removes extraneous hyphens from the start of block tag descriptions
