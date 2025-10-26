@@ -1168,4 +1168,183 @@ public class DocCommentTest {
     assertTrue("Should keep @throws with exception type even without description", java.contains("@throws IllegalArgumentException"));
     assertTrue("Should keep @throws with both exception type and description", java.contains("@throws NullPointerException if null"));
   }
+
+  @Test
+  public void testPreservePeriodForIncAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A class.\n"
+            + "     *\n"
+            + "     * @author Rahul Srivastava, Sun Microsystems Inc.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after Inc. abbreviation", 
+        java.contains("@author Rahul Srivastava, Sun Microsystems Inc.\n"));
+    assertFalse("Should not remove period from Inc.", 
+        java.contains("Sun Microsystems Inc\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForLtdAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A class.\n"
+            + "     *\n"
+            + "     * @author Jane Doe, Microsoft Ltd.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after Ltd. abbreviation", 
+        java.contains("@author Jane Doe, Microsoft Ltd.\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForCorpAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A class.\n"
+            + "     *\n"
+            + "     * @author John Smith, IBM Corp.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after Corp. abbreviation", 
+        java.contains("@author John Smith, IBM Corp.\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForJrAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A class.\n"
+            + "     *\n"
+            + "     * @author Bob Johnson Jr.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after Jr. abbreviation", 
+        java.contains("@author Bob Johnson Jr.\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForCoAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A class.\n"
+            + "     *\n"
+            + "     * @author Alice Williams, Acme Co.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after Co. abbreviation", 
+        java.contains("@author Alice Williams, Acme Co.\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForEtcInParam() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method.\n"
+            + "     *\n"
+            + "     * @param name text ending with etc.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after etc. abbreviation in param", 
+        java.contains("@param name text ending with etc.\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForStInParam() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method.\n"
+            + "     *\n"
+            + "     * @param address located on Main St.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after St. abbreviation in param", 
+        java.contains("@param address located on Main St.\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForEgInReturn() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method.\n"
+            + "     *\n"
+            + "     * @return data from database e.g. user records\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after e.g. abbreviation in return", 
+        java.contains("@return data from database e.g. user records\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForProfInSee() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method.\n"
+            + "     *\n"
+            + "     * @see Prof. Brown's research paper\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after Prof. abbreviation in see", 
+        java.contains("@see Prof. Brown's research paper\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForIeInSince() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A class.\n"
+            + "     *\n"
+            + "     * @since version 1.0 i.e. initial release\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after i.e. abbreviation in since", 
+        java.contains("@since version 1.0 i.e. initial release\n"));
+  }
+
+  @Test
+  public void testPreservePeriodForMultipleAbbreviations() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "    /**\n"
+            + "     * A comprehensive test.\n"
+            + "     *\n"
+            + "     * @author Dr. Smith, Research Corp.\n"
+            + "     * @author Prof. Johnson Jr.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should preserve period after Corp. in first author", 
+        java.contains("@author Dr. Smith, Research Corp.\n"));
+    assertTrue("Should preserve period after Jr. in second author", 
+        java.contains("@author Prof. Johnson Jr.\n"));
+  }
+
+  @Test
+  public void testRemovePeriodForNonAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method.\n"
+            + "     *\n"
+            + "     * @param name the name of the person.\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should remove period from non-abbreviation ending", 
+        java.contains("@param name the name of the person\n"));
+    assertFalse("Should not keep period for non-abbreviation", 
+        java.contains("the name of the person.\n"));
+  }
+
+  @Test
+  public void testPreservePeriodInMiddleOfText() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * A method.\n"
+            + "     *\n"
+            + "     * @param company the company name like Acme Inc. or others\n"
+            + "     */");
+    String java = docComment.toJava();
+    // The period after "Inc." should be preserved, but the one after "others" should be removed
+    assertTrue("Should preserve period after Inc. in middle of text", 
+        java.contains("Acme Inc."));
+    assertTrue("Should remove period after 'others' at end", 
+        java.contains("or others\n"));
+  }
 }

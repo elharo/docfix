@@ -37,7 +37,8 @@ class BlockTag {
     // Remove trailing period if not a sentence.
     // Check for periods followed by space or newline to detect multiple sentences.
     // Don't remove periods from @deprecated tags since they typically contain complete sentences.
-    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".") && !"deprecated".equals(type)) {
+    // Don't remove periods from abbreviations like Inc., Ltd., Corp., etc.
+    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".") && !"deprecated".equals(type) && !endsWithAbbreviation(text)) {
       text = text.trim().substring(0, text.trim().length() - 1);
     }
     this.text = text;
@@ -166,6 +167,48 @@ class BlockTag {
       }
     }
     return true;
+  }
+
+  /**
+   * Common abbreviations that should retain their trailing period.
+   * These are commonly found at the end of names, titles, and company names.
+   */
+  private static final Set<String> ABBREVIATIONS = Set.of(
+      "Inc.", "Ltd.", "Corp.", "Co.", "LLC.", "LLP.", "LP.",
+      "Jr.", "Sr.", "Esq.",
+      "Dr.", "Mr.", "Mrs.", "Ms.", "Miss.", "Prof.",
+      "Ph.D.", "M.D.", "M.B.A.", "B.A.", "B.S.", "M.A.", "M.S.",
+      "Ave.", "St.", "Rd.", "Blvd.", "Dept.", "Univ.",
+      "etc.", "e.g.", "i.e.", "cf.", "vs.", "vol.", "no.", "pp."
+  );
+
+  /**
+   * Checks if the text ends with a common abbreviation that should keep its period.
+   * This method performs early termination when a match is found.
+   * The abbreviation set is small (~30 items), so linear search is efficient.
+   *
+   * @param text the text to check
+   * @return true if the text ends with a known abbreviation
+   */
+  private boolean endsWithAbbreviation(String text) {
+    if (text == null || text.isEmpty()) {
+      return false;
+    }
+    
+    String trimmed = text.trim();
+    // Early return if text is too short to contain any abbreviation
+    if (trimmed.length() < 3) { // shortest abbreviations are 3 chars (e.g., "Co.", "St.")
+      return false;
+    }
+    
+    // Check if text ends with any known abbreviation
+    // Early termination: returns immediately when match is found
+    for (String abbreviation : ABBREVIATIONS) {
+      if (trimmed.endsWith(abbreviation)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   String getType() {
