@@ -197,7 +197,7 @@ class BlockTag {
     
     String trimmed = text.trim();
     // Early return if text is too short to contain any abbreviation
-    if (trimmed.length() < 3) { // shortest abbreviation is 3 chars (e.g., "Co.")
+    if (trimmed.length() < 3) { // shortest abbreviations are 3 chars (e.g., "Co.", "St.")
       return false;
     }
     
