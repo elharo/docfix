@@ -203,8 +203,8 @@ class BlockTag {
     
     // Check if text ends with any known abbreviation
     // Early termination: returns immediately when match is found
-    for (String abbrev : ABBREVIATIONS) {
-      if (trimmed.endsWith(abbrev)) {
+    for (String abbreviation : ABBREVIATIONS) {
+      if (trimmed.endsWith(abbreviation)) {
         return true;
       }
     }
