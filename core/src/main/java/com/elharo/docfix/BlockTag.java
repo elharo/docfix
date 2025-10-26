@@ -60,8 +60,7 @@ class BlockTag {
   private final static Set<String> ABBREVIATIONS = Set.of(
       "Inc", "Ltd", "Corp", "Co",
       "Sr", "Jr", "Dr", "Mr", "Mrs", "Ms",
-      "Prof", "Rev", "Hon", "Gov",
-      "Ph.D", "M.D", "Esq"
+      "Prof", "Rev", "Hon", "Gov", "Esq"
   );
 
   static BlockTag parse(String trimmed) {
