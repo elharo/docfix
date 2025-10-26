@@ -1257,8 +1257,6 @@ public class DocCommentTest {
             + "     * @return returns john's name\n"
             + "     */");
     String java = docComment.toJava();
-    // After removing "returns ", the text is "john's name" which should be lowercased
-    // because "john's" (with apostrophe) is not recognized as a proper noun
     assertTrue("Should remove 'returns' from @return tag", 
         java.contains("@return john's name"));
   }
