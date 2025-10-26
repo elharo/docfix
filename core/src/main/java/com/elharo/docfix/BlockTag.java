@@ -18,6 +18,12 @@ class BlockTag {
    */
   private final String spaces;
 
+  // Constants for removing redundant "returns" or "return" from @return tags
+  private static final String RETURNS_PREFIX = "returns ";
+  private static final int RETURNS_PREFIX_LENGTH = RETURNS_PREFIX.length();
+  private static final String RETURN_PREFIX = "return ";
+  private static final int RETURN_PREFIX_LENGTH = RETURN_PREFIX.length();
+
   private BlockTag(String type, String argument, String text, String spaces) {
     if ("exception".equals(type)) {
       type = "throws"; // Normalize 'exception' to 'throws'
@@ -32,12 +38,14 @@ class BlockTag {
     // Remove redundant "return" or "returns" at the start of @return tag descriptions
     if ("return".equals(type) && text != null && !text.isEmpty()) {
       // Check for "returns " (with space) at the start, case-insensitive
-      if (text.length() > 8 && text.substring(0, 8).toLowerCase(java.util.Locale.ENGLISH).equals("returns ")) {
-        text = text.substring(8); // Remove "returns "
+      if (text.length() > RETURNS_PREFIX_LENGTH && 
+          text.regionMatches(true, 0, RETURNS_PREFIX, 0, RETURNS_PREFIX_LENGTH)) {
+        text = text.substring(RETURNS_PREFIX_LENGTH);
       }
       // Check for "return " (with space) at the start, case-insensitive
-      else if (text.length() > 7 && text.substring(0, 7).toLowerCase(java.util.Locale.ENGLISH).equals("return ")) {
-        text = text.substring(7); // Remove "return "
+      else if (text.length() > RETURN_PREFIX_LENGTH && 
+               text.regionMatches(true, 0, RETURN_PREFIX, 0, RETURN_PREFIX_LENGTH)) {
+        text = text.substring(RETURN_PREFIX_LENGTH);
       }
     }
 
