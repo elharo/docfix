@@ -37,7 +37,8 @@ class BlockTag {
     // Remove trailing period if not a sentence.
     // Check for periods followed by space or newline to detect multiple sentences.
     // Don't remove periods from @deprecated tags since they typically contain complete sentences.
-    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".") && !"deprecated".equals(type)) {
+    // Don't remove periods from abbreviations like "Inc." or "Ltd."
+    if (!text.contains(". ") && !text.contains(".\n") && text.endsWith(".") && !"deprecated".equals(type) && !endsWithAbbreviation(text)) {
       text = text.trim().substring(0, text.trim().length() - 1);
     }
     this.text = text;
@@ -53,6 +54,14 @@ class BlockTag {
       "serialData",
       "since",
       "version"
+  );
+
+  // Common abbreviations that should keep their periods
+  private final static Set<String> ABBREVIATIONS = Set.of(
+      "Inc", "Ltd", "Corp", "Co",
+      "Sr", "Jr", "Dr", "Mr", "Mrs", "Ms",
+      "Prof", "Rev", "Hon", "Gov",
+      "Ph.D", "M.D", "Esq"
   );
 
   static BlockTag parse(String trimmed) {
@@ -166,6 +175,29 @@ class BlockTag {
       }
     }
     return true;
+  }
+
+  /**
+   * Checks if the text ends with a known abbreviation.
+   * This handles cases like "Sun Microsystems Inc." where the period
+   * should be kept because it's part of the abbreviation.
+   *
+   * @param text the text to check
+   * @return true if the text ends with a known abbreviation followed by a period
+   */
+  private boolean endsWithAbbreviation(String text) {
+    if (!text.endsWith(".")) {
+      return false;
+    }
+    
+    // Remove the trailing period to get the potential abbreviation
+    String textWithoutPeriod = text.substring(0, text.length() - 1);
+    
+    // Find the last word
+    int lastSpace = textWithoutPeriod.lastIndexOf(' ');
+    String lastWord = lastSpace >= 0 ? textWithoutPeriod.substring(lastSpace + 1) : textWithoutPeriod;
+    
+    return ABBREVIATIONS.contains(lastWord);
   }
 
   String getType() {

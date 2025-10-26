@@ -1168,4 +1168,88 @@ public class DocCommentTest {
     assertTrue("Should keep @throws with exception type even without description", java.contains("@throws IllegalArgumentException"));
     assertTrue("Should keep @throws with both exception type and description", java.contains("@throws NullPointerException if null"));
   }
+
+  @Test
+  public void testAuthorTagWithIncAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Test class.\n"
+            + " *\n"
+            + " * @author Rahul Srivastava, Sun Microsystems Inc.\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Inc. abbreviation should keep its period", java.contains("@author Rahul Srivastava, Sun Microsystems Inc.\n"));
+  }
+
+  @Test
+  public void testAuthorTagWithLtdAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Test class.\n"
+            + " *\n"
+            + " * @author John Smith, Tech Company Ltd.\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Ltd. abbreviation should keep its period", java.contains("@author John Smith, Tech Company Ltd.\n"));
+  }
+
+  @Test
+  public void testAuthorTagWithCorpAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Test class.\n"
+            + " *\n"
+            + " * @author Jane Doe, Big Corp.\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Corp. abbreviation should keep its period", java.contains("@author Jane Doe, Big Corp.\n"));
+  }
+
+  @Test
+  public void testAuthorTagWithCoAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Test class.\n"
+            + " *\n"
+            + " * @author Bob Johnson, Example Co.\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Co. abbreviation should keep its period", java.contains("@author Bob Johnson, Example Co.\n"));
+  }
+
+  @Test
+  public void testAuthorTagWithJrAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Test class.\n"
+            + " *\n"
+            + " * @author Martin Luther King Jr.\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Jr. abbreviation should keep its period", java.contains("@author Martin Luther King Jr.\n"));
+  }
+
+  @Test
+  public void testAuthorTagWithSrAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Test class.\n"
+            + " *\n"
+            + " * @author William Gates Sr.\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Sr. abbreviation should keep its period", java.contains("@author William Gates Sr.\n"));
+  }
+
+  @Test
+  public void testAuthorTagWithoutAbbreviation() {
+    DocComment docComment = DocComment.parse(Kind.CLASS,
+        "/**\n"
+            + " * Test class.\n"
+            + " *\n"
+            + " * @author John Doe\n"
+            + " */");
+    String java = docComment.toJava();
+    assertTrue("Non-abbreviated author should not have period added", java.contains("@author John Doe\n"));
+  }
 }
