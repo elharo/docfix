@@ -1170,6 +1170,98 @@ public class DocCommentTest {
   }
 
   @Test
+  public void testRemoveRedundantReturnsLowercase() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Formats a message.\n"
+            + "     *\n"
+            + "     * @return returns the formatted message\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should remove redundant 'returns' from @return tag", java.contains("@return the formatted message"));
+    assertFalse("Should not contain '@return returns'", java.contains("@return returns"));
+  }
+
+  @Test
+  public void testRemoveRedundantReturnLowercase() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Gets a value.\n"
+            + "     *\n"
+            + "     * @return return the value\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should remove redundant 'return' from @return tag", java.contains("@return the value"));
+    assertFalse("Should not contain '@return return'", java.contains("@return return"));
+  }
+
+  @Test
+  public void testRemoveRedundantReturnsMixedCase() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Calculates something.\n"
+            + "     *\n"
+            + "     * @return Returns the result\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should remove redundant 'Returns' from @return tag", java.contains("@return the result"));
+    assertFalse("Should not contain '@return Returns'", java.contains("@return Returns"));
+  }
+
+  @Test
+  public void testRemoveRedundantReturnUppercase() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Gets data.\n"
+            + "     *\n"
+            + "     * @return RETURN the data\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should remove redundant 'RETURN' from @return tag", java.contains("@return the data"));
+    assertFalse("Should not contain '@return RETURN'", java.contains("@return RETURN"));
+  }
+
+  @Test
+  public void testDoNotRemoveReturnFromMiddleOfSentence() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Checks return status.\n"
+            + "     *\n"
+            + "     * @return a return value if available\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should not remove 'return' when it's not at the start", 
+        java.contains("@return a return value if available"));
+  }
+
+  @Test
+  public void testRemoveRedundantReturnsWithNoSpace() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Gets something.\n"
+            + "     *\n"
+            + "     * @return returnsValue\n"
+            + "     */");
+    String java = docComment.toJava();
+    // Should not remove when there's no space after "returns"
+    assertTrue("Should not remove 'returns' when not followed by space", 
+        java.contains("@return returnsValue"));
+  }
+
+  @Test
+  public void testRemoveRedundantReturnsPreservesCapitalization() {
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Gets a name.\n"
+            + "     *\n"
+            + "     * @return returns john's name\n"
+            + "     */");
+    String java = docComment.toJava();
+    assertTrue("Should remove 'returns' from @return tag", 
+        java.contains("@return john's name"));
+  }
+
+  @Test
   public void testPreservePeriodForIncAbbreviation() {
     DocComment docComment = DocComment.parse(Kind.CLASS,
         "    /**\n"

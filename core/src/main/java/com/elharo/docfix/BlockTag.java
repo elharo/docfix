@@ -29,6 +29,22 @@ class BlockTag {
       text = text.substring(2).trim(); // Remove leading "- "
     }
 
+    // Remove redundant "return" or "returns" at the start of @return tag descriptions
+    if ("return".equals(type) && text != null && !text.isEmpty()) {
+      int returnsLength = "returns ".length();
+      int returnLength = "return ".length();
+      // Check for "returns " (with space) at the start, case-insensitive
+      if (text.length() > returnsLength && 
+          text.regionMatches(true, 0, "returns ", 0, returnsLength)) {
+        text = text.substring(returnsLength);
+      }
+      // Check for "return " (with space) at the start, case-insensitive
+      else if (text.length() > returnLength && 
+               text.regionMatches(true, 0, "return ", 0, returnLength)) {
+        text = text.substring(returnLength);
+      }
+    }
+
     if (text != null && !text.isEmpty() && shouldLowerCase(type, text)) {
       char first = text.charAt(0);
       text = Character.toString(first).toLowerCase(java.util.Locale.ENGLISH) + text.substring(1);
