@@ -184,6 +184,8 @@ class BlockTag {
 
   /**
    * Checks if the text ends with a common abbreviation that should keep its period.
+   * This method performs early termination when a match is found.
+   * The abbreviation set is small (~30 items), so linear search is efficient.
    *
    * @param text the text to check
    * @return true if the text ends with a known abbreviation
@@ -194,6 +196,13 @@ class BlockTag {
     }
     
     String trimmed = text.trim();
+    // Early return if text is too short to contain any abbreviation
+    if (trimmed.length() < 3) { // shortest abbreviation is 3 chars (e.g., "Co.")
+      return false;
+    }
+    
+    // Check if text ends with any known abbreviation
+    // Early termination: returns immediately when match is found
     for (String abbrev : ABBREVIATIONS) {
       if (trimmed.endsWith(abbrev)) {
         return true;
