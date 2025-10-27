@@ -6,7 +6,7 @@
 
   <groupId>com.elharo.docfix</groupId>
   <artifactId>docfix-parent</artifactId>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>DocFix Parent</name>
@@ -49,7 +49,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
-    <project.build.outputTimestamp>2025-10-27T12:45:45Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-10-27T14:07:34Z</project.build.outputTimestamp>
   </properties>
 
   <inceptionYear>2025</inceptionYear>
