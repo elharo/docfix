@@ -95,16 +95,7 @@ After the timestamp update is merged to main, create the release branch:
 git checkout -b release/$VERSION
 ```
 
-### 3. Prepare the Release
-
-Before releasing, ensure the project is ready:
-
-```bash
-# Verify everything compiles and plugins work
-mvn clean package
-```
-
-### 4. Update Version Numbers
+### 3. Update Version Numbers
 
 Update the version in the parent POM from SNAPSHOT to the release version:
 
@@ -114,6 +105,15 @@ mvn versions:set -DnewVersion=$VERSION
 
 # Commit the version change
 git commit -m "Release version $VERSION"
+```
+
+### 4. Prepare the Release
+
+Before releasing, ensure the project is ready:
+
+```bash
+# Verify everything compiles and plugins work
+mvn clean package
 ```
 
 ### 5. Tag the Release
