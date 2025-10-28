@@ -46,24 +46,54 @@ export NEXT_VERSION=1.3.0
 
 After setting these variables, all subsequent commands can be copy-pasted without editing.
 
-### 1. Create a release branch
-
-```bash
-git checkout -b release/$VERSION
-```
-
-### 2. Update the Reproducible Build Timestamp
+### 1. Update the Reproducible Build Timestamp
 
 The project uses [Maven reproducible builds](https://maven.apache.org/guides/mini/guide-reproducible-builds.html) to ensure that identical source code produces identical artifacts. Before each release, update the `project.build.outputTimestamp` property in the root `pom.xml` to the current date:
 
-1. Open `pom.xml` in the root directory
-2. Locate the `<project.build.outputTimestamp>` property in the `<properties>` section
-3. Update it to the current date in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`
+1. Ensure you're on the main branch:
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+
+2. Create a branch for the timestamp update:
+   ```bash
+   git checkout -b update-timestamp-$VERSION
+   ```
+
+3. Open `pom.xml` in the root directory
+4. Locate the `<project.build.outputTimestamp>` property in the `<properties>` section
+5. Update it to the current date in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`
    - Example: `2025-10-13T00:00:00Z`
    - Use `00:00:00` for the time component
    - Always use UTC timezone (indicated by the `Z` suffix)
 
+6. Commit and push the timestamp update:
+   ```bash
+   git add pom.xml
+   git commit -m "Update reproducible build timestamp for version $VERSION"
+   git push origin update-timestamp-$VERSION
+   ```
+
+7. Create a pull request from `update-timestamp-$VERSION` to `main` with:
+   - Title: "Update reproducible build timestamp for version $VERSION"
+   - Description: Sets the reproducible build timestamp for the upcoming release
+
+8. Once the pull request is approved and merged, update your local main branch:
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+
 This timestamp will be embedded in all build artifacts (JARs, etc.) for this release, ensuring reproducibility.
+
+### 2. Create a release branch
+
+After the timestamp update is merged to main, create the release branch:
+
+```bash
+git checkout -b release/$VERSION
+```
 
 ### 3. Update Version Numbers
 
