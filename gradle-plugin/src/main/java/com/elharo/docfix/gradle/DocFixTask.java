@@ -60,21 +60,17 @@ public abstract class DocFixTask extends DefaultTask {
             return;
         }
 
-        try {
-            Charset charset = Charset.forName(getEncoding().get());
-            boolean dryrun = getDryrun().get();
-            
-            if (dryrun) {
-                getLogger().lifecycle("Running in dry-run mode. No files will be modified.");
-            }
-            
-            DocFix.fixDirectory(sourceDir, dryrun, charset);
-            
-            if (!dryrun) {
-                getLogger().lifecycle("DocFix completed successfully");
-            }
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid encoding: " + getEncoding().get(), e);
+        Charset charset = Charset.forName(getEncoding().get());
+        boolean dryrun = getDryrun().get();
+        
+        if (dryrun) {
+            getLogger().lifecycle("Running in dry-run mode. No files will be modified.");
+        }
+        
+        DocFix.fixDirectory(sourceDir, dryrun, charset);
+        
+        if (!dryrun) {
+            getLogger().lifecycle("DocFix completed successfully");
         }
     }
 }
