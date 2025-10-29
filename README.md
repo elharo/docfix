@@ -144,7 +144,7 @@ For Gradle projects, you can use DocFix as a Gradle plugin with zero installatio
 gradle docfix --init-script init-docfix.gradle
 ```
 
-Where `init-docfix.gradle` contains:
+Download the `init-docfix.gradle` file from the repository or create it with this content:
 
 ```groovy
 initscript {
@@ -159,6 +159,17 @@ initscript {
 
 allprojects {
     apply plugin: com.elharo.docfix.gradle.DocFixPlugin
+    
+    tasks.configureEach {
+        if (name == 'docfix') {
+            if (project.hasProperty('docfix.dryrun')) {
+                dryrun = Boolean.parseBoolean(project.property('docfix.dryrun').toString())
+            }
+            if (project.hasProperty('docfix.encoding')) {
+                encoding = project.property('docfix.encoding').toString()
+            }
+        }
+    }
 }
 ```
 
