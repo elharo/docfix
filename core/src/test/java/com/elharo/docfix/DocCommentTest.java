@@ -1439,4 +1439,23 @@ public class DocCommentTest {
     assertTrue("Should remove period after 'others' at end", 
         java.contains("or others\n"));
   }
+
+  @Test
+  public void testReturnTagWithExtraSpaces() {
+    // Test case from issue: DocFix fails to lowercase return tag when there are extra spaces
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "  /**\n"
+            + "   * Removes a grammar.\n"
+            + "   *\n"
+            + "   * @param desc The Grammar Description.\n"
+            + "   * @return     The removed grammar.\n"
+            + "   */");
+    String java = docComment.toJava();
+    // The @return description should be lowercased even with extra spaces
+    assertTrue("Return tag should be lowercased", 
+        java.contains("@return the removed grammar\n"));
+    // The @param should also be lowercased
+    assertTrue("Param tag should be lowercased", 
+        java.contains("@param desc the Grammar Description\n"));
+  }
 }
