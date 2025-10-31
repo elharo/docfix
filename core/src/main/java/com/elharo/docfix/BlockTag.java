@@ -82,10 +82,14 @@ class BlockTag {
     String spaces = " ";
     if (noArgumentTags.contains(type)) {
       if (parts.length > 1) {
-        text += parts[1];
+        text += parts[1].trim();
       }
       if (parts.length > 2) {
-        text += " " + parts[2].trim();
+        String part2Trimmed = parts[2].trim();
+        if (!text.isEmpty() && !part2Trimmed.isEmpty()) {
+          text += " ";
+        }
+        text += part2Trimmed;
       }
     } else {
        arg = parts.length > 1 ? parts[1] : null;
