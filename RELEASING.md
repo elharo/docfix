@@ -61,25 +61,30 @@ The project uses [Maven reproducible builds](https://maven.apache.org/guides/min
    git checkout -b update-timestamp-$VERSION
    ```
 
-3. Open `pom.xml` in the root directory
-4. Locate the `<project.build.outputTimestamp>` property in the `<properties>` section
-5. Update it to the current date in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`
-   - Example: `2025-10-13T00:00:00Z`
-   - Use `00:00:00` for the time component
-   - Always use UTC timezone (indicated by the `Z` suffix)
+3. Generate the timestamp from the last commit and update the root `pom.xml`:
+   ```bash
+   # Generate timestamp from last commit
+   TIMESTAMP=$(git log -1 --format=%cI)
+   echo "Setting timestamp to: $TIMESTAMP"
+   
+   # Update the pom.xml file automatically
+   sed -i "s|<project.build.outputTimestamp>.*</project.build.outputTimestamp>|<project.build.outputTimestamp>$TIMESTAMP</project.build.outputTimestamp>|" pom.xml
+   ```
+   
+   This uses the timestamp of the last commit in ISO 8601 format, ensuring reproducible builds. The `%cI` format provides the committer date in strict ISO 8601 format (e.g., `2025-10-13T14:30:45Z`).
 
-6. Commit and push the timestamp update:
+4. Commit and push the timestamp update:
    ```bash
    git add pom.xml
    git commit -m "Update reproducible build timestamp for version $VERSION"
    git push origin update-timestamp-$VERSION
    ```
 
-7. Create a pull request from `update-timestamp-$VERSION` to `main` with:
+5. Create a pull request from `update-timestamp-$VERSION` to `main` with:
    - Title: "Update reproducible build timestamp for version $VERSION"
    - Description: Sets the reproducible build timestamp for the upcoming release
 
-8. Once the pull request is approved and merged, update your local main branch:
+6. Once the pull request is approved and merged, update your local main branch:
    ```bash
    git checkout main
    git pull origin main
