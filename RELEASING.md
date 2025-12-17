@@ -101,7 +101,7 @@ Update the version in the parent POM from SNAPSHOT to the release version:
 
 ```bash
 # Use Maven versions plugin to update all modules consistently
-mvn versions:set -DnewVersion=$VERSION
+mvn versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
 
 # Commit the version change
 git commit -m "Release version $VERSION"
@@ -178,7 +178,7 @@ git checkout main
 git checkout -b prepare-next-development-$NEXT_VERSION
 
 # Update to next development version
-mvn versions:set -DnewVersion=$NEXT_VERSION-SNAPSHOT
+mvn versions:set -DnewVersion=$NEXT_VERSION-SNAPSHOT -DgenerateBackupPoms=false
 
 # Commit the version change
 git add .
