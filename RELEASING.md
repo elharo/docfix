@@ -87,7 +87,16 @@ The project uses [Maven reproducible builds](https://maven.apache.org/guides/min
      --body "Sets the reproducible build timestamp for the upcoming release"
    ```
 
-6. Once the pull request is approved and merged, update your local main branch:
+6. Approve and merge the pull request from the command line:
+   ```bash
+   # Approve the pull request
+   gh pr review update-timestamp-$VERSION --approve
+   
+   # Merge the pull request (squash merge is recommended)
+   gh pr merge update-timestamp-$VERSION --squash --delete-branch
+   ```
+
+7. Once the pull request is approved and merged, update your local main branch:
    ```bash
    git checkout main
    git pull origin main
@@ -201,6 +210,15 @@ Then create a pull request from `prepare-next-development-$NEXT_VERSION` to `mai
 gh pr create --base main --head prepare-next-development-$NEXT_VERSION \
   --title "Prepare for next development iteration: $NEXT_VERSION-SNAPSHOT" \
   --body "Updates version numbers for continued development"
+```
+
+Approve and merge the pull request from the command line:
+```bash
+# Approve the pull request
+gh pr review prepare-next-development-$NEXT_VERSION --approve
+
+# Merge the pull request (squash merge is recommended)
+gh pr merge prepare-next-development-$NEXT_VERSION --squash --delete-branch
 ```
 
 Once the pull request is approved and merged, main will be updated with the next SNAPSHOT version.
