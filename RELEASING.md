@@ -92,7 +92,7 @@ The project uses [Maven reproducible builds](https://maven.apache.org/guides/min
    # Approve the pull request
    gh pr review update-timestamp-$VERSION --approve
    
-   # Merge the pull request (squash merge is recommended)
+   # Merge the pull request
    gh pr merge update-timestamp-$VERSION --squash --delete-branch
    ```
 
@@ -217,7 +217,7 @@ Approve and merge the pull request from the command line:
 # Approve the pull request
 gh pr review prepare-next-development-$NEXT_VERSION --approve
 
-# Merge the pull request (squash merge is recommended)
+# Merge the pull request
 gh pr merge prepare-next-development-$NEXT_VERSION --squash --delete-branch
 ```
 
