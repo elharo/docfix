@@ -80,9 +80,12 @@ The project uses [Maven reproducible builds](https://maven.apache.org/guides/min
    git push origin update-timestamp-$VERSION
    ```
 
-5. Create a pull request from `update-timestamp-$VERSION` to `main` with:
-   - Title: "Update reproducible build timestamp for version $VERSION"
-   - Description: Sets the reproducible build timestamp for the upcoming release
+5. Create a pull request from `update-timestamp-$VERSION` to `main`:
+   ```bash
+   gh pr create --base main --head update-timestamp-$VERSION \
+     --title "Update reproducible build timestamp for version $VERSION" \
+     --body "Sets the reproducible build timestamp for the upcoming release"
+   ```
 
 6. Once the pull request is approved and merged, update your local main branch:
    ```bash
@@ -193,9 +196,12 @@ git commit -m "Prepare for next development iteration: $NEXT_VERSION-SNAPSHOT"
 git push origin prepare-next-development-$NEXT_VERSION
 ```
 
-Then create a pull request from `prepare-next-development-$NEXT_VERSION` to `main` with:
-- Title: "Prepare for next development iteration: $NEXT_VERSION-SNAPSHOT"
-- Description: Updates version numbers for continued development
+Then create a pull request from `prepare-next-development-$NEXT_VERSION` to `main`:
+```bash
+gh pr create --base main --head prepare-next-development-$NEXT_VERSION \
+  --title "Prepare for next development iteration: $NEXT_VERSION-SNAPSHOT" \
+  --body "Updates version numbers for continued development"
+```
 
 Once the pull request is approved and merged, main will be updated with the next SNAPSHOT version.
 
