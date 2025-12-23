@@ -67,7 +67,7 @@ The project uses [Maven reproducible builds](https://maven.apache.org/guides/min
    TIMESTAMP=$(git log -1 --format=%cI)
    echo "Setting timestamp to: $TIMESTAMP"
    
-   # Update the pom.xml file (works on both macOS and Linux)
+   # Update the pom.xml file
    sed -i.bak "s|<project.build.outputTimestamp>.*</project.build.outputTimestamp>|<project.build.outputTimestamp>$TIMESTAMP</project.build.outputTimestamp>|" pom.xml && rm pom.xml.bak
    ```
    
