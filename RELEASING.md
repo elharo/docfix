@@ -121,6 +121,7 @@ Update the version in the parent POM from SNAPSHOT to the release version:
 mvn versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false
 
 # Commit the version change
+git add .
 git commit -m "Release version $VERSION"
 ```
 
