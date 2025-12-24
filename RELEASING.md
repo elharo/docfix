@@ -185,7 +185,52 @@ After the Maven Central release is published, create a GitHub release:
 
 The GitHub release will be associated with the tag and will be visible on the repository's releases page.
 
-### 9. Prepare for Next Development Iteration
+### 9. Update Version Numbers in README
+
+After the release is tagged and published, update the version numbers in the README.md file to reference the newly released version:
+
+```bash
+# Switch to main branch and create a new branch for the README update
+git checkout main
+git checkout -b update-readme-version-$VERSION
+
+# Update the Maven plugin command to use the new version
+sed -i.bak "s/mvn com\.elharo\.docfix:docfix-maven-plugin:[0-9.]*:fix/mvn com.elharo.docfix:docfix-maven-plugin:$VERSION:fix/" README.md && rm README.md.bak
+
+# Update the pom.xml dependency example to use the new version
+sed -i.bak "s|<version>[0-9.]*</version>|<version>$VERSION</version>|" README.md && rm README.md.bak
+
+# Commit the version change
+git add README.md
+git commit -m "Update README version references to $VERSION"
+
+# Push the branch and create a pull request
+git push origin update-readme-version-$VERSION
+```
+
+Then create a pull request from `update-readme-version-$VERSION` to `main`:
+```bash
+gh pr create --base main --head update-readme-version-$VERSION \
+  --title "Update README version references to $VERSION" \
+  --body "Updates version references in README.md to reflect the $VERSION release"
+```
+
+Approve and merge the pull request from the command line:
+```bash
+# Approve the pull request
+gh pr review update-readme-version-$VERSION --approve
+
+# Merge the pull request
+gh pr merge update-readme-version-$VERSION --squash --delete-branch
+```
+
+Once the pull request is approved and merged, the README will show the latest released version for users to reference.
+
+Note: This updates the Maven plugin command and the pom.xml dependency example. The CLI jar examples with SNAPSHOT versions are not updated as they reference the development build.
+
+
+
+### 10. Prepare for Next Development Iteration
 
 Update main branch for the next development version:
 
@@ -225,7 +270,7 @@ Once the pull request is approved and merged, main will be updated with the next
 
 Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
 
-### 10. Abandoning a Release
+### 11. Abandoning a Release
 
 If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
 
