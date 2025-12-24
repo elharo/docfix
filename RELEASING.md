@@ -195,10 +195,10 @@ git checkout main
 git checkout -b update-readme-version-$VERSION
 
 # Update the Maven plugin command to use the new version
-sed -i.bak "s/mvn com\.elharo\.docfix:docfix-maven-plugin:[0-9.]*:fix/mvn com.elharo.docfix:docfix-maven-plugin:$VERSION:fix/" README.md && rm README.md.bak
+sed -i.bak "s/mvn com\.elharo\.docfix:docfix-maven-plugin:[0-9]\+\.[0-9]\+\.[0-9]\+:fix/mvn com.elharo.docfix:docfix-maven-plugin:$VERSION:fix/" README.md && rm README.md.bak
 
 # Update the pom.xml dependency example to use the new version
-sed -i.bak "s|<version>[0-9.]*</version>|<version>$VERSION</version>|" README.md && rm README.md.bak
+sed -i.bak "s|<version>[0-9]\+\.[0-9]\+\.[0-9]\+</version>|<version>$VERSION</version>|" README.md && rm README.md.bak
 
 # Commit the version change
 git add README.md
