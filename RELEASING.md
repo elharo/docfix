@@ -228,8 +228,6 @@ Once the pull request is approved and merged, the README will show the latest re
 
 Note: This updates the Maven plugin command and the pom.xml dependency example. The CLI jar examples with SNAPSHOT versions are not updated as they reference the development build.
 
-
-
 ### 10. Prepare for Next Development Iteration
 
 Update main branch for the next development version:
