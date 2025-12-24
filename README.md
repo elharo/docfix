@@ -63,7 +63,7 @@ You can run DocFix on non-Maven projects using Java 11 or later with the compile
 
 ```bash
 mvn clean package
-java -jar core/target/docfix-1.0.5-SNAPSHOT-cli.jar [--dryrun] <file-or-directory>
+java -jar core/target/docfix-1.0.6-SNAPSHOT-cli.jar [--dryrun] <file-or-directory>
 ```
 
 This enables you to process any particular file or directory regardless of location or build system. 
@@ -77,18 +77,18 @@ This enables you to process any particular file or directory regardless of locat
 
 **Fix a single Java file:**
 ```bash
-java -jar core/target/docfix-1.0.5-SNAPSHOT-cli.jar src/main/java/MyClass.java
+java -jar core/target/docfix-1.0.6-SNAPSHOT-cli.jar src/main/java/MyClass.java
 ```
 
 **Fix all Java files in a directory (recursively):**
 ```bash
-java -jar core/target/docfix-1.0.5-SNAPSHOT-cli.jar src/main/java
+java -jar core/target/docfix-1.0.6-SNAPSHOT-cli.jar src/main/java
 ```
 
 
 **Preview changes without modifying files:**
 ```bash
-java -jar core/target/docfix-1.0.5-SNAPSHOT-cli.jar --dryrun src/main/java
+java -jar core/target/docfix-1.0.6-SNAPSHOT-cli.jar --dryrun src/main/java
 ```
 
 ### Maven Plugin
@@ -123,7 +123,7 @@ To include the plugin in your project's build process, add it to your `pom.xml`:
     <plugin>
       <groupId>com.elharo.docfix</groupId>
       <artifactId>docfix</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.6</version>
       <executions>
         <execution>
           <goals>
