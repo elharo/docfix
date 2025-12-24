@@ -68,7 +68,7 @@ The project uses [Maven reproducible builds](https://maven.apache.org/guides/min
    echo "Setting timestamp to: $TIMESTAMP"
    
    # Update the pom.xml file
-   sed -i "s|<project.build.outputTimestamp>.*</project.build.outputTimestamp>|<project.build.outputTimestamp>$TIMESTAMP</project.build.outputTimestamp>|" pom.xml
+   sed -i.bak "s|<project.build.outputTimestamp>.*</project.build.outputTimestamp>|<project.build.outputTimestamp>$TIMESTAMP</project.build.outputTimestamp>|" pom.xml && rm pom.xml.bak
    ```
    
    This uses the timestamp of the last commit in ISO 8601 format, ensuring reproducible builds. The `%cI` format provides the committer date in strict ISO 8601 format (e.g., `2025-10-13T14:30:45Z`).
