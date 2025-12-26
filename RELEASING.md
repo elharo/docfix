@@ -224,7 +224,7 @@ Once the pull request is merged, main will be updated with the next SNAPSHOT ver
 
 Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
 
-### 11. Abandoning a Release
+### Abandoning a Release
 
 If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
 
