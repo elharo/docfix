@@ -183,7 +183,11 @@ After the Maven Central release is published, create a GitHub release:
 
 The GitHub release will be associated with the tag and will be visible on the repository's releases page.
 
-### 9. Prepare for Next Development Iteration
+### 9. Update Version Numbers in README
+
+After the release is tagged and published, update the version numbers in the README.md file to reference the newly released version.
+
+### 10. Prepare for Next Development Iteration
 
 Update main branch for the next development version:
 
@@ -220,7 +224,7 @@ Once the pull request is merged, main will be updated with the next SNAPSHOT ver
 
 Note: This keeps main branch always on a SNAPSHOT version and never contains release versions.
 
-### 10. Abandoning a Release
+### 11. Abandoning a Release
 
 If you need to abandon a release before publishing (e.g., critical issues discovered during deployment), remove the tag:
 
