@@ -45,6 +45,13 @@ class DocComment {
   }
 
   private final static Map<String, Integer> tagOrder = new HashMap<>();
+  
+  // Special field identifiers that should not be capitalized in Javadoc comments
+  // These are Java field names with special meaning
+  private final static String[] SPECIAL_IDENTIFIERS = {
+    "serialVersionUID",
+    "serialPersistentFields"
+  };
 
   static {
     tagOrder.put("author", 0);
@@ -72,22 +79,12 @@ class DocComment {
       return false;
     }
     
-    // List of special identifiers that should not be capitalized
-    // These are common field names with special meanings in Java
-    String[] specialIdentifiers = {
-      "serialVersionUID",
-      "serialPersistentFields"
-    };
-    
-    for (String identifier : specialIdentifiers) {
+    for (String identifier : SPECIAL_IDENTIFIERS) {
       // Check if description starts with the identifier followed by a non-letter character
       // (to avoid matching "serialVersionUIDValue" for example)
       if (description.startsWith(identifier)) {
-        if (description.length() == identifier.length()) {
-          return true;
-        }
-        char nextChar = description.charAt(identifier.length());
-        if (!Character.isLetter(nextChar)) {
+        if (description.length() == identifier.length() 
+            || !Character.isLetter(description.charAt(identifier.length()))) {
           return true;
         }
       }
