@@ -68,8 +68,8 @@ class DocComment {
   }
 
   /**
-   * Checks if the description starts with a special identifier that should not be capitalized.
-   * These are typically field names like serialVersionUID that have special meaning in Java.
+   * Checks if the description starts with a word that should not be capitalized.
+   * These are typically identifiers like serialVersionUID that have special meaning in Java.
    *
    * @param description the description to check
    * @return true if the description starts with a special identifier
