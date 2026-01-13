@@ -1458,4 +1458,32 @@ public class DocCommentTest {
     assertTrue("Param tag should be lowercased", 
         java.contains("@param desc the Grammar Description\n"));
   }
+
+  @Test
+  public void testSerialVersionUIDMultilineNotCapitalized() {
+    DocComment docComment = DocComment.parse(Kind.FIELD,
+        "/**\n"
+            + " * serialVersionUID for serialization.\n"
+            + " */");
+    String java = docComment.toJava();
+    // serialVersionUID should not be capitalized
+    assertTrue("serialVersionUID should not be capitalized", 
+        java.contains(" * serialVersionUID for serialization.\n"));
+    assertFalse("Should not capitalize serialVersionUID", 
+        java.contains(" * SerialVersionUID"));
+  }
+
+  @Test
+  public void testSerialPersistentFieldsMultilineNotCapitalized() {
+    DocComment docComment = DocComment.parse(Kind.FIELD,
+        "/**\n"
+            + " * serialPersistentFields declares which fields are serialized.\n"
+            + " */");
+    String java = docComment.toJava();
+    // serialPersistentFields should not be capitalized
+    assertTrue("serialPersistentFields should not be capitalized", 
+        java.contains(" * serialPersistentFields declares which fields are serialized.\n"));
+    assertFalse("Should not capitalize serialPersistentFields", 
+        java.contains(" * SerialPersistentFields"));
+  }
 }
