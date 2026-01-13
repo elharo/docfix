@@ -126,4 +126,31 @@ public class SingleLineCommentTest {
     assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
     assertEquals("/** This is normal text. */", comment.toJava());
   }
+
+  @Test
+  public void testSerialVersionUIDNotCapitalized() {
+    String raw = "/** serialVersionUID. */";
+    DocComment comment = DocComment.parse(DocComment.Kind.FIELD, raw);
+
+    assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
+    assertEquals("/** serialVersionUID. */", comment.toJava());
+  }
+
+  @Test
+  public void testSerialVersionUIDWithoutPeriod() {
+    String raw = "/** serialVersionUID */";
+    DocComment comment = DocComment.parse(DocComment.Kind.FIELD, raw);
+
+    assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
+    assertEquals("/** serialVersionUID. */", comment.toJava());
+  }
+
+  @Test
+  public void testSerialPersistentFieldsNotCapitalized() {
+    String raw = "/** serialPersistentFields for this class */";
+    DocComment comment = DocComment.parse(DocComment.Kind.FIELD, raw);
+
+    assertTrue("Should return a SingleLineComment instance", comment instanceof SingleLineComment);
+    assertEquals("/** serialPersistentFields for this class. */", comment.toJava());
+  }
 }

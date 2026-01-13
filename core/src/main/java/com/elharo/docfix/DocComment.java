@@ -25,8 +25,13 @@ class DocComment {
   protected DocComment(Kind kind, String description, List<BlockTag> blockTags, int indent) {
     this.kind = kind;
     if (description != null && !description.isBlank()) {
-      char first = description.charAt(0);
-      description = (Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1)).trim();
+      // Only capitalize if description doesn't start with a special identifier
+      if (!startsWithSpecialIdentifier(description)) {
+        char first = description.charAt(0);
+        description = (Character.toString(first).toUpperCase(java.util.Locale.ENGLISH) + description.substring(1)).trim();
+      } else {
+        description = description.trim();
+      }
       // add a period to the end of the description if it doesn't end with a
       // punctuation mark and doesn't end with a URL
       if ((Character.isLetterOrDigit(description.charAt(description.length() - 1))) 
@@ -53,6 +58,42 @@ class DocComment {
     tagOrder.put("serialField", 7); // Same priority as serial
     tagOrder.put("serialData", 7); // Same priority as serial
     tagOrder.put("deprecated", 8);
+  }
+
+  /**
+   * Checks if the description starts with a special identifier that should not be capitalized.
+   * These are typically field names like serialVersionUID that have special meaning in Java.
+   *
+   * @param description the description to check
+   * @return true if the description starts with a special identifier
+   */
+  private static boolean startsWithSpecialIdentifier(String description) {
+    if (description == null || description.isEmpty()) {
+      return false;
+    }
+    
+    // List of special identifiers that should not be capitalized
+    // These are common field names with special meanings in Java
+    String[] specialIdentifiers = {
+      "serialVersionUID",
+      "serialPersistentFields"
+    };
+    
+    for (String identifier : specialIdentifiers) {
+      // Check if description starts with the identifier followed by a non-letter character
+      // (to avoid matching "serialVersionUIDValue" for example)
+      if (description.startsWith(identifier)) {
+        if (description.length() == identifier.length()) {
+          return true;
+        }
+        char nextChar = description.charAt(identifier.length());
+        if (!Character.isLetter(nextChar)) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
   }
 
   private static List<BlockTag> sortTags(List<BlockTag> blockTags) {
