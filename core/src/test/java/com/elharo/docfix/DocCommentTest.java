@@ -1486,4 +1486,28 @@ public class DocCommentTest {
     assertFalse("Should not capitalize serialPersistentFields", 
         java.contains(" * SerialPersistentFields"));
   }
+
+  @Test
+  public void testRemoveHyphensWithExtraSpaces() {
+    // Test the exact scenario from issue: extra spaces before hyphen
+    DocComment docComment = DocComment.parse(Kind.METHOD,
+        "    /**\n"
+            + "     * Resolves lifecycle phase of a given mojo forks aware.\n"
+            + "     *\n"
+            + "     * @param project       - project context\n"
+            + "     * @param mojoExecution - mojo to resolve lifecycle for\n"
+            + "     * @return phase\n"
+            + "     */");
+    String java = docComment.toJava();
+    
+    // Verify hyphens are removed even with extra spaces before them
+    assertTrue("Should remove hyphen from @param project", 
+        java.contains("@param project       project context"));
+    assertTrue("Should remove hyphen from @param mojoExecution", 
+        java.contains("@param mojoExecution mojo to resolve lifecycle for"));
+    assertFalse("Should not contain '- project context'", 
+        java.contains("- project context"));
+    assertFalse("Should not contain '- mojo to resolve'", 
+        java.contains("- mojo to resolve"));
+  }
 }
