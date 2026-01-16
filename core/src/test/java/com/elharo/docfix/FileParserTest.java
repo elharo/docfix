@@ -5,8 +5,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -319,5 +321,122 @@ public class FileParserTest {
     for (int i = 0; i < expected.length; i++) {
       assertEquals("Line " + i + " should match", expected[i], result.get(i));
     }
+  }
+
+  // Tests for extractChunks method
+  
+  @Test
+  public void testExtractChunksSimpleClass() throws IOException, JavaParseException {
+    String source = "package test;\n" +
+                   "\n" +
+                   "/**\n" +
+                   " * A simple class.\n" +
+                   " */\n" +
+                   "public class Test {\n" +
+                   "}\n";
+    
+    List<String> chunks = FileParser.extractChunks(new StringReader(source));
+    
+    assertEquals("Should have 4 chunks", 4, chunks.size());
+    assertEquals("package test;", chunks.get(0));
+    assertEquals("", chunks.get(1)); // empty line
+    assertEquals("/**\n * A simple class.\n */", chunks.get(2));
+    assertEquals("public class Test {\n}", chunks.get(3));
+  }
+  
+  @Test
+  public void testExtractChunksWithMultipleJavadocs() throws IOException, JavaParseException {
+    String source = "/**\n" +
+                   " * Class comment.\n" +
+                   " */\n" +
+                   "class Test {\n" +
+                   "  /**\n" +
+                   "   * Method comment.\n" +
+                   "   */\n" +
+                   "  void method() {\n" +
+                   "  }\n" +
+                   "}\n";
+    
+    List<String> chunks = FileParser.extractChunks(new StringReader(source));
+    
+    assertEquals("Should have 5 chunks", 5, chunks.size());
+    assertEquals("/**\n * Class comment.\n */", chunks.get(0));
+    assertEquals("class Test {", chunks.get(1));
+    assertEquals("/**\n   * Method comment.\n   */", chunks.get(2));
+    assertEquals("void method() {\n  }", chunks.get(3));
+    assertEquals("", chunks.get(4)); // trailing empty line
+  }
+  
+  @Test
+  public void testExtractChunksRemovesLeadingTrailingLineTerminators() throws IOException, JavaParseException {
+    String source = "\npackage test;\n\n" +
+                   "/**\n" +
+                   " * Comment.\n" +
+                   " */\n" +
+                   "\nclass Test {\n}\n\n";
+    
+    List<String> chunks = FileParser.extractChunks(new StringReader(source));
+    
+    assertEquals("Should have 4 chunks", 4, chunks.size());
+    assertEquals("package test;\n", chunks.get(0)); // leading \n removed
+    assertEquals("/**\n * Comment.\n */", chunks.get(1));
+    assertEquals("class Test {\n}", chunks.get(2)); // leading \n removed  
+    assertEquals("", chunks.get(3)); // trailing \n\n becomes empty
+  }
+  
+  @Test
+  public void testExtractChunksPreservesOneLineTerminator() throws IOException, JavaParseException {
+    String source = "\n\npackage test;\n\n\n" +
+                   "/**\n" +
+                   " * Comment.\n" +
+                   " */\n\n" +
+                   "class Test {\n}\n\n\n";
+    
+    List<String> chunks = FileParser.extractChunks(new StringReader(source));
+    
+    assertEquals("Should have 4 chunks", 4, chunks.size());
+    assertEquals("\npackage test;\n\n", chunks.get(0)); // only one leading/trailing \n removed
+    assertEquals("/**\n * Comment.\n */", chunks.get(1));
+    assertEquals("class Test {\n}\n\n", chunks.get(2)); // only one leading/trailing \n removed
+    assertEquals("", chunks.get(3));
+  }
+  
+  @Test
+  public void testExtractChunksEmptyInput() throws IOException, JavaParseException {
+    List<String> chunks = FileParser.extractChunks(new StringReader(""));
+    assertEquals("Empty input should produce empty list", 0, chunks.size());
+  }
+  
+  @Test
+  public void testExtractChunksOnlyJavadoc() throws IOException, JavaParseException {
+    String source = "/**\n * Only comment.\n */";
+    
+    List<String> chunks = FileParser.extractChunks(new StringReader(source));
+    
+    assertEquals("Should have 1 chunk", 1, chunks.size());
+    assertEquals("/**\n * Only comment.\n */", chunks.get(0));
+  }
+  
+  @Test
+  public void testExtractChunksNoJavadoc() throws IOException, JavaParseException {
+    String source = "package test;\nclass Test {}\n";
+    
+    List<String> chunks = FileParser.extractChunks(new StringReader(source));
+    
+    assertEquals("Should have 1 chunk", 1, chunks.size());
+    assertEquals("package test;\nclass Test {}", chunks.get(0));
+  }
+
+  @Test
+  public void testExtractChunksMultipleDocCommentsNoLineBreaks() throws IOException, JavaParseException {
+    String source = "/**First*/class A{}/**Second*/class B{}";
+    
+    List<String> chunks = FileParser.extractChunks(new StringReader(source));
+    
+    assertEquals("Should have 4 chunks", 4, chunks.size());
+    assertEquals("/**First*/", chunks.get(0));
+    assertEquals("class A{}", chunks.get(1));
+    assertEquals("/**Second*/", chunks.get(2));
+    assertEquals("class B{}", chunks.get(3));
   }
 }
