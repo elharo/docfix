@@ -1505,9 +1505,7 @@ public class DocCommentTest {
         java.contains("@param project       project context"));
     assertTrue("Should remove hyphen from @param mojoExecution", 
         java.contains("@param mojoExecution mojo to resolve lifecycle for"));
-    assertFalse("Should not contain '- project context'", 
-        java.contains("- project context"));
-    assertFalse("Should not contain '- mojo to resolve'", 
-        java.contains("- mojo to resolve"));
+    assertFalse("Should not contain a hyphen", 
+        java.contains(" - "));
   }
 }
