@@ -136,6 +136,95 @@ To include the plugin in your project's build process, add it to your `pom.xml`:
 </build>
 ```
 
+### Gradle Plugin
+
+For Gradle projects, you can use DocFix as a Gradle plugin with zero installation:
+
+```bash
+gradle docfix --init-script init-docfix.gradle
+```
+
+Download the `init-docfix.gradle` file from the repository or create it with this content:
+
+```groovy
+initscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.elharo.docfix:docfix-gradle-plugin:1.0.6-SNAPSHOT'
+    }
+}
+
+allprojects {
+    apply plugin: com.elharo.docfix.gradle.DocFixPlugin
+    
+    tasks.configureEach {
+        if (name == 'docfix') {
+            if (project.hasProperty('docfix.dryrun')) {
+                dryrun = Boolean.parseBoolean(project.property('docfix.dryrun').toString())
+            }
+            if (project.hasProperty('docfix.encoding')) {
+                encoding = project.property('docfix.encoding').toString()
+            }
+        }
+    }
+}
+```
+
+This enables zero-click execution similar to the Maven plugin, assuming Gradle and Java are already installed.
+
+The plugin processes all Java files in `src/main/java` by default.
+
+#### Gradle Plugin Options
+
+- **Dry-run mode:** Preview changes without modifying files:
+  ```bash
+  gradle docfix --init-script init-docfix.gradle -Pdocfix.dryrun=true
+  ```
+
+- **Custom encoding:** Specify character encoding:
+  ```bash
+  gradle docfix --init-script init-docfix.gradle -Pdocfix.encoding=ISO-8859-1
+  ```
+
+#### Adding to Your Project
+
+To include the plugin in your project's build process, add it to your `build.gradle`:
+
+```groovy
+plugins {
+    id 'java'
+    id 'com.elharo.docfix' version '1.0.6-SNAPSHOT'
+}
+```
+
+Or for Kotlin DSL (`build.gradle.kts`):
+
+```kotlin
+plugins {
+    java
+    id("com.elharo.docfix") version "1.0.6-SNAPSHOT"
+}
+```
+
+Then run:
+
+```bash
+gradle docfix
+```
+
+You can also configure the plugin in your build file:
+
+```groovy
+docfix {
+    sourceDirectory = file('src/main/java')
+    encoding = 'UTF-8'
+    dryrun = false
+}
+```
+
 ### Programmatic Usage
 
 You can also use DocFix programmatically in your Java code:

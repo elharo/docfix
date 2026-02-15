@@ -1,0 +1,38 @@
+/*
+ * DocFix Gradle Init Script
+ * 
+ * This init script enables zero-install execution of the DocFix Gradle plugin,
+ * similar to how Maven allows: mvn com.elharo.docfix:docfix-maven-plugin:fix
+ * 
+ * Usage:
+ *   gradle docfix --init-script init-docfix.gradle
+ * 
+ * With dry-run:
+ *   gradle docfix --init-script init-docfix.gradle -Pdocfix.dryrun=true
+ */
+
+initscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.elharo.docfix:docfix-gradle-plugin:1.0.6-SNAPSHOT'
+    }
+}
+
+allprojects {
+    apply plugin: com.elharo.docfix.gradle.DocFixPlugin
+    
+    // Configure the docfix task based on project properties
+    tasks.configureEach {
+        if (name == 'docfix') {
+            if (project.hasProperty('docfix.dryrun')) {
+                dryrun = Boolean.parseBoolean(project.property('docfix.dryrun').toString())
+            }
+            if (project.hasProperty('docfix.encoding')) {
+                encoding = project.property('docfix.encoding').toString()
+            }
+        }
+    }
+}
