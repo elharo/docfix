@@ -24,3 +24,6 @@ jobs:
 
     - name: Run tests
       run: mvn test
+
+    - name: Verify reproducible build
+      run: bash verify-reproducible-build.sh
