@@ -129,6 +129,9 @@ Before releasing, ensure the project is ready:
 ```bash
 # Verify everything compiles and plugins work
 mvn clean package
+
+# Verify the build is reproducible
+bash verify-reproducible-build.sh
 ```
 
 ### 5. Tag the Release
