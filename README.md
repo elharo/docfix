@@ -68,6 +68,28 @@ java -jar core/target/docfix-1.0.6-SNAPSHOT-cli.jar [--dryrun] <file-or-director
 
 This enables you to process any particular file or directory regardless of location or build system. 
 
+### Native Executable with GraalVM (Experimental)
+
+DocFix can also be compiled to a native CLI executable with [GraalVM Native Image](https://www.graalvm.org/native-image/).
+
+```bash
+# 1) Build the shaded CLI jar
+mvn clean package
+
+# 2) Build a native executable from the CLI jar
+native-image \
+  -jar core/target/docfix-*-cli.jar \
+  -o core/target/docfix
+
+# 3) Run the native executable
+./core/target/docfix --dryrun src/main/java
+```
+
+Notes:
+- Use a GraalVM JDK distribution that includes the `native-image` tool.
+- The executable name and jar version may vary by release.
+- No additional runtime dependencies are required.
+
 ### Options
 
 - `--dryrun`: Preview changes without modifying files. Shows what would be changed.
