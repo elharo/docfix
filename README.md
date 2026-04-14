@@ -91,13 +91,6 @@ After installation, run it as:
 docfix --dryrun src/main/java
 ```
 
-Notes:
-
-- You can distribute DocFix as the CLI JAR (for example via GitHub Releases or Maven Central). Users can then install a `docfix` launcher locally with JBang using either the local JAR path or the Maven coordinate shown above.
-- This also works for non-Maven projects (no `pom.xml`) because the installed `docfix` command runs directly on files/directories you pass it.
-- JBang is optional. You can also distribute the CLI JAR directly and run it with `java -jar ...`, or provide small wrapper scripts (`docfix`/`docfix.bat`) that call the JAR.
-- `jbang app install` gives users a launcher command, not a single native binary. If you want a standalone native executable, build native binaries separately (for example with GraalVM Native Image) and publish one per target OS/architecture.
-
 ### Options
 
 - `--dryrun`: Preview changes without modifying files. Shows what would be changed.
