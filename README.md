@@ -68,6 +68,29 @@ java -jar core/target/docfix-1.0.6-SNAPSHOT-cli.jar [--dryrun] <file-or-director
 
 This enables you to process any particular file or directory regardless of location or build system. 
 
+### JBang executable
+
+If you have [JBang](https://www.jbang.dev/) installed, you can create an OS-native launcher script for DocFix.
+
+From a local checkout:
+
+```bash
+mvn clean package
+jbang app install --name docfix --force ./core/target/docfix-*-cli.jar
+```
+
+For a released version from Maven Central:
+
+```bash
+jbang app install --name docfix --force com.elharo.docfix:docfix:<released-version>
+```
+
+After installation, run it as:
+
+```bash
+docfix --dryrun src/main/java
+```
+
 ### Options
 
 - `--dryrun`: Preview changes without modifying files. Shows what would be changed.
