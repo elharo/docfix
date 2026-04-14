@@ -89,6 +89,9 @@ Notes:
 - Use a GraalVM JDK distribution that includes the `native-image` tool.
 - The executable name and jar version may vary by release.
 - No additional runtime dependencies are required.
+- The generated native image can be distributed as a standalone executable.
+- Native images are platform-specific (OS + CPU architecture), so build one binary per target platform (for example Linux x64, macOS arm64, Windows x64).
+- Cross-compiling is generally not the default workflow; in practice, build on each target platform (or in matching CI runners/containers) to produce release binaries.
 
 ### Options
 
