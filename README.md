@@ -79,10 +79,10 @@ mvn clean package
 jbang app install --name docfix --force ./core/target/docfix-*-cli.jar
 ```
 
-For a released version from Maven Central:
+For a released version from Maven Central (replace `1.0.6` with the version you want):
 
 ```bash
-jbang app install --name docfix --force com.elharo.docfix:docfix:<released-version>
+jbang app install --name docfix --force com.elharo.docfix:docfix:1.0.6
 ```
 
 After installation, run it as:
