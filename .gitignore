@@ -5,6 +5,12 @@ target/
 # VS Code settings
 .vscode/settings.json
 
+# Gradle
+.gradle/
+build/
+gradle-plugin/.gradle/
+gradle-plugin/build/
+
 # Maven versions plugin backup files
 *.versionsBackup
 
